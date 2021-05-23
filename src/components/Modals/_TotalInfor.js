@@ -1,0 +1,131 @@
+import React from "react";
+import {
+  View,
+  Text,
+  TouchableWithoutFeedback,
+  FlatList,
+  Image,
+  Dimensions, Alert,
+  Platform,
+} from "react-native";
+import { WebView } from 'react-native-webview';
+import colors from "../../config/colors";
+import Constants from "expo-constants";
+import { ITEM_FONT_SIZE, BUTTON_FONT_SIZE } from "../../config/constants";
+import { sendNotification } from '../../services/emenu';
+import Question from '../../components/Question';
+
+const SCREEN_WIDTH = Dimensions.get("window").width;
+const SCREEN_HEIGHT = Dimensions.get("window").height - Constants.statusBarHeight;
+
+export class _TotalInfor extends React.Component {
+  state = { showAbout: false };
+  componentDidMount() {
+    this.state = {
+      showAbout: false,
+      lastBookingTime: (new Date()).getTime()
+    };
+  }
+  renderAbout = () => {
+    const { manifest } = Constants;
+    const { endpoint, settings, BookingsStyle, t } = this.props;
+    let FontSize = ITEM_FONT_SIZE * 0.9;
+    return (
+      <TouchableWithoutFeedback
+        onPress={() => { return; }}
+      >
+        <View
+          style={{
+            position: "absolute",
+            left: SCREEN_WIDTH / 4,
+            top: SCREEN_HEIGHT * 0.2,
+            width: SCREEN_WIDTH / 2,
+            height: BUTTON_FONT_SIZE * 2.5 + ITEM_FONT_SIZE * 7.5,
+            borderColor: colors.grey3,
+            borderTopLeftRadius: 4,
+            borderTopRightRadius: 4,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "white"
+          }}>
+          <View style={{
+            flexDirection: "row", justifyContent: "center", alignItems: "center",
+            borderTopLeftRadius: 4, borderTopRightRadius: 4, backgroundColor: "#008bc5",
+            width: '100%', height: BUTTON_FONT_SIZE * 2.5
+          }}>
+            <Text style={{ height: ITEM_FONT_SIZE * 2, fontSize: ITEM_FONT_SIZE * 1.6, color: colors.white, textAlign: "center" }}>
+              {t._("Tạm tính").toUpperCase()}
+            </Text>
+          </View>
+          <View style={{
+            flexDirection: 'column', height: ITEM_FONT_SIZE * 6.5, width: '100%',
+            justifyContent: 'center', paddingHorizontal: ITEM_FONT_SIZE
+          }}>
+            <Text style={{
+              flexWrap: 'wrap', height: 'auto', marginTop: ITEM_FONT_SIZE * 0.5,
+              maxHeight: ITEM_FONT_SIZE * 3, fontSize: ITEM_FONT_SIZE, textAlign: "left"
+            }}>{t._("Vui lòng liên hệ thu ngân để biết chính xác số tiền phải thanh toán.")}</Text>
+          </View>
+          <View style={{ height: ITEM_FONT_SIZE, justifyContent: 'center', width: '100%', textAlign: 'center' }}>
+            <Text style={{ color: colors.grey5, fontSize: ITEM_FONT_SIZE * 0.6, textAlign: 'center' }}>{t._("@Copyright 2019 Hop Nhat Software All Rights Reserved")}</Text>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  };
+  sendNotice = (type) => {
+    const { table, setState, sendNotice, t } = this.props;
+    this.setState({ isWorking: true });
+    let now = (new Date()).getTime();
+    if ((now - this.state.lastBookingTime) / 1000 < 60) {
+      this.setState({ lastBookingTime: now }, () => {
+        Question.alert(t._('notice'), t._('Cảm ơn bạn đã gọi, chúng tôi sẽ liên hệ bạn trong thời gian sớm nhất!'), [
+          {
+            text: 'OK',
+            onPress: () => sendNotice(type)
+          }
+        ])
+      });
+      return;
+    }
+    let title = 'Bạn nhận được lời yêu cầu ' + (type == 1 ? 'thanh toán ' : 'hỗ trợ') + 'từ bàn ' + table.TbNo;
+    sendNotification(type, title, title, table).then((res) => {
+      if (res.Status == 1) {
+        Question.alert(t._('notice'), t._('Cảm ơn bạn đã gọi, chúng tôi sẽ liên hệ bạn trong thời gian sớm nhất!'), [
+          {
+            text: 'OK',
+            onPress: () => sendNotice(type)
+          }
+        ])
+      }
+
+    }).catch((error) => {
+      console.log('error', error);
+    });
+  }
+  render() {
+    const {
+      setState
+    } = this.props;
+    let that = this;
+    return (
+      <TouchableWithoutFeedback
+        onPress={() => {
+          setState({ ShowTotalInfo: false });
+        }}
+      >
+        <View
+          style={{
+            position: "absolute",
+            right: 0,
+            top: 0,
+            width: SCREEN_WIDTH,
+            height: '100%',
+            backgroundColor: "rgba(0, 0, 0, 0.4)"
+          }}>
+          {this.renderAbout()}
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  }
+}
