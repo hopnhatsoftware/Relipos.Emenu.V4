@@ -1804,9 +1804,9 @@ export default class Bookingscreen extends Component {
 
         <View style={styles.Container}>
           <View style={[styles.mainContainer1, { backgroundColor: "#333D4C", }]}>
-            <View style={{ justifyContent: 'center', alignItems: 'center', height: ITEM_FONT_SIZE * 4, }}>
+            <View style={{ justifyContent: 'center', alignItems: 'center', height: SCREEN_WIDTH * 0.18, }}>
               <Image resizeMode="stretch" source={require('../../assets/icons/relipos_logo_1024_bg_white1.png')}
-                style={{ width: ITEM_FONT_SIZE * 3, height: ITEM_FONT_SIZE * 3, }} />
+                style={{ width: "100%", height: "100%", }} />
             </View>
             <_PrdGroup
               state={this.state}
