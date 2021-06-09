@@ -10,7 +10,6 @@ export class Button extends React.Component {
         const { title, titleStyle, containerStyle, disabled, onPress, icon } = this.props;
         let iconSize = this.props.iconSize;
         iconSize = iconSize ? iconSize : ITEM_FONT_SIZE;
-        console.log('icon', icon);
 
         if (disabled) {
             return (<View style={[{ padding: 10, backgroundColor: colors.white, justifyContent:'center', alignItems:'center', borderRadius: 5, flexDirection: 'row' }, containerStyle]}>

@@ -1,7 +1,7 @@
 export { GetPosList,loadPosConfig} from './meta';
 export {login} from './users';
 export {ListArea,ListTables, getOrderId, 
-    GetPrdGroups , GetPrdChildGroups, GetProductByGroupParent,
+    GetViewGroup , GetPrdChildGroups, GetProductByGroupParent,
     UploadFile,
     getTicketInfor, sendOrder
     ,LoadChoiceByProduct,SetMenu_gettemDefault,getAllItembyChoiceId,

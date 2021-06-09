@@ -56,7 +56,6 @@ export const login = async (endpoint, userName, passWord) => {
     DeviceId: Constants.deviceId ? Constants.deviceId : 'simulator',
     PosId: settings.PosId && settings.PosId > 0 ? settings.PosId : 1
   }
-
   const URL = endpoint + '/Emenu/Login?' + serialize({
     username: userName,
     password: passWord,
@@ -71,8 +70,6 @@ export const login = async (endpoint, userName, passWord) => {
     Device,
     ModId: 5,
   };
-
-  console.log(URL, JSON.stringify(data));
   return fetch(URL, {
     method: 'POST',
     headers: {

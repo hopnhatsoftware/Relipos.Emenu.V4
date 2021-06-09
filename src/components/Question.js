@@ -8,7 +8,6 @@ import { ModalManager } from 'react-native-root-modal';
 export default class Question extends React.Component {
   static modal = null;
   static alert(title, message, buttons = []) {
-    // console.log(global.theme);
     if (Question.modal) {
       Question.modal.destroy();
     }

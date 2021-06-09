@@ -1,48 +1,48 @@
 import React from 'react';
 
-import Requestscreen from './src/screens/Requestscreen';
-import BookingSetscreen from './src/screens/BookingSetscreen';
-import Bookingscreen from './src/screens/Bookingscreen';
-import Areascreen from './src/screens/Areascreen';
-import Loginscreen from './src/screens/Loginscreen';
-import Logoutscreen from './src/screens/Logoutscreen';
-import Settingscreen from './src/screens/Settingscreen';
-import ScannerScreen from './src/screens/ScannerScreen';
+import RequestView from './src/screens/RequestView';
+import SetMenuView from './src/screens/SetMenuView';
+import OrderView from './src/screens/OrderView';
+import TableView from './src/screens/TableView';
+import LoginView from './src/screens/LoginView';
+import LogoutView from './src/screens/LogoutView';
+import SettingView from './src/screens/SettingView';
+import ScannerView from './src/screens/ScannerView';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 
 const MainRoot = createAppContainer(createSwitchNavigator(
   {
     Login: {
-      path: '/Loginscreen',
-      screen: Loginscreen,
+      path: '/LoginView',
+      screen: LoginView,
      },
      Logout: {
-       path: '/Logoutscreen',
-       screen: Logoutscreen,
+       path: '/LogoutView',
+       screen: LogoutView,
       },
      Areas: {
-      path: '/Areascreen',
-      screen: Areascreen,
+      path: '/TableView',
+      screen: TableView,
      },
-     Booking: {
-      path: '/Bookingscreen',
-      screen: Bookingscreen,
+     OrderView: {
+      path: '/OrderView',
+      screen: OrderView,
      },
-     BookingSet: {
-      path: '/BookingSetscreen',
-      screen: BookingSetscreen,
+     SetMenuView: {
+      path: '/SetMenuView',
+      screen: SetMenuView,
      },
-     Request: {
-      path: '/Requestscreen',
-      screen: Requestscreen,
+     RequestView: {
+      path: '/RequestView',
+      screen: RequestView,
      },
      Settings: {
-      path: '/Settingscreen',
-      screen: Settingscreen,
+      path: '/SettingView',
+      screen: SettingView,
      },
      Scanner: {
-      path: '/ScannerScreen',
-      screen: ScannerScreen,
+      path: '/ScannerView',
+      screen: ScannerView,
      },
   },
   {

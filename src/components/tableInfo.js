@@ -5,43 +5,43 @@ import {ScrollView, View, Text, StyleSheet, TouchableOpacity} from 'react-native
 import {BACKGROUND_COLOR,THIRD_COLOR, SCREEN_WIDTH, SCREEN_HEIGHT,MARGIN_TOP, HEADER_HEIGHT,TABLE_HEADER_COLOR} from '../config/constants';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import {formatTime,numberWithCommas} from '../services/util';
-import t from '../services/translate';
+import translate from '../services/translate';
 import GridStyles from '../styles/grid';
 export default TableInfo = ({
-  data, onPress, selectedId, t, onClose, ticketInfo,
+  data, onPress, selectedId, translate, onClose, ticketInfo,
   leftComponent,rightComponent,...props}) => (
   <View style={[GridStyles.container,{height:SCREEN_HEIGHT-MARGIN_TOP-HEADER_HEIGHT}]}>
     <View style={styles.topPanel}>
       <View style={styles.rowItem}>
-        <Text style={styles.itemLabel}>{t._('ticket_no')}:</Text>
+        <Text style={styles.itemLabel}>{translate.Get('ticket_no')}:</Text>
         <Text style={styles.itemValue}>{ticketInfo.TkNo}</Text>
       </View>
       <View style={styles.rowItem}>
-        <Text style={styles.itemLabel}>{t._('no_of_customer')}:</Text>
+        <Text style={styles.itemLabel}>{translate.Get('no_of_customer')}:</Text>
         <Text style={styles.itemValue}>{ticketInfo.TkCustomerQuantity}</Text>
       </View>
       <View style={styles.rowItem}>
-        <Text style={styles.itemLabel}>{t._('creater')}:</Text>
+        <Text style={styles.itemLabel}>{translate.Get('creater')}:</Text>
         <Text style={styles.itemValue}>{ticketInfo.ObjCreateName}</Text>
       </View>
       <View style={styles.rowItem}>
-        <Text style={styles.itemLabel}>{t._('total_amount')}:</Text>
+        <Text style={styles.itemLabel}>{translate.Get('total_amount')}:</Text>
         <Text style={styles.itemValue}>{ticketInfo.TkTotalAmount}</Text>
       </View>
     </View>
   <LinearGradient
     colors={TABLE_HEADER_COLOR} style={GridStyles.tableTitle}>
     <View style={[styles.id, GridStyles.border]}>
-      <Text style={[styles.id, GridStyles.headerText]} numberOfLines={1}>{t._('no')}</Text>
+      <Text style={[styles.id, GridStyles.headerText]} numberOfLines={1}>{translate.Get('no')}</Text>
       </View>
     <View style={[styles.title, GridStyles.border]}>
-      <Text style={[GridStyles.headerText]} numberOfLines={1}>{t._('item_name')}</Text>
+      <Text style={[GridStyles.headerText]} numberOfLines={1}>{translate.Get('item_name')}</Text>
       </View>
     <View style={[styles.time, GridStyles.border]}>
-      <Text style={[GridStyles.headerText]} numberOfLines={1}>{t._('order_time')}</Text>
+      <Text style={[GridStyles.headerText]} numberOfLines={1}>{translate.Get('order_time')}</Text>
       </View>
     <View style={[styles.amount, GridStyles.border]}>
-      <Text style={[GridStyles.headerText]} numberOfLines={1}>{t._('total_amount')}</Text>
+      <Text style={[GridStyles.headerText]} numberOfLines={1}>{translate.Get('total_amount')}</Text>
       </View>
     </LinearGradient>
     <ScrollView style={[GridStyles.container]}>

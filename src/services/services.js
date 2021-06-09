@@ -58,18 +58,15 @@ export const fetchFile = async (Path, Data) => {
 
     //xhr.setRequestHeader("Authorization", auth_key); 
     xhr.send(formdata);
-    console.log('POST formdata', URL, auth_key, formdata);
     // 7. track upload progress
     if (xhr.upload) {
       // track the upload progress
       xhr.upload.onprogress = ({ total, loaded }) => {
         const uploadProgress = (loaded / total);
-        console.log(uploadProgress);
       };
     }
     // 4. catch for request error
   }).then((res) => {
-    console.log(res);
     return JSON.parse(res.currentTarget._response);
   });
 }
@@ -83,13 +80,9 @@ export const execFetch = async (Path, Method, Data) => {
   let JwtToken = await _retrieveData('APP@JWT', JSON.stringify({}));
   JwtToken = JSON.parse(JwtToken);
   let URL = endpoint + '/' + Path;
-  console.log('user', user);
 
   if (Method == 'GET') {
     URL = URL + '?' + serialize(Data);
-    console.log('URL', URL, Base64.btoa(user.UserName + ':' + user.PassWord + ':' + user.BranchId), user);
-    console.log('execFetch: ', JwtToken, Method, URL, ': JwtToken ' + JwtToken)
-    console.log('JwtToken ' + JwtToken)
     return fetch(URL, {
       method: Method,
       headers: {
@@ -113,14 +106,13 @@ export const execFetch = async (Path, Method, Data) => {
     }).catch(async (error) => {
       Alert.alert(
         "Error",
-        URL + " " + "Request Timeout",
+        URL + " " + error,
       )
     });
   }
-  console.log('URL - Data', URL, Data);
 
   return fetch(URL, {
-    method: Method,
+    method: Method, 
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
@@ -131,7 +123,6 @@ export const execFetch = async (Path, Method, Data) => {
     return res.json();
   }).then((data) => {
     if (data.Status == 2 || data.Status == 3) {  //   if (data.Status != 1) {
-
       if (data.Status == 3) {
         data.Exception_Message = URL + " - " + data.Exception_Message;
       }
@@ -144,7 +135,7 @@ export const execFetch = async (Path, Method, Data) => {
   }).catch(async (error) => {
     Alert.alert(
       "Error",
-      URL + " " + "Request Timeout",
+      URL + " " + error,
     )
   });
 }
@@ -175,12 +166,10 @@ export const execFetchNoMessenger = async (Path, Method, Data) => {
     }).catch(async (error) => {
       Alert.alert(
         "Error",
-        URL + " " + "Request Timeout",
+        URL + " " + error,
       )
     });
   }
-  console.log('URL - Data', URL, Data);
-
   return fetch(URL, {
     method: Method,
     headers: {
@@ -196,7 +185,7 @@ export const execFetchNoMessenger = async (Path, Method, Data) => {
   }).catch(async (error) => {
     Alert.alert(
       "Error",
-      URL + " " + "Request Timeout",
+      URL + " " + error,
     )
   });
 }

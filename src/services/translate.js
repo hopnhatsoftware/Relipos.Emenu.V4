@@ -20,7 +20,7 @@ export default class t{
         }
         return this;
     }
-    _= (key,args)=>{
+    Get= (key,args)=>{
         let value = key in i18n[this.lang]? i18n[this.lang][key] :key;
         let i = 0;
 
@@ -30,8 +30,6 @@ export default class t{
         if (__DEV__) {
             if(!(key in this.dictionary) && key===value){
                 this.dictionary[key.toString()] = value;
-                console.log(key, value, this.dictionary);
-                
                 _storeData('dictionary',JSON.stringify(this.dictionary));
             }
         }

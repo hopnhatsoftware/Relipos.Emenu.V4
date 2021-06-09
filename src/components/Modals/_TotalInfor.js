@@ -54,7 +54,7 @@ export class _TotalInfor extends React.Component {
             width: '100%', height: BUTTON_FONT_SIZE * 2.5
           }}>
             <Text style={{ height: ITEM_FONT_SIZE * 2, fontSize: ITEM_FONT_SIZE * 1.6, color: colors.white, textAlign: "center" }}>
-              {t._("Tạm tính").toUpperCase()}
+              {translate.Get("Tạm tính").toUpperCase()}
             </Text>
           </View>
           <View style={{
@@ -64,10 +64,10 @@ export class _TotalInfor extends React.Component {
             <Text style={{
               flexWrap: 'wrap', height: 'auto', marginTop: ITEM_FONT_SIZE * 0.5,
               maxHeight: ITEM_FONT_SIZE * 3, fontSize: ITEM_FONT_SIZE, textAlign: "left"
-            }}>{t._("Vui lòng liên hệ thu ngân để biết chính xác số tiền phải thanh toán.")}</Text>
+            }}>{translate.Get("Vui lòng liên hệ thu ngân để biết chính xác số tiền phải thanh toán.")}</Text>
           </View>
           <View style={{ height: ITEM_FONT_SIZE, justifyContent: 'center', width: '100%', textAlign: 'center' }}>
-            <Text style={{ color: colors.grey5, fontSize: ITEM_FONT_SIZE * 0.6, textAlign: 'center' }}>{t._("@Copyright 2019 Hop Nhat Software All Rights Reserved")}</Text>
+            <Text style={{ color: colors.grey5, fontSize: ITEM_FONT_SIZE * 0.6, textAlign: 'center' }}>{translate.Get("@Copyright 2019 Hop Nhat Software All Rights Reserved")}</Text>
           </View>
         </View>
       </TouchableWithoutFeedback>
@@ -79,7 +79,7 @@ export class _TotalInfor extends React.Component {
     let now = (new Date()).getTime();
     if ((now - this.state.lastBookingTime) / 1000 < 60) {
       this.setState({ lastBookingTime: now }, () => {
-        Question.alert(t._('notice'), t._('Cảm ơn bạn đã gọi, chúng tôi sẽ liên hệ bạn trong thời gian sớm nhất!'), [
+        Question.alert(translate.Get('notice'), translate.Get('Cảm ơn bạn đã gọi, chúng tôi sẽ liên hệ bạn trong thời gian sớm nhất!'), [
           {
             text: 'OK',
             onPress: () => sendNotice(type)
@@ -91,7 +91,7 @@ export class _TotalInfor extends React.Component {
     let title = 'Bạn nhận được lời yêu cầu ' + (type == 1 ? 'thanh toán ' : 'hỗ trợ') + 'từ bàn ' + table.TbNo;
     sendNotification(type, title, title, table).then((res) => {
       if (res.Status == 1) {
-        Question.alert(t._('notice'), t._('Cảm ơn bạn đã gọi, chúng tôi sẽ liên hệ bạn trong thời gian sớm nhất!'), [
+        Question.alert(translate.Get('notice'), translate.Get('Cảm ơn bạn đã gọi, chúng tôi sẽ liên hệ bạn trong thời gian sớm nhất!'), [
           {
             text: 'OK',
             onPress: () => sendNotice(type)
@@ -100,7 +100,7 @@ export class _TotalInfor extends React.Component {
       }
 
     }).catch((error) => {
-      console.log('error', error);
+      console.log('sendNotice error:', error);
     });
   }
   render() {

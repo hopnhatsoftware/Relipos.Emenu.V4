@@ -20,7 +20,7 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 export class ComboBox extends React.Component {
   render() {
-    let { data, t, keyId, value, name, onCancel, onSelect, selectedId } = this.props;
+    let { data, translate, keyId, value, name, onCancel, onSelect, selectedId } = this.props;
     return (
       <View style={{ backgroundColor: "rgba(98,98,98,0.6)", position: "absolute", top: 0, left: 0, width: SCREEN_WIDTH, justifyContent: 'center', alignItems: 'center', height: SCREEN_HEIGHT + Constants.statusBarHeight }}>
         <View style={[{ borderColor: colors.grey3, borderTopLeftRadius: 4, borderTopRightRadius: 4, backgroundColor: colors.white, width: SCREEN_WIDTH / 1.1 },

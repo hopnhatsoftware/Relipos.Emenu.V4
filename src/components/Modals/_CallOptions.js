@@ -28,19 +28,11 @@ export class _CallOptions extends React.Component {
     };
   }
   render() {
-    const {
-      changeLanguage,
-      t,
-      tableStatus,
-      call,
-      BookingsStyle,
-      setState
-    } = this.props;
+    const { translate,  call, BookingsStyle, setState } = this.props;
     let that = this;
     return (
       <TouchableOpacity
         onPress={() => {
-          console.log('hide filter bell');
           if (this.state.showAbout) {
             this.setState({ showAbout: false });
           }
@@ -75,7 +67,7 @@ export class _CallOptions extends React.Component {
               call != 1 ?
                 <TouchableOpacity style={{ width: '100%', paddingLeft: 10, paddingRight: 5, paddingTop: 2, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}
                   onPress={() => { setState({ showCall: false, call: 2, }); }}>
-                  <Image resizeMode="stretch" source={require('../../../assets/icons/iconNew/IconGoiNhanVien2-10.png')}
+                  <Image resizeMode="stretch" source={require('../../../assets/icons/IconCall.png')}
                   style={[
                     BookingsStyle.header_logo,
                     {
@@ -85,12 +77,12 @@ export class _CallOptions extends React.Component {
                       alignItems: "center"
                     }
                   ]}/>
-                  <Text style={[{ color: "#FF7E27", textAlign: 'center', fontSize: ITEM_FONT_SIZE * 0.6 }]}> {t._("Đang gọi nhân viên")} </Text>
+                  <Text style={[{ color: "#FF7E27", textAlign: 'center', fontSize: ITEM_FONT_SIZE * 0.6 }]}> {translate.Get("Đang gọi nhân viên")} </Text>
                 </TouchableOpacity>
                 :
                 <TouchableOpacity style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}
                   onPress={() => { setState({ showCall: false, call: 1, }); }}>
-                  <Image resizeMode="stretch" source={require('../../../assets/icons/iconNew/IconGoiNhanVien1-10.png')}
+                  <Image resizeMode="stretch" source={require('../../../assets/icons/iconCall_While.png')}
                     style={[
                     BookingsStyle.header_logo,
                     {
@@ -100,7 +92,7 @@ export class _CallOptions extends React.Component {
                       alignItems: "center"
                     }
                   ]} />
-                  <Text style={[{ color: "#FF7E27", textAlign: 'center', fontSize: ITEM_FONT_SIZE * 0.6 }]}> {t._("Đang gọi nhân viên")} </Text>
+                  <Text style={[{ color: "#FF7E27", textAlign: 'center', fontSize: ITEM_FONT_SIZE * 0.6 }]}> {translate.Get("Đang gọi nhân viên")} </Text>
                 </TouchableOpacity>
             }
           </View>

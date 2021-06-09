@@ -36,7 +36,7 @@ export const getOrderId = async (item, OrdPlatform) => { ///////////////////////
   return await execFetch(URL, 'GET', { TicketId: item.TicketID, Culture: culture, OrdPlatform: OrdPlatform });
 }
 
-export const GetPrdGroups = async (settings, item) => {
+export const GetViewGroup = async (settings, item) => {
   const culture = await _retrieveData('culture', 1);
   const URL = '/Emenu/GetViewGroup';
   return await execFetch(URL, 'GET', {
@@ -60,7 +60,7 @@ export const GetProductByGroupParent = async (settings, item, group, KeySearch) 
   const culture = await _retrieveData('culture', 1);
   const URL = '/Emenu/getProductByGroupParent';
   return await execFetch(URL, 'GET', {
-    TicketID: item.TicketID, PrdId: 0, KeySearch: KeySearch, PrgId: group.PrgId, AreaId: item.AreaID,
+    TicketID: item.TicketID, PrdId: -1, KeySearch: KeySearch, PrgId: group.PrgId, AreaId: item.AreaID,
     BustId: settings.I_BusinessType ? settings.I_BusinessType : 1, BranchId: settings.I_BranchId, PosId: settings.PosId ? settings.PosId : 1, Culture: culture
   });
 }
@@ -74,49 +74,52 @@ export const loadOrderInformation = async (settings, item) => {
   });
 }
 
-export const sendOrder = async (settings, item, OrdPlatform, details) => {
+export const sendOrder = async (settings, table, OrdPlatform, details) => {
+ try{
   const culture = await _retrieveData('culture', 1);
-  let TicketDetails = [];
+  let OrderDetails = [];
   details.forEach((product, index) => {
-    if (typeof product.Details != 'undefined' && product.Details) {
-      product.Details.forEach((item, index) => {
-        product.Json = JSON.stringify(item.subItems);
-        if (typeof product.Json == 'undefined') {
-          product.Json = '';
-        }
-      });
-    }
+    if (typeof product.Json == 'undefined') 
+      product.Json = '';
+    if (typeof product.subItems == 'undefined') 
+    product.Json = JSON.stringify(product.subItems);
     product.OrddDescription = '';
     if (typeof product.itemDescription != 'undefined' && product.itemDescription) {
       product.itemDescription.forEach((item, index) => {
         product.OdsdDescription += item.MrqDescription + ' ';
       });
     }
-    TicketDetails.push({
+    OrderDetails.push({
       ...product,
       OrddVatPercent: typeof product.PrdVatPercent != 'undefined' && product.PrdVatPercent ? product.PrdVatPercent : 0 ,
-      OrddQuantity: product.Qty,
+      OrddQuantity: product.OrddQuantity,
       OrddPrice: product.UnitPrice,
       UomId: product.UnitId
     });
+    //console.log("product"+JSON.stringify(product));
+    
   });
-
-  let Data = {
-    OrdId: item.OrderId,
-    TicketID: item.TicketID,
+ // console.log("OrderDetails"+JSON.stringify(OrderDetails))
+  let ParramOrders = {
+    OrdId: table.OrderId,
+    TicketID: table.TicketID,
     PosId: settings.PosId ? settings.PosId : 1,
     BranchId: settings.I_BranchId,
     Culture: culture,
     BustId: 1,
     CurId: settings.I_Currency,
-    OrdPlatform: OrdPlatform,
-    TicketDetails
+    OrdPlatform: OrdPlatform,  
+    OrderDetails:OrderDetails
   }
   const URL = '/Emenu/Post';
-
-  console.warn('Data', Data);
-  console.warn('URL', URL);
-  return await execFetch(URL, 'POST', Data);
+  //console.warn('Data', ParramOrders);
+  //console.warn('URL', URL);
+  return await execFetch(URL, 'POST', ParramOrders);
+}catch(ex)
+{
+  console.log("sendOrder Error"+ex);
+   
+}
 }
 
 export const UploadFile = async (file) => {

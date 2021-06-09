@@ -1,5 +1,6 @@
 import {StyleSheet} from 'react-native';
 export default {
+  Header:'#333D4C',
   backgroundColor:'#FFFFFF',
   primary1: '#FF0000',
   primary2: '#FFFFFF',

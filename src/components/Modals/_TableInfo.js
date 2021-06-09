@@ -21,7 +21,7 @@ import colors from '../../config/colors';
 import { _retrieveData, _storeData } from '../../services/storages';
 import { FormInputText, Button } from '../../components';
 import { Icon } from "react-native-elements";
-import { LOGIN_INPUT_FONT_SIZE, MARGIN_TOP, ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, BACKGROUND_COLOR } from '../../config/constants';
+import { LOGIN_INPUT_FONT_SIZE, ITEM_FONT_SIZE, BACKGROUND_COLOR, H2FontSize ,H3FontSize,H4FontSize} from '../../config/constants';
 import styles from '../../styles/general'
 import Question from '../../components/Question';
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -65,24 +65,25 @@ export class _TableInfo extends React.Component {
   }
 
   render() {
-    const { onClose, onPress, onPressShow, TicketInfor, t, isLoading } = this.props;
+    const { onClose, onPress, onPressShow, TicketInfor, translate, isLoading,backgroundColor,pnHeaderheight } = this.props;
     return (
       <View style={{ backgroundColor: "rgba(98,98,98,0.6)", position: "absolute", width: SCREEN_WIDTH, justifyContent: 'center', alignItems: 'center', height: SCREEN_HEIGHT + Constants.statusBarHeight }}>
-        <View style={[{ backgroundColor: colors.white, borderWidth: 2, position: "absolute", borderRadius: 8, width: SCREEN_WIDTH / 1.8, borderColor: '#FFFFFF', paddingBottom: 5 },]}>
-          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopLeftRadius: 6, borderTopRightRadius: 6, borderColor: BACKGROUND_COLOR, backgroundColor: BACKGROUND_COLOR, height: BUTTON_FONT_SIZE * 2.5 }}>
-            <Text style={{ height: 35, fontSize: ITEM_FONT_SIZE * 1.2, color: colors.white, textAlign: 'center', fontFamily: 'RobotoBold' }}>{t._("Thông tin phiếu")}</Text>
+        <View style={[{ backgroundColor: colors.white, borderWidth: 1, position: "absolute",  width: SCREEN_WIDTH*0.6,height:'60%', borderColor: backgroundColor},]}>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopLeftRadius: 8, borderTopRightRadius: 8, borderColor: backgroundColor,marginTop:-1,marginRight:-1,marginLeft:-1,
+          backgroundColor: backgroundColor, height: pnHeaderheight,paddingTop:10,paddingBottom:10 }}> 
+            <Text style={{ height: 35, fontSize:H2FontSize, color: colors.white, textAlign: 'center', fontFamily: 'RobotoBold' }}>{translate.Get("Thông tin phiếu")}</Text>
           </View>
-          <ScrollView style={{ width: '100%', }}>
+          <ScrollView style={{ width: '100%', }}> 
             <KeyboardAvoidingView behavior='position' style={{ paddingBottom: 70 }}>
-              <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.6)', }}>
-                <View style={{ backgroundColor: 'white', }}>
+             
+                <View style={{ backgroundColor: 'white',borderRadius: 8, }}>
                   <View style={{ flexDirection: 'row', paddingTop: 10, paddingLeft: 10, paddingRight: 10, width: '100%' }}>
                   </View>
                   <View style={{ flexDirection: 'row', paddingTop: 10, paddingLeft: 10, paddingRight: 10, width: '100%' }}>
                     <View style={{ flexDirection: 'row', width: '50%', paddingRight: 5, }}>
                       <View style={[{ width: '100%', paddingTop: 10, }]}>
                         <FormInputText
-                          nameText={t._('Khách nam')}
+                          nameText={translate.Get('Khách nam')}
                           keyboardAppearance='light'
                           autoFocus={false}
                           autoCapitalize='none'
@@ -94,7 +95,7 @@ export class _TableInfo extends React.Component {
                           icon='user'
                           inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
                           textStyle={{ color: '#000000' }}
-                          placeholder={t._('Số lượng khách nam')}
+                          placeholder={translate.Get('Số lượng khách nam')}
                           placeholderTextColor="#bdc6cf"
                           refInput={input => this.textInputMaleQuantity = input}
                           onChangeText={(textInputMaleQuantity) => { TicketInfor.TkMaleQuantity = textInputMaleQuantity; this.setState({ TicketInfor }) }}
@@ -107,7 +108,7 @@ export class _TableInfo extends React.Component {
                     <View style={{ flexDirection: 'row', width: '50%', paddingRight: 5, }}>
                       <View style={[{ width: '100%', paddingTop: 10, }]}>
                         <FormInputText
-                          nameText={t._('Khách nữ')}
+                          nameText={translate.Get('Khách nữ')}
                           keyboardAppearance='light'
                           autoFocus={false}
                           autoCapitalize='none'
@@ -118,7 +119,7 @@ export class _TableInfo extends React.Component {
                           returnKeyType='next'
                           inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
                           textStyle={{ color: '#000000' }}
-                          placeholder={t._('Số lượng khách nữ')}
+                          placeholder={translate.Get('Số lượng khách nữ')}
                           placeholderTextColor="#bdc6cf"
                           refInput={input => this.textInputFemaleQuantity = input}
                           onChangeText={(textInputFemaleQuantity) => { TicketInfor.TkFemaleQuantity = textInputFemaleQuantity; this.setState({ TicketInfor }) }}
@@ -134,7 +135,7 @@ export class _TableInfo extends React.Component {
                     <View style={{ flexDirection: 'row', width: '50%', paddingRight: 5, }}>
                       <View style={[{ width: '100%', paddingTop: 10, }]}>
                         <FormInputText
-                          nameText={t._('Trẻ em')}
+                          nameText={translate.Get('Trẻ em')}
                           keyboardAppearance='light'
                           autoFocus={false}
                           autoCapitalize='none'
@@ -145,7 +146,7 @@ export class _TableInfo extends React.Component {
                           inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor: '#FFFFFF', }}
                           inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
                           textStyle={{ color: '#000000' }}
-                          placeholder={t._('Số lượng trẻ em')}
+                          placeholder={translate.Get('Số lượng trẻ em')}
                           placeholderTextColor="#bdc6cf"
                           refInput={input => this.textInputChildrenQuantity = input}
                           onChangeText={(textInputChildrenQuantity) => { TicketInfor.TkChildrenQuantity = textInputChildrenQuantity; this.setState({ TicketInfor }) }}
@@ -159,7 +160,7 @@ export class _TableInfo extends React.Component {
                       <View style={[{ width: '100%', paddingTop: 10, }]}>
                         <FormInputText
                           value={TicketInfor.TkForeignQuantity ? TicketInfor.TkForeignQuantity.toString() : ''}
-                          nameText={t._('Khách nước ngoài')}
+                          nameText={translate.Get('Khách nước ngoài')}
                           keyboardAppearance='light'
                           autoFocus={false}
                           autoCapitalize='none'
@@ -170,7 +171,7 @@ export class _TableInfo extends React.Component {
                           returnKeyType='next'
                           inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
                           textStyle={{ color: '#000000' }}
-                          placeholder={t._('SL khách nước ngoài')}
+                          placeholder={translate.Get('SL khách nước ngoài')}
                           placeholderTextColor="#bdc6cf"
                           refInput={input => this.textInputForeignQuantity = input}
                           onChangeText={(textInputForeignQuantity) => { TicketInfor.TkForeignQuantity = textInputForeignQuantity; this.setState({ TicketInfor }) }}
@@ -186,7 +187,7 @@ export class _TableInfo extends React.Component {
                       <View style={[{ width: '100%', paddingTop: 10, }]}>
                         <FormInputText
                           value={TicketInfor.TkCustomerQuantity ? TicketInfor.TkCustomerQuantity.toString() : '1'}
-                          nameText={t._('Số lượng khách')}
+                          nameText={translate.Get('Số lượng khách')}
                           keyboardAppearance='light'
                           autoFocus={false}
                           keyboardType="numeric"
@@ -197,7 +198,7 @@ export class _TableInfo extends React.Component {
                           returnKeyType='next'
                           inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
                           textStyle={{ color: '#000000' }}
-                          placeholder={t._('Số lượng khách')}
+                          placeholder={translate.Get('Số lượng khách')}
                           placeholderTextColor="#bdc6cf"
                           refInput={input => this.textInputCustomquantity = input}
                           onChangeText={(textInputCustomquantity) => { TicketInfor.TkCustomerQuantity = textInputCustomquantity; this.setState({ TicketInfor }); }}
@@ -210,7 +211,7 @@ export class _TableInfo extends React.Component {
                       <View style={[{ width: '100%', paddingTop: 10, }]}>
                         <FormInputText
                           value={TicketInfor.CustomerName ? TicketInfor.CustomerName : ''}
-                          nameText={t._('Khách hàng')}
+                          nameText={translate.Get('Khách hàng')}
                           keyboardAppearance='light'
                           autoFocus={false}
                           autoCapitalize='none'
@@ -221,7 +222,7 @@ export class _TableInfo extends React.Component {
                           returnKeyType='next'
                           inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
                           textStyle={{ color: '#000000' }}
-                          placeholder={t._('Dạng khách')}
+                          placeholder={translate.Get('Dạng khách')}
                           placeholderTextColor="#bdc6cf"
                           refInput={input => this.textInputCustomerName = input} />
                         <View style={{ position: 'absolute', right: '4%', top: '40%' }}>
@@ -238,17 +239,17 @@ export class _TableInfo extends React.Component {
                       <View style={[{ width: '100%', paddingTop: 10, }]}>
                         <FormInputText
                           value={TicketInfor.Description ? TicketInfor.Description.toString() : ''}
-                          nameText={t._('Ghi chú')}
+                          nameText={translate.Get('Ghi chú')}
                           keyboardAppearance='light'
                           autoFocus={false}
                           autoCapitalize='none'
                           autoCorrect={false}
                           color='#000'
                           inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor: '#FFFFFF', }}
-                          returnKeyType='next'
-                          inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
+                          returnKeyType='next' 
+                          inputStyle={{ height: H3FontSize * 5, paddingLeft: 10 }}
                           textStyle={{ color: '#000000' }}
-                          placeholder={t._('Diễn giải thông tin khách hàng')}
+                          placeholder={translate.Get('Diễn giải thông tin khách hàng')}
                           placeholderTextColor="#bdc6cf"
                           refInput={input => this.textInputDescription = input}
                           onChangeText={(textInputDescription) => { TicketInfor.Description = textInputDescription; this.setState({ TicketInfor }); }}
@@ -260,32 +261,28 @@ export class _TableInfo extends React.Component {
                     </View>
                   </View>
                 </View>
-              </View>
+            
             </KeyboardAvoidingView>
           </ScrollView>
           <View style={{
-            width: '100%', backgroundColor: BACKGROUND_COLOR, flexDirection: 'row', borderBottomLeftRadius: 6, borderBottomRightRadius: 6,
-            position: 'absolute', bottom: 0, justifyContent: 'space-evenly', alignItems: 'center', height: BUTTON_FONT_SIZE * 2.5,
+            width: '100%', flexDirection: 'row',  position: 'absolute', bottom: 0, justifyContent: 'space-evenly', alignItems: 'center', height: pnHeaderheight,marginBottom:-1
           }}>
-            <View style={{
-              height: BUTTON_FONT_SIZE * 2.5, flexDirection: 'row', justifyContent: 'space-evenly', width: '100%',
-              borderTopRightRadius: 1, borderTopWidth: 1, borderColor: '#DDDDDD'
-            }}>
               <Button
-                containerStyle={{ backgroundColor: colors.red, justifyContent: 'center', alignItems: 'center', width: '50%', }}
-                title={t._('Bỏ qua')}
-                titleStyle={{ color: colors.white, fontSize: ITEM_FONT_SIZE * 0.9, }}
+                containerStyle={{ backgroundColor: colors.red, justifyContent: 'center', alignItems: 'center', 
+                width: '50%',borderBottomLeftRadius: 6,marginLeft:-1 }}
+                title={translate.Get('Bỏ qua')} 
+                titleStyle={{ color: colors.white, fontSize: H3FontSize }}
                 onPress={() => onClose.apply(null, [])}
                 disabled={isLoading} />
-              <View style={{ borderRightWidth: 1, borderRadius: 1, borderColor: '#DDDDDD', }}></View>
+             
               <Button
-                containerStyle={{ backgroundColor: BACKGROUND_COLOR, justifyContent: 'center', alignItems: 'center', width: '50%', }}
-                title={t._('Chấp nhận')}
-                titleStyle={{ color: colors.white, fontSize: ITEM_FONT_SIZE * 0.9, }}
+                containerStyle={{ backgroundColor: BACKGROUND_COLOR, justifyContent: 'center',
+                 alignItems: 'center', width: '50%', borderBottomRightRadius: 6,marginRight:-1 }}
+                title={translate.Get('Chấp nhận')}
+                titleStyle={{ color: colors.white, fontSize: H3FontSize, }}
                 onPress={() => { onPress.apply(null, []); }}
                 disabled={isLoading} />
             </View>
-          </View>
         </View>
       </View>
     );

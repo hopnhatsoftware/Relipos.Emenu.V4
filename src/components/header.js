@@ -1,3 +1,4 @@
+/*Header của Form */
 import React from "react";
 import {
   View, TouchableOpacity, TextInput, StyleSheet, Text,
@@ -20,19 +21,16 @@ export class _Header extends React.Component {
   componentDidMount() {
   }
   render() {
-    const { state, table, language, BookingsStyle, _searchProduct, onPressBack, t, name, titleSet, setState, lockTable } = this.props;
-    let settings = state.settings, endpoint = state.endpoint;
-    console.log('logo', settings.URL_LOGO);
+    const {isShowBack, state, table, language, BookingsStyle, _searchProduct, onPressBack, translate, name, titleSet, setState, lockTable,islockTable,backgroundColor } = this.props;
+    
     return (
-      <View style={[BookingsStyle.header,{  backgroundColor: "#008bc5", width:SCREEN_WIDTH, }]}>
+      <View style={[BookingsStyle.header,{  backgroundColor: backgroundColor, width:SCREEN_WIDTH, }]}>
         <View style={{ paddingTop: 1, width: "20%", flexDirection: 'row', justifyContent: "space-between" }}>
-          <TouchableOpacity
-            onPress={() => { onPressBack.apply(null, []); }}
-            style={{ width: '14%', justifyContent: 'center', alignItems: 'center' }}>
-            <Image
-              resizeMode="contain"
-              source={require('../../assets/icons/v2/icon_Back.png')}
-              style={[
+        {(isShowBack==true)? 
+          <TouchableOpacity  onPress={() => { onPressBack.apply(null, []); }}  style={{ width: '14%', justifyContent: 'center', alignItems: 'center' }}>
+            <Image  resizeMode="contain" 
+             source={require('../../assets/icons/v2/icon_Back.png')} 
+             style={[
                 BookingsStyle.header_logo,
                 {
                   maxWidth: '42%',
@@ -42,12 +40,11 @@ export class _Header extends React.Component {
                 }
               ]}
             />
-          </TouchableOpacity>
-          <Image
-            resizeMode="contain"
-            source={
-              require('../../assets/icons/logo1_ngang.png')
-            }
+          </TouchableOpacity> :null
+         }
+          <Image resizeMode="contain" 
+          source={require('../../assets/LogoSos.jpg')}
+          //source={ require('../../assets/icons/logo1_ngang.png')  }
             style={[
               BookingsStyle.header_logo,
               {
@@ -56,14 +53,15 @@ export class _Header extends React.Component {
                 justifyContent: "center",
                 alignItems: "center"
               }
-            ]}
-          />
+            ]} />
           <View style={{ flexDirection: 'column', width: '60%', justifyContent: "center", alignItems: 'center', }}>
             <View style={{ flexDirection: 'column', width: '100%', justifyContent: "center", alignItems: 'center', }}>
               <Text style={[{ color: "#FFFFFF", textAlign: 'center', fontFamily: "RobotoBold", fontSize: ITEM_FONT_SIZE }]}> {table.TbNo} </Text>
-              <Text style={{ color: "#FFFFFF", textAlign: 'center', fontSize: ITEM_FONT_SIZE * 0.6 }}>{table.Ticket ? table.Ticket.TkNo : "..."}</Text>
+              <Text style={{ color: "#FFFFFF", textAlign: 'center', fontSize: ITEM_FONT_SIZE * 0.6 }}>{table.Ticket ? table.Ticket.TkNo : ""}</Text>
             </View>
           </View>
+          {(islockTable==true)? 
+          <View style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}>
           {!lockTable ?
             <TouchableOpacity style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
               onPress={() => {
@@ -71,18 +69,22 @@ export class _Header extends React.Component {
               }}>
               <Icon name="unlock" iconStyle={{ color: colors.white, paddingLeft: ITEM_FONT_SIZE * 1, }} fontSize={ITEM_FONT_SIZE * 1.4} type="antdesign"></Icon>
             </TouchableOpacity>
-            : <View style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}>
+            : 
+            <View style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}>
               <Icon name="lock" iconStyle={{ color: colors.red, paddingLeft: ITEM_FONT_SIZE * 1, }} fontSize={ITEM_FONT_SIZE * 1.4} type="antdesign"></Icon>
-            </View>}
+            </View>
+              }:null
+              </View> :null
+            }
         </View>
 
         <View style={{ width: "68%", flexDirection: "row", justifyContent: "center", alignItems: 'center', }}>
           <View style={[BookingsStyle.header_search, { flexDirection: "row" }]}>
-            {name == 'Booking' ?
+            {name == 'OrderView' ?
               <TextInput
                 style={[BookingsStyle.item_search, styles.item_Search]}
                 keyboardAppearance="light"
-                placeholder={t._("Nhập tên món...")}
+                placeholder={translate.Get("Nhập tên món...")}
                 fontStyle="italic"
                 autoFocus={false}
                 value={state.keysearch}
@@ -98,7 +100,7 @@ export class _Header extends React.Component {
                 </View>
               </View>
             }
-            {name == 'Booking' ?
+            {name == 'OrderView' ?
               <TouchableOpacity style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
                 onPress={() => { _searchProduct(); }}>
                 <Image resizeMode="stretch" source={require('../../assets/icons/v2/icon_Find.png')}

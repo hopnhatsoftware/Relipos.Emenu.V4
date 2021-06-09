@@ -17,7 +17,7 @@ import { MARGIN_TOP, ENDPOINT_URL } from '../../config/constants';
 import {MyHeader} from '../../components/header';
 import EndpointEditor from './editor';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import t from '../../services/translate';
+import translate from '../../services/translate';
 import styles from '../../styles/general';
 import ListStyles from '../../styles/list';
 import Question from '../../components/Question';
@@ -27,10 +27,10 @@ export default class EndpointsList extends Component {
   constructor(props) {
     super(props);
     this.state ={data:[],selectedId:-1,isAdding:false,showMenu:false,selectedName:''};
-    this.t = new t();
+    this.translate = new translate();
   }
   async componentDidMount() {
-    this.t = await this.t.loadLang();
+    this.translate = await this.translate.loadLang();
     await Font.loadAsync({
       'georgia': require('../../../assets/fonts/Georgia.ttf'),
       'regular': require('../../../assets/fonts/Montserrat-Regular.ttf'),
@@ -44,12 +44,12 @@ export default class EndpointsList extends Component {
   deleteEndpoint = ()=>{
     let data = this.state.data;
     if(this.state.id ==0){
-      alert(this.t._('endpoints.cannot_delete_default'));
+      alert(this.translate.Get('endpoints.cannot_delete_default'));
     }
     else if(this.state.selectedId > -1 && this.state.selectedId in data){
       Question.alert(
-        this.t._('alert'),
-        this.t._('alert.delete'),
+        this.translate.Get('alert'),
+        this.translate.Get('alert.delete'),
         [
           {
             text: 'Cancel', onPress: () => { }
@@ -74,7 +74,7 @@ export default class EndpointsList extends Component {
       res = JSON.parse(res);
     }
     else{
-      res = [{id:0, name:this.t._('default'), endpoint: ENDPOINT_URL}];
+      res = [{id:0, name:this.translate.Get('default'), endpoint: ENDPOINT_URL}];
     }
     this.setState({data: res});
   }
@@ -85,7 +85,7 @@ export default class EndpointsList extends Component {
       this.props.onSelected.apply(null,[endpoint]);
     }
     else{
-      alert(this.t._('endpoint.please_select'));
+      alert(this.translate.Get('endpoint.please_select'));
     }
   }
   renderMenu(){
@@ -105,7 +105,7 @@ export default class EndpointsList extends Component {
                     containerStyle={ListStyles.item}
                     titleStyle={ListStyles.item}
                     subtitleStyle={ListStyles.item}
-                    title={this.t._('edit')}
+                    title={this.translate.Get('edit')}
                     onPress={()=>{ this.setState({isAdding:true})}}
                   />:<View/>}
                   {this.state.selectedId>0?
@@ -116,7 +116,7 @@ export default class EndpointsList extends Component {
                       containerStyle={ListStyles.item}
                       titleStyle={ListStyles.item}
                       subtitleStyle={ListStyles.item}
-                      title={this.t._('delete')}
+                      title={this.translate.Get('delete')}
                       onPress={()=>{this.deleteEndpoint()}}
                       />:<View/>}
                     <ListItem
@@ -126,7 +126,7 @@ export default class EndpointsList extends Component {
                         containerStyle={ListStyles.item}
                         titleStyle={ListStyles.item}
                         subtitleStyle={ListStyles.item}
-                        title={this.t._('select')}
+                        title={this.translate.Get('select')}
                         onPress={()=>{this.selectEndpoint()}}
                       />
             </View>:
@@ -138,7 +138,7 @@ export default class EndpointsList extends Component {
                   containerStyle={ListStyles.item}
                   titleStyle={ListStyles.item}
                   subtitleStyle={ListStyles.item}
-                  title={this.t._('add')}
+                  title={this.translate.Get('add')}
                   onPress={()=>{ this.setState({isAdding:true})}}
                 />
             </View>
@@ -164,7 +164,7 @@ export default class EndpointsList extends Component {
           } rightComponent={
             <MaterialCommunityIcons name="menu" color="white" size={20} onPress={()=>this.setState({showMenu:!this.state.showMenu})}></MaterialCommunityIcons>
           }
-          title={ this.state.selectedId ==-1?this.t._('endpoint.list'): this.t._('selected',[this.state.selectedName])}
+          title={ this.state.selectedId ==-1?this.translate.Get('endpoint.list'): this.translate.Get('selected',[this.state.selectedName])}
           />
           <FlatList data={data}
           renderItem={({ item, index }) => (

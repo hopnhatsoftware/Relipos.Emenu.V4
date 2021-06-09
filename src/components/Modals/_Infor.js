@@ -51,7 +51,7 @@ export class _Infor extends React.Component {
         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", borderTopLeftRadius: 4, borderTopRightRadius: 4, backgroundColor: "#008bc5", 
         width:'100%', height: BUTTON_FONT_SIZE * 2.5 }}>
           <Text style={{ height: ITEM_FONT_SIZE * 2, fontSize: ITEM_FONT_SIZE * 1.6, color: colors.white, textAlign: "center" }}>
-          { t._("Thuế và Phí").toUpperCase()} 
+          { translate.Get("Thuế và Phí").toUpperCase()} 
           </Text>
         </View>
         <View style={{flexDirection:'row', height: SCREEN_HEIGHT /2 - BUTTON_FONT_SIZE * 2.5 - ITEM_FONT_SIZE, width:'100%',justifyContent:'center'}}>
@@ -62,7 +62,7 @@ export class _Infor extends React.Component {
         />
         </View>
         <View style={{height:ITEM_FONT_SIZE, justifyContent:'center', width:'100%', textAlign:'center'}}>
-          <Text style={{color:colors.grey5, fontSize:ITEM_FONT_SIZE*0.6, textAlign:'center'}}>{t._("@Copyright 2019 Hop Nhat Software All Rights Reserved")}</Text>
+          <Text style={{color:colors.grey5, fontSize:ITEM_FONT_SIZE*0.6, textAlign:'center'}}>{translate.Get("@Copyright 2019 Hop Nhat Software All Rights Reserved")}</Text>
         </View>
         </View>
       </TouchableWithoutFeedback>
@@ -75,7 +75,7 @@ export class _Infor extends React.Component {
     let now = (new Date()).getTime();
     if((now - this.state.lastBookingTime)/1000 < 60){
       this.setState({lastBookingTime: now},()=>{
-        Question.alert(t._('notice'),t._('Cảm ơn bạn đã gọi, chúng tôi sẽ liên hệ bạn trong thời gian sớm nhất!'),[
+        Question.alert(translate.Get('notice'),translate.Get('Cảm ơn bạn đã gọi, chúng tôi sẽ liên hệ bạn trong thời gian sớm nhất!'),[
           {
             text:'OK',
             onPress:()=>sendNotice(type)
@@ -87,7 +87,7 @@ export class _Infor extends React.Component {
     let title = 'Bạn nhận được lời yêu cầu '+(type==1?'thanh toán ':'hỗ trợ')+'từ bàn ' + table.TbNo;
     sendNotification(type,title,title,table).then((res)=>{
       if(res.Status == 1){
-        Question.alert(t._('notice'),t._('Cảm ơn bạn đã gọi, chúng tôi sẽ liên hệ bạn trong thời gian sớm nhất!'),[
+        Question.alert(translate.Get('notice'),translate.Get('Cảm ơn bạn đã gọi, chúng tôi sẽ liên hệ bạn trong thời gian sớm nhất!'),[
           {
             text:'OK',
             onPress:()=>sendNotice(type)
@@ -96,7 +96,7 @@ export class _Infor extends React.Component {
       }
       
     }).catch((error)=>{
-      console.log('error',error);
+      console.log('sendNotice error:',error);
     });
   }
   render() {

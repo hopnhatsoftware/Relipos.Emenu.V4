@@ -5,25 +5,24 @@ import {BACKGROUND_COLOR,MAIN_COLOR, SCREEN_WIDTH, SCREEN_HEIGHT,TABLE_HEADER_CO
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import {numberWithCommas} from '../services/util';
 export default UsingGrid = ({
-  data, onPress, selectedId, t,
-  leftComponent,rightComponent,...props}) => (
+  data, onPress, selectedId, translate,leftComponent,rightComponent,...props}) => (
   <View>
   <LinearGradient
     colors={TABLE_HEADER_COLOR} style={styles.tableTitle}>
     <View style={[styles.id, styles.border]}>
-      <Text style={[ styles.headerText]} numberOfLines={1}>{t._('no')}</Text>
+      <Text style={[ styles.headerText]} numberOfLines={1}>{translate.Get('no')}</Text>
       </View>
     <View style={[styles.table, styles.border]}>
-      <Text style={[styles.headerText]} numberOfLines={1}>{t._('table')}</Text>
+      <Text style={[styles.headerText]} numberOfLines={1}>{translate.Get('table')}</Text>
       </View>
     <View style={[styles.number, styles.border]}>
-      <Text style={[styles.headerText]} numberOfLines={1}>{t._('no_of_customer')}</Text>
+      <Text style={[styles.headerText]} numberOfLines={1}>{translate.Get('no_of_customer')}</Text>
       </View>
     <View style={[styles.time, styles.border]}>
-      <Text style={[styles.headerText]} numberOfLines={1}>{t._('time')}</Text>
+      <Text style={[styles.headerText]} numberOfLines={1}>{translate.Get('time')}</Text>
       </View>
     <View style={[styles.amount, styles.border]}>
-      <Text style={[styles.headerText]} numberOfLines={1}>{t._('amount')}</Text>
+      <Text style={[styles.headerText]} numberOfLines={1}>{translate.Get('amount')}</Text>
       </View>
     </LinearGradient>
     <ScrollView style={styles.container}>

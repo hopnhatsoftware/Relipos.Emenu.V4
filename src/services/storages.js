@@ -2,7 +2,7 @@ import { AsyncStorage } from "react-native";
 import {Util} from 'expo';
  export const _storeData = async (key, value, callback) => {
     try {
-      await AsyncStorage.setItem('@LKI:'+ key, value,callback);
+      await AsyncStorage.setItem('@Relipos:'+ key, value,callback);
     } catch (error) {
       // Error saving data
        console.error(error);
@@ -10,7 +10,7 @@ import {Util} from 'expo';
   }
   export const _retrieveData = async (key, def) => {
     try {
-      const value = await AsyncStorage.getItem('@LKI:'+ key);
+      const value = await AsyncStorage.getItem('@Relipos:'+ key);
       if(value != null){
         return value;
       }
@@ -25,16 +25,14 @@ import {Util} from 'expo';
   }
   export const _logout = async(callback) =>{
     try {
-      AsyncStorage.removeItem('@LKI:user',callback);
+      AsyncStorage.removeItem('@Relipos:user',callback);
      } catch (error) {
-       // Error retrieving data
-       console.log(error);
        return null;
      }
   }
   export const _remove = async(key, callback) =>{
     try {
-      AsyncStorage.removeItem('@LKI:'+ key,callback);
+      AsyncStorage.removeItem('@Relipos:'+ key,callback);
      } catch (error) {
        // Error retrieving data
        console.log(error);
@@ -45,8 +43,6 @@ import {Util} from 'expo';
     try {
       const value = await AsyncStorage.clear(_clearData);
      } catch (error) {
-       // Error retrieving data
-       console.log(error);
        return null;
      }
   }

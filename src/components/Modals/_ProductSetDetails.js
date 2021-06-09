@@ -20,7 +20,7 @@ export class ProductSetDetails extends React.Component {
   }
 
   render() {
-    const { item, index, cart, BookingsStyle, setState, t, onChangeQty, endpoint } = this.props;
+    const { item, index, cart, BookingsStyle, setState, translate, onChangeQty, endpoint } = this.props;
     CartIndex = cart.ind;
     CartItem = cart.prd;
     return (
@@ -134,7 +134,7 @@ export class ProductSetDetails extends React.Component {
                       color: "#FFFFFF", fontFamily: "RobotoBold", width: "100%",
                       fontSize: ITEM_FONT_SIZE * 1.2, paddingLeft: ITEM_FONT_SIZE
                     }} numberOfLines={3}>
-                      {t._('Price') + ': ' + formatCurrency(item.UnitPrice > 0 ? item.UnitPrice : 0, "")}
+                      {translate.Get('Price') + ': ' + formatCurrency(item.UnitPrice > 0 ? item.UnitPrice : 0, "")}
                     </Text>
                   </View>
                   {item.PrdIsSetMenu == true ? (
@@ -143,7 +143,7 @@ export class ProductSetDetails extends React.Component {
                         color: "#FFFFFF", paddingTop: SCREEN_HEIGHT * 0.005, paddingRight: 10,
                         fontSize: ITEM_FONT_SIZE * 1.5, textAlign: "center", fontFamily: "RobotoBold"
                       }}>
-                        {CartItem ? CartItem.Qty : '0'}
+                        {CartItem ? CartItem.Quantity : '0'}
                       </Text>
                       {CartItem ?
                         <TouchableOpacity style={{ justifyContent: "center", alignItems: "center" }}
@@ -173,7 +173,7 @@ export class ProductSetDetails extends React.Component {
                   )
                     :
                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                      {CartItem && CartItem.Qty > 0 ?
+                      {CartItem && CartItem.Quantity > 0 ?
                         <TouchableOpacity style={{ padding: 10, justifyContent: "center", alignItems: "center" }}
                           onPress={() => onChangeQty(item, index, 2)}>
                           <Image resizeMode="stretch" source={require('../../../assets/icons/v2/icon_View3.png')}

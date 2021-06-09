@@ -15,7 +15,7 @@ import {_retrieveData, _storeData} from '../../services/storages';
 import {  ENDPOINT_URL } from '../../config/constants';
 import {MyHeader} from '../../components/header';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import t from '../../services/translate';
+import translate from '../../services/translate';
 import styles from '../../styles/general';
 import FormStyles from '../../styles/form';
 import {FormInput} from '../../components/formControls';
@@ -38,7 +38,7 @@ export default class EndpointEditor extends Component {
   }
 
   async componentDidMount() {
-    this.t = await this.t.loadLang();
+    this.translate = await this.translate.loadLang();
     await Font.loadAsync({
       'georgia': require('../../../assets/fonts/Georgia.ttf'),
       'regular': require('../../../assets/fonts/Montserrat-Regular.ttf'),
@@ -51,7 +51,7 @@ export default class EndpointEditor extends Component {
     let res =  await _retrieveData('EndpointsList');
     let language = await _retrieveData('culture',1);
     if(!res || res.length==0){
-      res = [{id:0, name:this.t._('default'), endpoint: ENDPOINT_URL}];
+      res = [{id:0, name:this.translate.Get('default'), endpoint: ENDPOINT_URL}];
     }
     else{
       res = JSON.parse(res);
@@ -81,12 +81,12 @@ export default class EndpointEditor extends Component {
   delete = ()=>{
     let data = this.state.data;
     if(this.state.id ==0){
-      alert(this.t._('endpoints.cannot_delete_default'));
+      alert(this.translate.Get('endpoints.cannot_delete_default'));
     }
     else if(this.state.id > -1 && this.state.id in data){
       Question.alert(
-        this.t._('alert'),
-        this.t._('alert.delete'),
+        this.translate.Get('alert'),
+        this.translate.Get('alert.delete'),
         [
           {
             text: 'Cancel', onPress: () => { }
@@ -128,7 +128,7 @@ export default class EndpointEditor extends Component {
         <MyHeader leftComponent={
           <MaterialCommunityIcons color="white" size={20} name="arrow-left-bold" onPress={()=>this.props.onBack.apply(null,[this.state.data])}></MaterialCommunityIcons>
         }
-         title={this.t._('endpoint.add')}/>
+         title={this.translate.Get('endpoint.add')}/>
         <KeyboardAvoidingView behavior='position'>
           <View style={FormStyles.formContainer}>
           <FormInput
@@ -137,9 +137,9 @@ export default class EndpointEditor extends Component {
             value={name}
             onChangeText={name => this.setState({ name })}
             inputStyle={FormStyles.inputText}
-            placeholder={this.t._('name')}
+            placeholder={this.translate.Get('name')}
             returnKeyType="next"
-            errorMessage={isNameValid ? null : this.t._('login.fail.missing_name')}
+            errorMessage={isNameValid ? null : this.translate.Get('login.fail.missing_name')}
             onSubmitEditing={() => {
               this.validateName()
               this.endpointInput.focus()
@@ -149,18 +149,18 @@ export default class EndpointEditor extends Component {
             refInput={input => (this.endpointInput = input)}
             icon="link" 
             value={endpoint}
-            placeholder={this.t._('endpoint')}
+            placeholder={this.translate.Get('endpoint')}
             returnKeyType="next"
             keyboardType="url"
             inputStyle={FormStyles.inputText}
             onChangeText={endpoint => this.setState({ endpoint })}
-            errorMessage={isEndpointValid ? null : this.t._('login.fail.wrong_endpoint')}
+            errorMessage={isEndpointValid ? null : this.translate.Get('login.fail.wrong_endpoint')}
             onSubmitEditing={this.updateEndpoint}
           />
           <View style={{flexDirection:"row", justifyContent:"space-between"}}>
               <Button
                 icon={{name:"input", color:"white"}}
-                title={this.t._('save')}
+                title={this.translate.Get('save')}
                 onPress = {this.updateEndpoint}
                 buttonStyle={FormStyles.button} 
                 containerStyle={FormStyles.buttonContainer}
@@ -170,7 +170,7 @@ export default class EndpointEditor extends Component {
               />
               <Button
                 icon={{name:"close", color:"white"}}
-                title={this.state.id >=0? this.t._('delete') : this.t._('cancel')}
+                title={this.state.id >=0? this.translate.Get('delete') : this.translate.Get('cancel')}
                 onPress={this.delete}
                 buttonStyle={FormStyles.button}
                 containerStyle={FormStyles.buttonContainer}

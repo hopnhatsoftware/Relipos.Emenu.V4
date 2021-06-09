@@ -10,7 +10,7 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 export default StyleSheet.create({
   header: {
-    height: SCREEN_HEIGHT * 0.085,
+    
     // backgroundColor: "#333D4C",
     width: SCREEN_WIDTH * 0.818,
     flexDirection: "row", //Step 1
