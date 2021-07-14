@@ -20,7 +20,7 @@ const SCREEN_HEIGHT = Dimensions.get('window').height;
 export default class LoginView extends Component {
 
   login_button_text = 'Login';
-
+  has_back_button=false;
   constructor(props) {
     super(props);
     this.state = {
@@ -80,7 +80,7 @@ export default class LoginView extends Component {
         return;
       }
       else {
-        this.props.navigation.navigate("Areas", { settings, user });
+        this.props.navigation.navigate("TableView", { settings, user });
         return;
       }
     }
@@ -120,132 +120,123 @@ export default class LoginView extends Component {
     }
     setCustomText(customTextProps)
   }
-
+BingdingConfig = async (user,Config,JwtToken) => { 
+  let { password, settings } = this.state;
+  user.PassWord = password;
+  user.BranchId = Config.I_BranchId;
+  //console.log('Config.I_ItemGroupLevel:'+JSON.stringify(Config.I_ItemGroupLevel))
+  _storeData('APP@USER', JSON.stringify(user), () => {
+    _storeData('APP@USER_LINKING', JSON.stringify(user), () => {
+      _storeData('APP@CONFIG', JSON.stringify(Config), () => {
+        _storeData('APP@JWT', JSON.stringify(JwtToken), () => {
+          CheckCasherIn(Config).then(res => { 
+            
+            if (res.Status == 1) 
+            {
+              this.setState({ isLoading: false, fontLoaded: true, isWorking: false, }, () => {
+                this.props.navigation.navigate("TableView", { settings, user });
+              });
+            }
+            else {
+             
+              Question.alert('Thông báo !',
+              'Quầy này chưa vào ca vui lòng kiểm tra thu ngân !', [
+              {
+                text: "OK", onPress: () => {
+                  _remove('APP@USER');
+                  _remove('APP@USER_LINKING');
+                }
+              }
+            ]);
+              this.setState({ fontLoaded: true, isWorking: false, isLoading: false, });
+            }
+          }).catch((error) => {
+            Question.alert( this.translate.Get('Notice'),
+              this.translate.Get('Có lỗi trong quá trình xử lý :'+error), [
+              {
+                text: "OK", onPress: () => {}
+              }
+            ]);
+            this.setState({ fontLoaded: true, isWorking: false, isLoading: false, });
+          });
+          
+        });
+      });
+    });
+  });
+}
   login = async () => {  
-    let {  username, password, settings } = this.state;
+    let {  username, password } = this.state;
     let that = this;
-      // Simulate an API call
       const usernameValid = this.ValidaUsername();
       const passwordValid = this.validatePassword();
       if (!usernameValid || !passwordValid)
-      {
         return;
-      }
+     
       let endpoint = await _retrieveData('APP@BACKEND_ENDPOINT', JSON.stringify(ENDPOINT_URL));
       endpoint = JSON.parse(endpoint);
-    this.setState({ isLoading: true, isWorking: true, });
-
+    this.setState({  isWorking: true, });
         login(endpoint, username, password).then((res) => {
-          if (res.Status == 1) {
+        //  console.log('login in form LoginView:'+JSON.stringify(res));
+          if (res.Status != 1)
+          {
+            Question.alert(
+              this.translate.Get('Notice'),
+              res.Exception_Message ? res.Exception_Message : res.LicenseAlert, [
+              {
+                text: this.translate.Get('AlertOK'), onPress: () => {
+                }
+              }
+            ])
+            return;
+          }
+          
             if (res.isAlertLicense == true) {
               Question.alert( this.translate.Get('Notice'),
                 res.LicenseAlert ? res.LicenseAlert : this.translate.Get('Vui lòng xem lại bản quyền!'), [
                 {
                   text: this.translate.Get('AlertOK'), onPress: () => {
                     if (res.Data != undefined && 'UserId' in res.Data && res.Data.UserId > 0) {
-                      let user = res.Data;
-                      let Config = res.Config;
-                      let JwtToken = res.JwtToken;
-                      user.BranchId = Config.I_BranchId;
-                      user.PassWord = password;
-                      _storeData('APP@USER', JSON.stringify(user), () => {
-                        _storeData('APP@USER_LINKING', JSON.stringify(user), () => {
-                          _storeData('APP@CONFIG', JSON.stringify(Config), () => {
-                            _storeData('APP@JWT', JSON.stringify(JwtToken), () => {
-                              CheckCasherIn().then(res => {
-                                if (res.Status == 1) {
-                                  this.setState({ isLoading: false, fontLoaded: true, isWorking: false, }, () => {
-                                    that.props.navigation.navigate("Areas", { settings, user });
-                                  });
-                                }
-                                else {
-                                  this.setState({ fontLoaded: true, isWorking: false, isLoading: false, });
-                                }
-                              }).catch(error => {
-                                this.setState({ fontLoaded: true, isWorking: false, isLoading: false, });
-                              });
-                            });
-                          });
-                        });
-                      });
+                      this.BingdingConfig(res.Data,res.Config,res.JwtToken);
                     }
                     else {
-                      Question.alert(
-                        this.translate.Get('Notice'),
+                      Question.alert( this.translate.Get('Notice'),
                         res.Exception_Message ? res.Exception_Message : this.translate.Get('Mật khẩu hoặc tài khoản không đúng!'), [
                         {
                           text: this.translate.Get('AlertOK'), onPress: () => {
-                            this.setState({ isLoading: false, isWorking: false, fontLoaded: true, })
                           }
                         }
                       ])
                     }
                   }
                 }
-              ])
+              ]);
+             return;
             }
-            else {
               if (res.Data != undefined && 'UserId' in res.Data && res.Data.UserId > 0) {
-                let user = res.Data;
-                let Config = res.Config;
-                let JwtToken = res.JwtToken;
-                user.BranchId = Config.I_BranchId;
-                user.PassWord = password;
-                _storeData('APP@USER', JSON.stringify(user), () => {
-                  _storeData('APP@USER_LINKING', JSON.stringify(user), () => {
-                    _storeData('APP@CONFIG', JSON.stringify(Config), () => {
-                      _storeData('APP@JWT', JSON.stringify(JwtToken), () => {
-                        CheckCasherIn().then(res => {
-                          if (res.Status == 1) {
-                            this.setState({ isLoading: false, fontLoaded: true, isWorking: false, }, () => {
-                              that.props.navigation.navigate("Areas", { settings, user });
-                            });
-                          }
-                          else {
-                            this.setState({ fontLoaded: true, isWorking: false, isLoading: false, });
-                          }
-                        }).catch(error => {
-                          this.setState({ fontLoaded: true, isWorking: false, isLoading: false, });
-                        });
-                      });
-                    });
-                  });
-                });
+                this.BingdingConfig(res.Data,res.Config,res.JwtToken);
               }
               else {
-                Question.alert(
-                  this.translate.Get('Notice'),
+                Question.alert(  this.translate.Get('Notice'),
                   res.Exception_Message ? res.Exception_Message : this.translate.Get('Mật khẩu hoặc tài khoản không đúng!'), [
                   {
                     text: this.translate.Get('AlertOK'), onPress: () => {
-                      this.setState({ isLoading: false, isWorking: false, fontLoaded: true, })
                     }
                   }
                 ])
               }
-            }
-          }
-          else {
-            Question.alert(
-              this.translate.Get('Notice'),
-              res.Exception_Message ? res.Exception_Message : res.LicenseAlert, [
-              {
-                text: this.translate.Get('AlertOK'), onPress: () => {
-                  this.setState({ isLoading: false, isWorking: false, fontLoaded: true, })
-                }
-              }
-            ])
-          }
+            
         }).catch((error) => {
           Question.alert( this.translate.Get('Notice'),
             this.translate.Get('Có lỗi trong quá trình xử lý :'+error), [
             {
               text: "Cancel", onPress: () => {
-                this.setState({ isLoading: false, isWorking: false, })
+               
               }
             }
           ]);
         });
+        this.setState({ isLoading: false, isWorking: false, })
   }
   changeLanguage = async (lang) => {
     if (this.state.language != lang) {
@@ -264,7 +255,7 @@ export default class LoginView extends Component {
     if (username.trim().length > 0)
     isValid=true;
     this.setState({ usernameValid:isValid });
-    console.log('usernameValid:'+isValid)
+   // console.log('usernameValid:'+isValid)
     return isValid;
     // }catch(ex)
     // {
@@ -287,7 +278,7 @@ export default class LoginView extends Component {
   }
   return false;
 }
-  _renderBooking = () => {
+_CombackView = () => {
     let { lockTable } = this.state;
     this.props.navigation.navigate('OrderView', { lockTable });
   }
@@ -345,10 +336,8 @@ export default class LoginView extends Component {
                 }}
                 errorMessage={(usernameValid==true) ? null : this.translate.Get('login.fail.missing_username')}
               />
-              <FormInput
-                leftIcon={
-                  <Icon
-                    name="lock"
+              <FormInput  leftIcon={
+                  <Icon  name="lock"
                     type="antdesign"
                     style={{
                       backgroundColor: 'transparent',
@@ -410,7 +399,21 @@ export default class LoginView extends Component {
                   </TouchableOpacity>
                 </View>
                 <View style={{ flexDirection: "row", alignContent: "center", paddingTop: ITEM_FONT_SIZE / 2, paddingBottom: ITEM_FONT_SIZE / 2, }}>
-                  
+                {this.has_back_button ? 
+                <View style={{ paddingRight: ITEM_FONT_SIZE / 2 }}>
+                  <Button
+                    con={{name:"input", color:"white"}}
+                    buttonStyle={styles.button}
+                    ontainerStyle={styles.buttonContainer}
+                    title={this.translate.Get('Back')}
+                    onPress={() => {
+                      Keyboard.dismiss();
+                      this._CombackView();
+                    }}
+                    titleStyle={styles.buttonText}
+                    disabled={isLoading}
+                  /></View> 
+                   : null}
                   <View style={{}}><Button buttonStyle={styles.button}  title={this.translate.Get(this.login_button_text)}
                     onPress={() => {
                       Keyboard.dismiss();
@@ -427,7 +430,7 @@ export default class LoginView extends Component {
           </View>
         </KeyboardAvoidingView>
 
-         <View style={styles.bottomImage}>
+         {/* <View style={styles.bottomImage}>
           <TouchableOpacity style={{ width: "80%", maxWidth: 442 }} onPress={() => {
             
             let now = (new Date()).getTime();
@@ -439,29 +442,29 @@ export default class LoginView extends Component {
             }
           }
           }>
-             {/* <Image resizeMode="contain" style={{ width: SCREEN_WIDTH * 0.8, maxWidth: 442 }} 
+             <Image resizeMode="contain" style={{ width: SCREEN_WIDTH * 0.8, maxWidth: 442 }} 
             source={require('../../assets/icons/relipos_copyright_white_2x.png')}
-             ></Image>  */}
+             ></Image> 
              
           </TouchableOpacity>
-        </View> 
+        </View>  */}
        
         {this.state.isWorking ?
           <View style={styles.item_view_text}>
             <ActivityIndicator color={colors.primary} size="large"></ActivityIndicator>
           </View>
           : null}
+           {this.has_back_button==false ?
            <View style={{position:'absolute',bottom:0,right:0}}>
         <TouchableOpacity onPress={() => this.props.navigation.navigate('Settings')}>
                     <Image resizeMode='center' source={require('../../assets/icons/IconSetting.png')} style={{ width: 30, height: 30, opacity: this.state.language == 1 ? 1 : 0.5 }}></Image>
                   </TouchableOpacity>
-                  </View>
+                  </View>:null}
       </View>
 
     );
   }
 }
-
 export const FormInput = props => {
   const { icon, type, refInput, ...otherProps } = props;
   return (

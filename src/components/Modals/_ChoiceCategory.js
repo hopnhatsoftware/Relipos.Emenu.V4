@@ -27,18 +27,18 @@ export class _ChoiceCategory extends React.Component {
     });
   }
   render() {
-    let { pnWidth,pnHeight,ItemWidth, BookingsStyle, ProductGroupList, _selectGroup, SelectedGroupIndex, setState } = this.props;
+    let { pnWidth,pnHeight,ItemWidth, BookingsStyle, ProductGroupList, _ChoiceCategorySelect, CategorySelectedIndex, setState } = this.props;
  // console.log('ItemWidth:'+ItemWidth);
     return (
       <View style={[BookingsStyle.header, { height:pnHeight, backgroundColor: "#E3E3E3", paddingTop: 2, }]}>
         <FlatList horizontal={true} data={ProductGroupList}   renderItem={({ item, index }) => 
         <TouchableOpacity  key={index}  style={{width:ItemWidth, height:'100%', justifyContent: 'center', alignItems: 'center',  }}
-            onPress={() => { _selectGroup(item, index) }}>
+            onPress={() => { _ChoiceCategorySelect(item, index) }}>
             <View style={{  width:'100%',height:'100%', flexDirection: 'row', borderRadius: 4, borderWidth: 1, borderColor: colors.grey4,
-               justifyContent: 'center', alignItems: 'center', backgroundColor: index == SelectedGroupIndex ? '#39ADFF' : 'white',
+               justifyContent: 'center', alignItems: 'center', backgroundColor: index == CategorySelectedIndex ? '#39ADFF' : 'white',
             }}>
-              <Text style={{  fontSize: H2FontSize * 0.9, color: index == SelectedGroupIndex ? colors.white : colors.grey4,
-                fontFamily: index == SelectedGroupIndex ? 'RobotoBold' : 'RobotoRegular',
+              <Text style={{  fontSize: H3FontSize , color: index == CategorySelectedIndex ? colors.white : colors.grey4,
+                fontFamily: index == CategorySelectedIndex ? 'RobotoBold' : 'RobotoRegular',
               }} numberOfLines={3}>{item.ChcgName}</Text>
             </View>
           </TouchableOpacity>}

@@ -5,19 +5,22 @@ import { execFetch, fetchFile, execFormData } from './services';
 
 
 //CheckCasherIn: Kiểm tra quây vào ca chưa
-export const CheckCasherIn = async () => {
+export const CheckCasherIn = async (Config) => {
   const culture = await _retrieveData('culture', 1);
-  const URL = '/Ticket/CheckCasherIn';
-  return await execFetch(URL, 'GET', {});
+  const URL = '/MainView/CheckCasherIn';
+  return await execFetch(URL, 'GET', {
+    CoutId: Config.I_Counter,
+    BranchId:Config.I_BranchId,
+  });
 }
 
 
-export const ListArea = async (settings) => {
+export const ListArea = async (Config) => {
   const culture = await _retrieveData('culture', 1);
   const URL = '/Area/Filter';
   return await execFetch(URL, 'GET', {
-    listOrgId: settings.I_BranchId,
-    BustId: settings.I_BusinessType ? settings.I_BusinessType : 1, CoutId: settings.I_Counter, Culture: culture,
+    listOrgId: Config.I_BranchId,
+    BustId: Config.I_BusinessType ? Config.I_BusinessType : 1, CoutId: Config.I_Counter, Culture: culture,
   });
 }
 
@@ -30,22 +33,25 @@ export const ListTables = async (settings, AreaId, Status) => {
   });
 }
 
-export const getOrderId = async (item, OrdPlatform) => { //////////////////////// dư tham số: OrdPlatform
+export const CancelOrder = async (OrderId) => { 
+  const URL = '/OrderView/CancelOrder';
+   return await execFetch(URL, 'GET', { OrderId:OrderId });
+}
+export const CheckAndGetOrder = async (item, OrdPlatform) => { //////////////////////// dư tham số: OrdPlatform
   const culture = await _retrieveData('culture', 1);
   const URL = '/Emenu/CheckAndGetOrder';
   return await execFetch(URL, 'GET', { TicketId: item.TicketID, Culture: culture, OrdPlatform: OrdPlatform });
 }
 
-export const GetViewGroup = async (settings, item) => {
+export const GetViewGroup = async (Config, item) => {
   const culture = await _retrieveData('culture', 1);
   const URL = '/Emenu/GetViewGroup';
   return await execFetch(URL, 'GET', {
-    TicketID: item.TicketID, PosID: settings.PosId ? settings.PosId : 1, AreaID: item.AreaID,
-    Culture: culture, BranchId: settings.I_BranchId, BustId: settings.I_BusinessType ? settings.I_BusinessType : 1,
-    PrgLevel: settings.I_ItemGroupLevel
+    TicketID: item.TicketID, PosID: Config.PosId ? Config.PosId : 1, AreaID: item.AreaID,
+    Culture: culture, BranchId: Config.I_BranchId, BustId: Config.I_BusinessType ? Config.I_BusinessType : 1,
+    PrgLevel: Config.I_ItemGroupLevel
   });
 }
-
 export const GetPrdChildGroups = async (settings, item, group) => {
   const culture = await _retrieveData('culture', 1);
   const URL = '/Emenu/LoadGroupChild';
@@ -111,7 +117,9 @@ export const sendOrder = async (settings, table, OrdPlatform, details) => {
     OrdPlatform: OrdPlatform,  
     OrderDetails:OrderDetails
   }
-  const URL = '/Emenu/Post';
+  console.log("ParramOrders"+JSON.stringify(ParramOrders))
+  //const URL = '/Emenu/Post'; Hàm cũ
+  const URL = '/OrderDetail/Post';
   //console.warn('Data', ParramOrders);
   //console.warn('URL', URL);
   return await execFetch(URL, 'POST', ParramOrders);

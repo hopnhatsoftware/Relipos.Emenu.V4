@@ -4,7 +4,7 @@ import {TouchableOpacity,  Dimensions,  ActivityIndicator, UIManager, TextInput,
 import Constants from 'expo-constants';
 import { _retrieveData, _storeData, _remove, _clearData } from '../services/storages';
 import { cacheFonts } from "../helpers/AssetsCaching";
-import { ListArea, ListTables, getOrderId, Object_Search, Ticket_getById, Ticket_Flush } from '../services';
+import { ListArea, ListTables, CheckAndGetOrder, Object_Search, Ticket_getById, Ticket_Flush } from '../services';
 import translate from '../services/translate';
 import { Icon } from 'react-native-elements';
 import { getTableColor } from '../services/util';
@@ -158,7 +158,7 @@ export default class TableView extends Component {
     let that = this;
     _remove('APP@USER', () => { 
       console.log('logout from request'); 
-      that.props.navigation.navigate('Login') ;
+      that.props.navigation.navigate('LoginView') ;
     });
   }
 
@@ -184,7 +184,7 @@ export default class TableView extends Component {
       }
     }).catch(async (err) => {
       _remove('APP@USER',
-        () => { this.props.navigation.navigate("Login"); });
+        () => { this.props.navigation.navigate("LoginView"); });
     });
   }
 
@@ -213,7 +213,6 @@ export default class TableView extends Component {
   filter = (status) => {
     this.setState({ showFilterPanel: false, tableStatus: status }, () => { this.loadTables(this.state.selectedAreaIndex) });
   }
-
   _onPressTable = async (item, index) => {
     const { user, AreasList, OrdPlatform, selectedAreaIndex } = this.state;
     let settings = await _retrieveData('settings', JSON.stringify({}));
@@ -230,7 +229,7 @@ export default class TableView extends Component {
       });
     }
     else {
-      getOrderId(item, OrdPlatform).then((res) => {
+      CheckAndGetOrder(item, OrdPlatform).then((res) => {
         item.OrderId = res.Data;
         item.AreaID = AreasList[selectedAreaIndex].AreID;
         _storeData('APP@TABLE', JSON.stringify(item),
@@ -276,7 +275,7 @@ export default class TableView extends Component {
           if (res.Status == 1) {
             TicketInfor = res.Data;
             _storeData('APP@TICKETINFOR', JSON.stringify(TicketInfor), () => {
-              getOrderId(sItemTable, OrdPlatform).then((res) => {
+              CheckAndGetOrder(sItemTable, OrdPlatform).then((res) => {
                 if (res.Status == 1) {
                   sItemTable.OrderId = res.Data;
                   sItemTable.AreaID = AreasList[selectedAreaIndex].AreID;

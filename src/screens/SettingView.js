@@ -179,7 +179,7 @@ export default class Settings extends Component {
   }
 
   _saveSettings = () => {
-    _storeData('settings', JSON.stringify(this.state.settings), () => { this.props.navigation.navigate("Login", { settings: this.state.settings }) });
+    _storeData('settings', JSON.stringify(this.state.settings), () => { this.props.navigation.navigate("LoginView", { settings: this.state.settings }) });
   }
 
   _clearSettings = () => {
@@ -332,7 +332,7 @@ export default class Settings extends Component {
         borderColor: colors.primary,
       }}>
         <TouchableOpacity style={{ paddingTop: 10 }}
-          onPress={() => this.props.navigation.navigate('Login')}>
+          onPress={() => this.props.navigation.navigate('LoginView')}>
           <Icon name='arrowleft' type='antdesign' style={{ fontSize: 20, paddingTop: 10, }} color='white' ></Icon>
         </TouchableOpacity>
         <View style={{ color: colors.primary, flex: 1, justifyContent: "center", alignItems: "center", flexDirection: 'row' }}>

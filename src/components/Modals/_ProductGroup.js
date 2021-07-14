@@ -1,6 +1,5 @@
 import React from "react";
-import { View, TouchableOpacity, Text,  FlatList,  Dimensions
-} from "react-native";
+import { View, TouchableOpacity, Text,  FlatList,  Dimensions,Image} from "react-native";
 import colors from "../../config/colors";
 import Constants from "expo-constants";
 import { H1FontSize,H2FontSize,H3FontSize,H4FontSize} from "../../config/constants";
@@ -30,24 +29,50 @@ export class _ProductGroup extends React.Component {
     });
   }
   render() {
-    let { ProductGroupList, _GroupClick, SelectedGroupIndex,pnheight} = this.props;
+    let { ProductGroupList,PrdChildGroups, _GroupClick,_selectChildGroup,SelectedChildGroupIndex, SelectedGroupIndex,pnheight} = this.props;
     return ( 
-      <View style={[{ height:pnheight,width:'99%' }]}>
+      <View style={[{ height:pnheight+100,width:'100%' }]}>
+      <View style={[{ height:pnheight,width:'100%' }]}>
         <FlatList data={ProductGroupList} renderItem={({ item, index }) => 
+        <View>
         <TouchableOpacity  key={index} style={{  width: '100%', justifyContent: 'center', alignItems: 'center',borderTopWidth:1,borderTopColor:colors.grey5  }}
             onPress={() => { _GroupClick(index) }}> 
-            <View style={{ flexDirection: 'row', width: '100%', 
-              justifyContent: 'flex-start', alignItems:'center', 
+            <View style={{ flexDirection: 'row', width: '100%',  justifyContent: 'flex-start', alignItems:'center', 
               borderRadius: 1, borderWidth: 1, borderColor: index == SelectedGroupIndex ? '#F87D26' : '#333D4C',
-              height: SCREEN_HEIGHT * 0.08, backgroundColor: index == SelectedGroupIndex ? '#F87D26' : '#333D4C',
+              height: H3FontSize*2.5, backgroundColor: index == SelectedGroupIndex ? '#F87D26' : '#333D4C',
             }}> 
-              <Text style={{ fontSize: H3FontSize, textAlign:'center',width:'100%', color: index == SelectedGroupIndex ? colors.white : colors.grey4,
+              <Text style={{ fontSize: H4FontSize,marginLeft:2, textAlign:'left',width:'89%', color: index == SelectedGroupIndex ? colors.white : colors.grey4,
                 fontFamily: index == SelectedGroupIndex ? 'RobotoBold' : 'RobotoRegular',
               }}>{item.PrgName}</Text>
+              {index == SelectedGroupIndex ?
+               <Image resizeMode='center' source={require('../../../assets/icons/IconDown.png')}
+                      style={{ width: '10%',paddingRight:2 }} /> :null
+              }
             </View>
-          </TouchableOpacity>}
-        />
+          </TouchableOpacity>
+          {SelectedGroupIndex== index ? PrdChildGroups.map((ChildItem, Childindex) => { 
+            return ( 
+              <TouchableOpacity key={Childindex}  style={{ width: '100%', justifyContent: 'center', alignItems: 'center',backgroundColor: Childindex == SelectedChildGroupIndex ? '#F99751' : '#48515E', }}
+                onPress={() => { _selectChildGroup(ChildItem, Childindex); }}  >
+              <View style={{ flexDirection: 'row', width: '100%',marginLeft:10, justifyContent: 'flex-start', alignItems:'center', 
+              height: H4FontSize*0.9*2.5, 
+              borderTopWidth:1,borderTopColor:colors.grey5
+            }}>  
+              <Text style={{ fontSize: H4FontSize*0.9,marginRight:5,textAlign:'left', color: Childindex == SelectedChildGroupIndex ? colors.white : colors.grey4,
+                fontFamily: Childindex == SelectedChildGroupIndex ? 'RobotoBold' : 'RobotoRegular',
+              }}>{ChildItem.PrgName}</Text>
+            </View>
+              </TouchableOpacity>
+            );
+          }):null
+        } 
+          </View>
+          }
+          >
+       
+          </FlatList>
       </View>
+    </View>
     );
   }
 }

@@ -34,13 +34,8 @@ export const getToken = async () => {
 }
 
 export const login = async (endpoint, userName, passWord) => {
-  let settings = await _retrieveData('settings', JSON.stringify({}));
-  if (settings == undefined) {
-    settings = { PosId: 1, PosIdName: 'Thu ngân' };
-  }
-  else {
-    settings = JSON.parse(settings);
-  }
+  let settings = await _retrieveData('settings', JSON.stringify({ PosId: 1, PosIdName: 'Thu ngân' }));
+  settings = JSON.parse(settings);
   if (userName == 'apple' && passWord == '123456') {
     return new Promise(resolve => {
       resolve(loginData);
@@ -56,20 +51,14 @@ export const login = async (endpoint, userName, passWord) => {
     DeviceId: Constants.deviceId ? Constants.deviceId : 'simulator',
     PosId: settings.PosId && settings.PosId > 0 ? settings.PosId : 1
   }
-  const URL = endpoint + '/Emenu/Login?' + serialize({
+  const URL = endpoint + '/LoginView/Login?' + serialize({
     username: userName,
     password: passWord,
     Culture: culture,
     Device,
     ModId: 5,
   });
-  let data = {
-    UserName: userName,
-    Password: passWord,
-    Culture: culture,
-    Device,
-    ModId: 5,
-  };
+  let data = { UserName: userName,  Password: passWord,  Culture: culture,  Device, ModId: 5,  };
   return fetch(URL, {
     method: 'POST',
     headers: {

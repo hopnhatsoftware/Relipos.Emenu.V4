@@ -15,7 +15,7 @@ import Question from '../Question';
 
 const Bordy={
   width:Dimensions.get("window").width,
-  height:Dimensions.get("window").height //- Constants.statusBarHeight;
+  height:Dimensions.get("window").height //- Constants.statusBarHeight
 } 
 const Titlecf={
   width:0,
@@ -41,34 +41,29 @@ const TabTitle={
 
 export class CardDetailView extends React.Component {
   textInput = null; 
-  state = {
-    showS_CodeHandleData: false,
-    KeyCode: '',
-    isHavingOrder:null,
-    iLoadNumber:1
-  };
+  
   _HandleQuantity = async (item,OrddQuantity,isReplace) => {
     try {
-      const { HandleQuantity,  } = this.props;
+      const { HandleQuantity,state  } = this.props;
+      
       HandleQuantity(item,OrddQuantity,isReplace);
-     let state= this.state;
-     state.iLoadNumber=state.iLoadNumber+1;
-      this.setState({state });
+     
+      state.iLoadNumber=state.iLoadNumber+1;
+     setState({state });
     } catch (error) {
       console.log('AddQuantity Error:'+error);
       return null;
-    }
+    } 
   };
   // Đã Order
   renderOrdered= ({ item, RowIndex }) => {
     const { BookingsStyle } = this.props;
-    if (item.TkdQuantity > 0) {
+    console.log('Render renderOrdered'+JSON.stringify(item))
+    if (item.TkdQuantity <= 0)
+    return null;
       return (
-        <View  style={{width: Bordy.width * 0.75,  justifyContent: 'center',  height: Bordy.height * 0.08,  borderBottomColor: colors.grey5,
-            borderBottomWidth: 1,  paddingTop: 1,  paddingLeft: 13
-          }}
-        >
-          <View style={{ width: Bordy.width * 0.75, flexDirection: "row", }}>
+        <View style={{ width: Contentcf.width, justifyContent:'flex-start', borderBottomColor: colors.grey5, borderBottomWidth: 1,paddingTop:1,paddingBottom:1, marginLeft: 2 }}>
+        <View style={{ width: Contentcf.width, flexDirection: "row"}}> 
             <Text  style={{  color: "#000000", width: Bordy.width * 0.05, fontSize: H2FontSize,  }} >
               {item.TkdQuantity}
             </Text>
@@ -79,8 +74,7 @@ export class CardDetailView extends React.Component {
                   width: Bordy.width * 0.5 - 25,
                   justifyContent: "center",
                   alignItems: "center",
-                  fontSize: H2FontSize,
-                  height: 'auto',
+                  fontSize: H2FontSize
                 }
               ]}
             >
@@ -99,25 +93,28 @@ export class CardDetailView extends React.Component {
           </View>
         </View>
       ); 
-    }
   };
   // Đang Order
   renderOrder = ({ item, RowIndex }) => {
+    const Column1=Contentcf.width* 0.17;
+    const ImageWidth=Column1*0.3;
+    const QuantityWidth=Column1*0.4;
     return (
-      <View style={{ width: Contentcf.width, justifyContent: "center", borderBottomColor: colors.grey5, borderBottomWidth: 1, marginLeft: 2 ,height:'auto'}}>
-        <View style={{ width: Contentcf.width, flexDirection: "row", paddingTop:5,paddingBottom:5}}> 
-        <View style={{  flexDirection: "row",  justifyContent: "center", width: Contentcf.width* 0.17 }} >
+      <View style={{ width: Contentcf.width,height:'auto', justifyContent:'flex-start', borderBottomColor: colors.grey5, borderBottomWidth: 1, marginLeft: 1 }}>
+        <View style={{ width: Contentcf.width, flexDirection: "row", paddingTop:1,paddingBottom:1}}> 
+        <View style={{  flexDirection: "row",  justifyContent: "center", width: Column1 }} >
          { (!item.PrdIsSetMenu) ?
-            <TouchableOpacity style={{ justifyContent: "center", alignItems: "center"  }} onPress={() => this._HandleQuantity(item, -1, false)}>
-              <Image resizeMode="stretch" source={require('../../../assets/icons/IconDelete.png')} style={{ width: Contentcf.width*0.042,height: Contentcf.width*0.042,  }} />
+            <TouchableOpacity  style={{width: ImageWidth, justifyContent: "center", alignItems: 'flex-start'  }} onPress={() => this._HandleQuantity(item, -1, false)}>
+              <Image resizeMode="stretch" source={require('../../../assets/icons/IconDelete.png')} 
+              style={{ width: ImageWidth*0.7,height: ImageWidth*0.7,  }} />
             </TouchableOpacity>:   
-            <TouchableOpacity style={{ justifyContent: "center", alignItems: "center" }}  onPress={() => { this._HandleQuantity(item,-1,false) }}>
-            <Icon name="close"  type="antdesign" size={Contentcf.width*0.042}  iconStyle={{ color: colors.red,  fontFamily: "RobotoBold",width:Contentcf.width*0.042  }} />
+            <TouchableOpacity style={{ width: ImageWidth,justifyContent: "center", alignItems: "flex-start" }}  onPress={() => { this._HandleQuantity(item,-1,false) }}>
+            <Icon name="close"  type="antdesign" size={ImageWidth*0.7}  iconStyle={{ color: colors.red,  fontFamily: "RobotoBold",width:ImageWidth*0.7,height:ImageWidth*0.7}} />
           </TouchableOpacity> 
           }
-            <View style={{ width: Contentcf.width*0.042,  height: 'auto',  justifyContent: 'center', alignItems: 'center'}}>
-           {!item.PrdIsSetMenu ?
-              <TextInput ref={input => this.textInput = input}  style={{  color: "#af3037", width: '100%',  fontSize: H3FontSize, textAlign: "center",fontFamily: "RobotoBold",}}
+            <View style={{ width: QuantityWidth,  height: 'auto',  justifyContent: 'center', alignItems: 'center'}}>
+          
+              <TextInput ref={input => this.textInput = input}  style={{  color: "#af3037", width: '100%',  fontSize: H3FontSize, textAlign:'left',fontFamily: "RobotoBold",}}
                 autoFocus={false}  autoCapitalize="none" autoCorrect={false} keyboardAppearance="dark"
                 keyboardType='numeric' autoCompleteType='off' returnKeyType='done' blurOnSubmit={true}
                 defaultValue={item.OrddQuantity ? item.OrddQuantity.toString() : ''}
@@ -129,18 +126,21 @@ export class CardDetailView extends React.Component {
                   Keyboard.dismiss();
                   this._HandleQuantity(item, item.OrddQuantity, true);
                 }}
-              />:
-               <Text style={{ color: "#af3037", fontSize: H3FontSize , fontFamily: "RobotoBold" }}>
-              {item.OrddQuantity}
-            </Text>
-            }
+              />
             </View>
-          {!item.PrdIsSetMenu ?
-            <TouchableOpacity name='btnAddQuantity' style={{ justifyContent: "center", alignItems: "center" }} onPress={() => this._HandleQuantity(item, 1, false)}>
-              <Image resizeMode="stretch" source={require('../../../assets/icons/v2/icon_View4.png')} style={{ width: Contentcf.width*0.042, height: Contentcf.width*0.042, }} />
-            </TouchableOpacity>
-            : null
-             }
+          
+            <TouchableOpacity name='btnAddQuantity' style={{width: ImageWidth, height: ImageWidth, justifyContent: "center", alignItems: "center" }} onPress={() =>{
+               if (item.PrdIsSetMenu)
+               return;
+               this._HandleQuantity(item, 1, false)
+               }}>
+            {!item.PrdIsSetMenu ? 
+            <Image resizeMode="stretch" source={require('../../../assets/icons/IconAdd.png')} 
+            style={{ width: ImageWidth*0.7, height: ImageWidth*0.7, }} />
+           : null
+          }
+           </TouchableOpacity>
+            
           </View>
           <View style={{ width: Contentcf.width* 0.555, justifyContent:'center', }}>
             <Text style={{  width: Contentcf.width* 0.555, fontSize: H3FontSize,  flexWrap: "wrap",textAlign:'left', }} numberOfLines={5}>
@@ -201,9 +201,10 @@ export class CardDetailView extends React.Component {
     console.log('componentDidMount');
   };
   render() {
-    let { showS_CodeHandleData, KeyCode } = this.state;
-    const { state, onGetInfor, onSendOrder, BookingsStyle, CartToggleHandle, translate, setState, settings, } = this.props;
-    if(state.isHavingOrder==null)
+    
+    let { state,setState, onGetInfor, onSendOrder, BookingsStyle, CartToggleHandle, translate, settings, ProductsOrdered} = this.props;
+   
+    if(typeof(state.isHavingOrder)==undefined||state.isHavingOrder ==null)
     state.isHavingOrder=true; 
     return ( 
       <View name='vwMash' style={{ position: "absolute", right: 0, top: 0,flexDirection: "row",
@@ -221,64 +222,49 @@ export class CardDetailView extends React.Component {
             backgroundColor: colors.white,
             borderColor: colors.grey3
           }}
-        >
+        > 
           <View  name='pnContent' style={{ width: Bordy.width * 0.75, flexDirection: "column", height: Bordy.height }}>
-            <View style={{  height: Titlecf.height,   paddingTop: 0,
-                borderBottomColor: colors.grey3,
-                borderBottomWidth: 1,
-                backgroundColor: colors.Header,
-                width: "100%",
-                justifyContent: "center", 
-                alignItems: "center",
-                flexDirection: "row"
+            <View style={{  height: Titlecf.height,  borderBottomColor: colors.grey3,  borderBottomWidth: 1,
+                backgroundColor: colors.Header,  width: "100%", justifyContent: "center",   alignItems: "center",  flexDirection: "row"
               }}
             >
-              <Text style={{ fontSize: H2FontSize, fontFamily: "RobotoBold", color: "white", 
-              textAlign: "center", paddingHorizontal: 4 }}>
+              <Text style={{ fontSize: H2FontSize, fontFamily: "RobotoBold", color: "white",  textAlign: "center" }}>
                 {translate.Get("Giỏ Hàng")}
               </Text>
-             
             </View>
             <View style={{ width: "100%", height: TabTitle.height, flexDirection: "row" }}>
-              <Button
-                onPress={() =>{
-                  setState({ isHavingOrder: true,iLoadNumber:state.iLoadNumber+1 });
-                } }
-                title={translate.Get("Đang Order")}
+              <Button title={translate.Get("Đang Order")}
                 containerStyle={{ width: "50%" }}
                 titleStyle={styles.button_order,{fontSize: H2FontSize}}
-                buttonStyle={{
-                  borderRadius: 0,
-                  backgroundColor: state.isHavingOrder?  '#dc7d46': colors.grey3
-                }}
-              ></Button>
+                buttonStyle={{  borderRadius: 0, backgroundColor: state.isHavingOrder?  '#dc7d46': colors.grey3 }}
+                onPress={() =>{
+                 setState({ isHavingOrder: true,iLoadNumber:state.iLoadNumber+1 });
+                  console.log('state.isHavingOrder:'+state.isHavingOrder)
+                } } />
               <Button
                 onPress={() => {
-                  onGetInfor() ;
-                  setState({isHavingOrder:false, iLoadNumber:state.iLoadNumber+1 });
+                  setState({isHavingOrder:false, iLoadNumber:state.iLoadNumber+1 } ,() => {
+                    onGetInfor();
+                    console.log('state.isHavingOrder:'+state.isHavingOrder)
+                  });
                 }}
                 title={translate.Get("Đã Order")}
                 containerStyle={{ width: "50%" }}
                 titleStyle={styles.button_order,{fontSize: H2FontSize}}
-                buttonStyle={{
-                 
-                  borderRadius: 0,
-                  backgroundColor: !state.isHavingOrder ? '#dc7d46': colors.grey3
-                }}
-              ></Button>
+                buttonStyle={{ borderRadius: 0, backgroundColor: !state.isHavingOrder ? '#dc7d46': colors.grey3  }}
+              />
             </View>
+            <View style={{ width: "100%",marginTop:1, height:Bordy.height-(Titlecf.height+TabTitle.height+(state.isHavingOrder ?TabTitle.height*2:0))}}>
             <FlatList
               keyExtractor={(item, RowIndex) => RowIndex.toString()}
-              data={ state.isHavingOrder ? state.CartInfor.items : state.ProductsOrdered }
-              extraData={this.state.iLoadNumber}
-              renderItem={
-                state.isHavingOrder ? this.renderOrder : this.renderOrdered
-              }
+              data={state.isHavingOrder ? state.CartInfor.items : ProductsOrdered }
+              extraData={state.iLoadNumber}
+              renderItem={state.isHavingOrder ? this.renderOrder : this.renderOrdered}
               contentContainerStyle={BookingsStyle.item_order}
             /> 
-          </View>
-          {state.isHavingOrder ? (
-            <View style={{ height: TabTitle.height*2, width: "100%", position: "absolute", flexDirection: "column", bottom: 0, right: 0 }}>
+            </View>
+            {state.isHavingOrder ? (
+            <View style={{ height: TabTitle.height*2, width: "100%",  flexDirection: "column" }}>
               <View style={{ width: "100%", height: TabTitle.height, flexDirection: "row", backgroundColor: colors.grey5 }}>
              
                   <View style={[styles.button_end_left_order, { width: "50%",textAlign:'left',paddingTop:(TabTitle.height-H2FontSize)/2  }]}> 
@@ -311,7 +297,6 @@ export class CardDetailView extends React.Component {
                   buttonStyle={{ backgroundColor: "#af3037", padding: H1FontSize * 0.25 }}
                   title={translate.Get("Gửi Order")}
                   containerStyle={{ backgroundColor: "#af3037", width: "50%" }}
-
                   onPress={() => {
                     if (settings.B_CustomerSendOrder == true) {
                       Question.alert(translate.Get("Notice"),
@@ -330,7 +315,7 @@ export class CardDetailView extends React.Component {
 
                     }
                     else {
-                      this.setState({ showS_CodeHandleData: true });
+                     setState({ showS_CodeHandleData: true });
                     }
                   }}
                  
@@ -385,43 +370,24 @@ export class CardDetailView extends React.Component {
                   </View>
                   : null
               }
-              <View style={{ width: "100%", height: Bordy.height * 0.08, flexDirection: "row", borderTopColor: colors.white, borderTopWidth: 1 }}>
-                <View style={[styles.item_text_right_end, styles.item_text_center, { width: "50%", paddingLeft: H1FontSize * 0.25, justifyContent: 'center', alignItems: "center" }]}>
+              <View style={{ width: "100%", height: H2FontSize*1.5, flexDirection: "row", borderTopColor: colors.white, borderTopWidth: 1 }}>
+                <View style={[styles.item_text_right_end, styles.item_text_center, { width: "50%", paddingLeft: H2FontSize * 0.25, justifyContent: 'center', alignItems: "center" }]}>
                   <View style={{ flexDirection: "row", width: '100%', }}>
-                    <Text style={{ fontSize: H1FontSize, color: colors.red }}>
+                    <Text style={{ fontSize: H2FontSize }}>
                       {translate.Get("Tạm tính")}:
                       </Text>
-                    <TouchableOpacity style={{ paddingTop: 5 }} onPress={() => setState({ ShowTotalInfo: true })}>
-                      <Icon
-                        name="questioncircle"
-                        type="antdesign"
-                        containerStyle={{
-                          marginLeft: H2FontSize ,
-                          justifyContent: "center"
-                        }}
-                        size={H2FontSize}
-                        iconStyle={{
-                          color: colors.primary,
-                          fontFamily: "RobotoBold"
-                        }}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                <View style={[styles.item_text_right_end, styles.item_text_center,
-                {
-                  width: "50%", paddingRight: H1FontSize * 0.25,
-                  alignItems: "flex-end"
-                }]}>
-                  <Text style={{ fontSize: H1FontSize, color: colors.red }}>
+                    <Text style={{ fontSize: H2FontSize, color: colors.red,marginLeft:10 }}>
                     {state.table.Ticket ? formatCurrency(state.table.Ticket.TkTotalAmount, "") : ""}
                   </Text>
+                  </View>
                 </View>
               </View>
             </View>
           )}
+          </View>
+         
 
-          {showS_CodeHandleData ?
+          {state.showS_CodeHandleData ?
             <View style={{
               backgroundColor: "rgba(98,98,98,0.6)", height: Bordy.height + Constants.statusBarHeight + 100,
               width: Bordy.width,
@@ -460,7 +426,7 @@ export class CardDetailView extends React.Component {
                       blurOnSubmit={false}
                       numberOfLines={5}
                       onChangeText={(KeyCode) => {
-                        this.setState({ KeyCode })
+                       setState({ KeyCode })
                       }}
                       onSubmitEditing={() => {
                         Keyboard.dismiss();
@@ -479,7 +445,7 @@ export class CardDetailView extends React.Component {
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         style={{ borderWidth: 1, borderRadius: 16, borderColor: "#ED1E24", height: 32, alignItems: 'center', justifyContent: 'center', }}>
-                        <TouchableOpacity onPress={() => { this.setState({ showS_CodeHandleData: false, }) }} style={[{ alignItems: 'center', justifyContent: 'center', width: '100%' }]}>
+                        <TouchableOpacity onPress={() => {setState({ showS_CodeHandleData: false, }) }} style={[{ alignItems: 'center', justifyContent: 'center', width: '100%' }]}>
                           <Text style={{ textAlign: 'center', width: '100%', color: 'white', }}>{translate.Get('BỎ QUA')}</Text>
                         </TouchableOpacity>
                       </LinearGradient>
@@ -493,12 +459,12 @@ export class CardDetailView extends React.Component {
                         <TouchableOpacity onPress={() => {
                           if (settings.S_CodeHandleData) {
                             if (settings.S_CodeHandleData == KeyCode) {
-                              this.setState({ showS_CodeHandleData: false, }, () => {
+                             setState({ showS_CodeHandleData: false, }, () => {
                                 onSendOrder();
                               });
                             }
                             else {
-                              this.setState({ showS_CodeHandleData: true, }, () => {
+                             setState({ showS_CodeHandleData: true, }, () => {
                                 Question.alert(
                                   translate.Get("Thông báo"),
                                   translate.Get("Bạn đã nhập code sai, vui lòng liên hệ với nhân viên!")
@@ -507,7 +473,7 @@ export class CardDetailView extends React.Component {
                             }
                           }
                           else {
-                            this.setState({ showS_CodeHandleData: true, }, () => {
+                           setState({ showS_CodeHandleData: true, }, () => {
                               Question.alert(
                                 translate.Get("Thông báo"),
                                 translate.Get("Bạn không có quyền gọi order, vui lòng liên hệ với nhân viên!")

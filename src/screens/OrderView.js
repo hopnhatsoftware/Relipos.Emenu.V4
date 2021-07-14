@@ -9,9 +9,9 @@ import { FlatList } from "react-native";
 import { Input, Button, Icon } from "react-native-elements";
 import { setCustomText } from "react-native-global-props";
 import { ProductDetails, CardDetailView, _CustomerSendNotification, _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor } from '../components';
-import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize,H2FontSize,H3FontSize,H4FontSize } from "../config/constants";
+import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize,H2FontSize,H3FontSize,H4FontSize,FontSize } from "../config/constants";
 import translate from "../services/translate";
-import {GetViewGroup,GetPrdChildGroups,GetProductByGroupParent,getTicketInfor, sendOrder,getOrderId,SetMenu_getChoiceCategory,getAllItembyChoiceId,} from "../services";
+import {GetViewGroup,GetPrdChildGroups,GetProductByGroupParent,getTicketInfor, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getAllItembyChoiceId,CancelOrder} from "../services";
 import { formatCurrency } from "../services/util";
 import colors from "../config/colors";
 import BookingsStyle from "../styles/bookings";
@@ -77,9 +77,7 @@ export default class OrderView extends Component {constructor(props) {
        ProductChoise:null,
        /*Vị trí mặt hàng đang chọn để xử lý */
        ProductChoiseIndex: -1,
-       
        ChoisetDetails: [],
-
       TimeToNextBooking: 0,
       CartInfor: {
         TotalQuantity: 0,
@@ -95,13 +93,15 @@ export default class OrderView extends Component {constructor(props) {
       endpoint: "",
       showSetInCart: false,
       ShowTotalInfo: false,
-      ProductImagePrefix: ""
+      ProductImagePrefix: "",
+      Config:{
+
+      }
     };
     this.translate = new translate();
   }
   componentWillUnmount() {
-    // Clear the interval right before component unmount
-   // clearInterval(this.interval);
+  // clearInterval(this.interval);
   }
   componentDidMount = async () => {
     try{
@@ -137,26 +137,27 @@ if (CartInfor!='')
     console.log('OrderView componentDidMount Error:' + ex);
   }
   };
-  onPressBack = () => {
-    let { lockTable } = this.state;
+  onPressBack = async() => {
+    let { lockTable,table } = this.state;
+    
     if (lockTable == true) {
-      this.props.navigation.navigate("Logout", { lockTable });
-    }
-    else {
-      _remove('APP@TABLE', () => {
-        _remove('APP@CART', () => {
-          this.props.navigation.navigate("Areas");
-        });
-      });
-    }
+       this.props.navigation.navigate("LogoutView", { lockTable });
+      
+    }else{
+    //console.log('table :'+JSON.stringify(table));
+    /*Cancel Order */
+    await CancelOrder(table.OrderId);
+    _remove('APP@TABLE', () => {
+      _remove('APP@CART', () => {
+      this.props.navigation.navigate("TableView");
+    });
+  
+  });
+}
   }
   _loadProductsIsSet = async (item) => {
     let language = await _retrieveData('culture', 1);
-    let { settings, CartItemSelected, } = this.state;
-    let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
-    Config = JSON.parse(Config);
-    Config.PosId = settings.PosId;
-    Config.I_BusinessType = 1;
+    let { settings, Config, } = this.state;
     item.TkdBasePrice = ('TkdBasePrice' in item) ? item.TkdBasePrice : item.UnitPrice;
     await SetMenu_getChoiceCategory(Config, item).then(async (res) => {
       if (res.Data.Table.length > 0) {
@@ -186,17 +187,7 @@ if (CartInfor!='')
     return;
   };
   _loadProductsByGroup = async group => {
-    let { table, keysearch } = this.state;
-    let settings = await _retrieveData('settings', JSON.stringify({
-      PosId:1,
-      PosIdName:'' 
-    }));
-    settings = JSON.parse(settings);
-    let Config = await _retrieveData('APP@CONFIG', JSON.stringify({
-      PosId:settings.PosId,
-      I_BusinessType:1
-    }));
-    Config = JSON.parse(Config);
+    let { table, keysearch,Config } = this.state;
     await GetProductByGroupParent(Config, table, group, keysearch).then(res => {
       if ("Table" in res.Data) {
         let Products = res.Data.Table;
@@ -216,16 +207,7 @@ if (CartInfor!='')
   };
   /*Vẽ nhóm cấp 2 */
   _loadChildGroups = async SelectedGroupIndex => {
-    let { table, ProductGroupList, SelectedChildGroupIndex } = this.state;
-    let settings = await _retrieveData('settings', JSON.stringify({
-      PosId:1,
-      PosIdName:''
-    }));
-      settings = JSON.parse(settings);
-    let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
-    Config = JSON.parse(Config);
-    Config.PosId = settings.PosId;
-    Config.I_BusinessType = 1;
+    let { table, ProductGroupList, SelectedChildGroupIndex,Config } = this.state;
     if (SelectedGroupIndex >= 0) {
       let group = ProductGroupList[SelectedGroupIndex];
       if (group) {
@@ -260,18 +242,13 @@ if (CartInfor!='')
     endpoint = endpoint.replace("api/", "");
     let language = await _retrieveData("culture", 1);
    
-    let settings = await _retrieveData('settings', JSON.stringify({}));
-    if (settings == '{}') {
-      settings = { "PosId": 1, "PosIdName": "Thu ngân" };
-    }
-    else {
-      settings = JSON.parse(settings);
-    }
-    let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
+    let settings = await _retrieveData('settings', JSON.stringify({ "PosId": 1, "PosIdName": "Thu ngân" }));
+    settings = JSON.parse(settings);
+    let Config = await _retrieveData('APP@CONFIG', JSON.stringify({
+          'PosId':settings.PosId,
+          'I_BusinessType':1
+          }));
     Config = JSON.parse(Config);
-    Config.PosId = settings.PosId;
-    Config.I_BusinessType = 1;
-    
     this.setState({endpoint,language,settings,Config});
   }catch(ex){
     console.log('_BindingFont Error :'+ex)
@@ -312,7 +289,7 @@ if (CartInfor!='')
           table = JSON.parse(table);
         }
         if ("TicketID" in table && table.TicketID > 0) {
-          getOrderId(table, OrdPlatform).then(res => {
+          CheckAndGetOrder(table, OrdPlatform).then(res => {
             table.OrderId = res.Data;
             _storeData("APP@TABLE", JSON.stringify(table), () => {
               GetViewGroup(Config, table).then(res => {
@@ -356,18 +333,8 @@ if (CartInfor!='')
     setCustomText(customTextProps);
   }
   _getTicketInfor = async () => {
-    let { table, Ticket, ProductsOrdered } = this.state;
-    let settings = await _retrieveData('settings', JSON.stringify({}));
-    if (settings == '{}') {
-      settings = { "PosId": 1, "PosIdName": "Thu ngân" };
-    }
-    else {
-      settings = JSON.parse(settings);
-    }
-    let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
-    Config = JSON.parse(Config);
-    Config.PosId = settings.PosId;
-    Config.I_BusinessType = 1;
+    let { table, Ticket, ProductsOrdered ,Config} = this.state;
+   
     if ("TicketID" in table && table.TicketID > 0) {
       getTicketInfor(Config, table).then(res => {
         if (!("Table" in res.Data) || res.Data.Table.length == 0) {
@@ -384,6 +351,7 @@ if (CartInfor!='')
           }
         }
         table.Ticket = Ticket;
+        //console.log('table.ProductsOrdered:'+JSON.stringify(ProductsOrdered));
         _storeData("APP@TABLE", JSON.stringify(table), () => {
           this.setState({ Ticket, table, ProductsOrdered, isBooking: false });
         });
@@ -512,21 +480,17 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
     });
   };
   _sendOrder = async () => {
-    let { table, CartInfor, OrdPlatform } = this.state;
-    let settings = await _retrieveData('settings', JSON.stringify({}));
-    settings = JSON.parse(settings);
-    let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
-    Config = JSON.parse(Config);
+    let { table, CartInfor, OrdPlatform,Config } = this.state;
+   
     if (CartInfor.TotalQuantity<=0) 
       return;
     this.setState({ isShowMash: true }); 
-
-    //console.log('CartInfor.items :'+JSON.stringify(CartInfor.items)); 
+    console.log('CartInfor.items :'+JSON.stringify(CartInfor.items)); 
     await sendOrder(Config, table, OrdPlatform, CartInfor.items).then(async res => {
       if (res.Status == 1) {
         await _remove("APP@CART", async () => {
           await this.setState({ CartInfor: {  TotalQuantity: 0, TotalAmount: 0, items: [], } }, async () => {
-            await getOrderId(table, OrdPlatform).then(async res => {
+            await CheckAndGetOrder(table, OrdPlatform).then(async res => {
               table.OrderId = res.Data;
               await _storeData("APP@TABLE", JSON.stringify(table), async () => {
                 _storeData('APP@TimeToNextBooking', JSON.stringify(new Date().getTime()), async () => {
@@ -545,7 +509,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
           );
         });
       } else {
-        await getOrderId(table, OrdPlatform).then(async res => {
+        await CheckAndGetOrder(table, OrdPlatform).then(async res => {
           table.OrderId = res.Data;
           await _storeData("APP@TABLE", JSON.stringify(table), async () => {
             await this.setState({ table: table, isShowMash: false }, async () => {
@@ -986,7 +950,9 @@ if (ProductChoise==null) {
               />
             </View>
           </View>
-          <View style={{ position: "absolute", right: H3FontSize * 3, flexDirection: "row" }}>
+          <View style={{ 
+             position: "absolute",
+             right: H3FontSize * 3, flexDirection: "row" }}>
             <Text style={{ color: "#000000", paddingRight: 5, fontSize: H3FontSize * 0.8 }}>
               {item.TksdPrice > 0 ? (<Text>+{formatCurrency(item.TksdPrice, "")}</Text>) : null}{" "}
             </Text>
@@ -1016,7 +982,9 @@ if (ProductChoise==null) {
             }
           /> 
           <View style={{ flexDirection: "row", backgroundColor: 'rgba(98,98,98,0.6)', height: H2FontSize*2, justifyContent: "center", alignItems: "center" }}>
-            <View style={{ flexDirection: "row", position: "absolute", backgroundColor: colors.grey5, left: 10, }}>
+            <View style={{ flexDirection: "row",
+              position: "absolute",
+              backgroundColor: colors.grey5, left: 10, }}>
               <View style={{ flexDirection: 'row', paddingLeft: 5, }}>
                 {CartItem.itemDescription != null ? 
                 <Text style={{ color: '#2285BE', paddingLeft: 5, fontSize: H2FontSize }}>#</Text> : null}
@@ -1026,13 +994,20 @@ if (ProductChoise==null) {
                 />
               </View>
             </View> 
-            <View style={{ flexDirection: "row", position: "absolute",  right: 5  }} >
+            <View style={{ flexDirection: "row",  position: "absolute",   right: 5  }} >
+            <TouchableOpacity
+                style={{ width: H2FontSize*1.5}}
+                onPress={() =>  this.HandleQuantity(CartItem,0,true) } >
+                <Icon name="close"  type="antdesign"  containerStyle={{ justifyContent: "center" }}
+                  size={H2FontSize*1.5}  iconStyle={{ color: colors.red, fontFamily: "RobotoBold" }}
+                />
+              </TouchableOpacity>
               <TouchableOpacity style={{ justifyContent: "center", alignItems: "center" }}
                 onPress={() => this.HandleQuantity(CartItem,-1,false)}>
                 <Image resizeMode="stretch" source={require('../../assets/icons/v2/icon_View3.png')}
                   style={{ width: H2FontSize*1.5, height: H2FontSize*1.5, }} />
               </TouchableOpacity> 
-              <Text style={{ color: "#af3037", width:H2FontSize*1.5, fontSize: H2FontSize*1.5 , textAlign: "center", fontFamily: "RobotoBold" }}>
+              <Text style={{ color: "#af3037", width:H2FontSize*3, fontSize: H2FontSize, textAlign: "center",justifyContent: "center", fontFamily: "RobotoBold" }}>
                 {CartItem.OrddQuantity}
               </Text>
               <TouchableOpacity style={{ justifyContent: "center", alignItems: "center" }}
@@ -1040,13 +1015,7 @@ if (ProductChoise==null) {
                 <Image resizeMode="stretch" source={require('../../assets/icons/v2/icon_View4.png')}
                   style={{ width:H2FontSize*1.5, height: H2FontSize*1.5, }} />
               </TouchableOpacity>
-              <TouchableOpacity
-                style={{ width: H2FontSize*1.5}}
-                onPress={() =>  this.HandleQuantity(CartItem,0,true) } >
-                <Icon name="close"  type="antdesign"  containerStyle={{ justifyContent: "center" }}
-                  size={H2FontSize*1.5}  iconStyle={{ color: colors.red, fontFamily: "RobotoBold" }}
-                />
-              </TouchableOpacity>
+           
             </View>
           </View>
         </View>
@@ -1139,16 +1108,16 @@ if (ProductChoise==null) {
       );
   };
   renderProduct = ({ item, index }) => {
-    
-    let iHeight=(ProductList.height/ProductList.RowNum)-2;
+    let { Config } = this.state;
     let iWith=(ProductList.width/ProductList.ColumnNum)-2;
+    //let iHeight=(ProductList.height/ProductList.RowNum)-2;
+    let iHeight=iWith*3/6;
     let {CartFilter}= this._getCartItems(item,null);
    // console.log("CartFilter TotalQuantity:"+JSON.stringify( CartFilter.TotalQuantity));
     item.OrddQuantity=CartFilter.TotalQuantity;
-   this.state.isRenderProduct=true;
+    this.state.isRenderProduct=true;
     return (
-      <TouchableHighlight 
-      style={ { borderBottomWidth: 1, borderLeftWidth: 1,borderTopWidth: 1,borderColor: colors.grey5,width:iWith-2,height: iHeight, }}>
+      <TouchableHighlight   style={ { borderBottomWidth: 1, borderLeftWidth: 1,borderTopWidth: 1,borderColor: colors.grey5,width:iWith-2,height: iHeight, }}>
         <View style={{ flexDirection: "row", flexWrap: "wrap", width: "100%", height: '100%' }}>
           <View style={{ width: "60%", height: '100%' }}>
             <TouchableOpacity name='dvImage' style={{ flexDirection: "row", width: '100%', height: '100%' }}
@@ -1179,33 +1148,44 @@ if (ProductChoise==null) {
             </TouchableOpacity>
           </View> 
           <View style={{ flexDirection: "column", flexWrap: "wrap", width: "40%", height: '100%',paddingLeft:5,paddingRight:5,backgroundColor: "#EEEEEE" }}>
-            <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%" }}>
-              <View name='pnProductName' style={{height:iHeight-(H1FontSize+H3FontSize+10),width: '100%', }}>
-                <Text style={{ color: "#0d65cd", textAlign: 'center', width: '95%',fontSize: H3FontSize, fontFamily: "RobotoBold",paddingTop:10 }} numberOfLines={5}> 
+          <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:'100%'}}>
+             {Config.B_ViewProductNo?
+               <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:iHeight-(H4FontSize+H2FontSize+10)}}>
+              <View name='pnProductNo' style={{width: '100%',height:H3FontSize*1.5 ,paddingTop:2 }}>
+                <Text style={{ color: "#0d65cd", textAlign: 'center', width: '95%',fontSize: H3FontSize, fontFamily: "RobotoBold"}} numberOfLines={2}> 
                   {item.PrdNo}
                 </Text>
-                <Text style={{color: "#000000",width: '100%',textAlign:'center',paddingLeft:5,fontSize:H4FontSize,flexWrap:"wrap",paddingTop:10 }} numberOfLines={5}>
-                  {item.PrdName}
+              </View>
+              <View name='pnProductName' style={{width: '100%',paddingTop:2 }}>
+                <Text style={{color: "#000000",width: '100%',textAlign:'left',fontSize:H4FontSize,flexWrap:"wrap"}} numberOfLines={5}>
+                  {item.PrdName} 
                 </Text>
               </View>
-              <View  name='lbPrice' style={{height:H3FontSize,width:'100%',paddingRight: 5 }}>
-                <Text style={{color: "#af3037",width: "100%",textAlign:'center',fontSize: H3FontSize}}>
+              </View>
+              :
+              <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:iHeight-(H4FontSize+H2FontSize+10)}}>
+            <View name='pnProductName' style={{width: '100%',paddingTop:2 }}>
+              <Text style={{color: "#000000",width: '100%',textAlign:'left',fontSize:H4FontSize,flexWrap:"wrap"}} numberOfLines={5}>
+                {item.PrdName} 
+              </Text>
+            </View>
+            </View>
+             }
+              <View  name='lbPrice' style={{height:H4FontSize,width:'100%' }}>
+                <Text style={{color: "#af3037",width: "100%",textAlign:'center',fontSize: H4FontSize}}>
                   {this.translate.Get("Giá")}:{" "}
                   <Text style={{ fontFamily: "RobotoItalic" }}>
                     {formatCurrency(item.UnitPrice, "")}
                   </Text>
                 </Text>
               </View>
-            </View>
-            <View style={{ position: "toFixed", bottom: 0,  right: 0, width: "100%", height: H1FontSize,paddingLeft:5,paddingRight:5}}>
+              <View style={{width: "100%", height: H2FontSize,paddingTop:5}}>
                 <View style={{ flexDirection: "row", justifyContent: 'space-evenly',  width: "100%", height: '100%'}}  >
                   {item.OrddQuantity> 0 ?
                     <TouchableOpacity 
                     onPress={() => { 
                 if (item.PrdIsSetMenu == true&&item.PrdViewSetMenuType && item.PrdViewSetMenuType == 1){
-
                       this.setState({ showSetInCart: true,SetItemsFilter:CartFilter.items, CartItemSelected: CartFilter.FirstItem, CartProductIndex :CartFilter.FirstIndex})
-                      //console.log('CartFilteritems:'+JSON.stringify(CartFilter.items));
                       }
                       else {
                       this.HandleQuantity(item,-1,false);
@@ -1214,18 +1194,18 @@ if (ProductChoise==null) {
                     }} >
                       {( item.PrdIsSetMenu == true&&item.PrdViewSetMenuType && item.PrdViewSetMenuType == 1)?
                       <Icon name='edit'  type="antdesign" containerStyle={{ justifyContent: "center" }}
-                      size={H1FontSize}  iconStyle={{ color: colors.yellow1, fontFamily: "RobotoRegular" }}  />
+                      size={H2FontSize}  iconStyle={{ color: colors.yellow1, fontFamily: "RobotoRegular" }}  />
                       :
-                      <Image resizeMode='contain' source={require('../../assets/icons/IconDelete.png')} style={{ width: H1FontSize, height: H1FontSize,}} />
+                      <Image resizeMode='center' source={require('../../assets/icons/IconDelete.png')} style={{ width: H2FontSize, height: H2FontSize,}} />
                       }
                     </TouchableOpacity> :
-                    <View style={{  width:H1FontSize, height: H1FontSize, justifyContent: 'center', alignItems: 'center', }}>
+                    <View style={{  width:H2FontSize, height: H2FontSize, justifyContent: 'center', alignItems: 'center', }}>
                     </View>
                   }
-                  <View style={{ width:(iWith-4)*0.4*0.6, height: '100%', justifyContent: 'center' }}>
+                  <View style={{ width:(iWith-4)*0.4*0.6, height: H2FontSize, justifyContent: 'center' }}>
                  {( item.PrdIsSetMenu != true && item.OrddQuantity>0)?
                       <TextInput ref={input => this.textInput = input}
-                        style={{  color: "#af3037",width: '100%',fontSize:H1FontSize,textAlign:"center",fontFamily: "RobotoBold", }}
+                        style={{  color: "#af3037",width: '100%',fontSize:H2FontSize,textAlign:"center",fontFamily: "RobotoBold", }}
                         autoFocus={false}
                         autoCapitalize="none"
                         autoCorrect={false}
@@ -1240,12 +1220,7 @@ if (ProductChoise==null) {
                           this.CaculatorCardInfor(true);
                         }}
                         onChangeText={(textInput) => {
-                         item.OrddQuantity = textInput;
-                          /*if(parseFloat(textInput)>0 )
-                          item.OrddQuantity = textInput;
-                          console.log('textInput'+textInput);
-                          */
-                      
+                         item.OrddQuantity = parseFloat(textInput);
                         }}
                         onSubmitEditing={() => {
                           Keyboard.dismiss();
@@ -1267,10 +1242,13 @@ if (ProductChoise==null) {
                      }
                   }}>
                     <Image resizeMode='center' source={require('../../assets/icons/IconAdd.png')}
-                      style={{width: H1FontSize, height: H1FontSize, }} />
+                      style={{width: H2FontSize, height: H2FontSize, }} />
                   </TouchableOpacity>
                 </View>
               </View>
+          
+            </View>
+           
           </View>
         </View>
       </TouchableHighlight>
@@ -1288,25 +1266,29 @@ if (ProductChoise==null) {
         </View>
       );
     }
-    const {ProductGroupList,Products,CartInfor,CartItemSelected,CartProductIndex,IsShowCustomerSendNotification,showCall,SelectedGroupIndex, Config, lockTable,} = this.state; 
+    const {ProductGroupList,PrdChildGroups,Products,CartInfor,CartItemSelected,CartProductIndex,IsShowCustomerSendNotification,SelectedChildGroupIndex,SelectedGroupIndex, Config, lockTable,ProductsOrdered} = this.state; 
     return (
       <View style={styles.pnbody,{height:Bordy.height,width:Bordy.width}}>
         <View style={styles.Container}>
-          { /* Lô gô */}
+         
           <View name='pbLeft' style={[styles.pnLeft, { backgroundColor: "#333D4C",width:pnLeft.width }]}>
             <View style={{ justifyContent: 'center', alignItems: 'center', height: pnLeft.width, }}>
               <Image resizeMode="stretch" 
               //source={require('../../assets/icons/Logo_Emenu_BG_Red_3.png')}
                source={require('../../assets/LogoSos.jpg')}
-                style={{ width: '100%', height: '100%' }} />
-            </View>
-            <_ProductGroup  state={this.state}  translate={this.translate}
+                style={{ width: '67%', height: '67%' }} />
+            </View> 
+            <_ProductGroup  state={this.state}  
+              translate={this.translate}
               ProductGroupList={ProductGroupList}
               SelectedGroupIndex={SelectedGroupIndex}
               _GroupClick={(index) => this._GroupClick(index)}
               setState={(state) => this.setState(state)}
               pnheight={Bordy.height-pnLeft.width}
               BookingsStyle={BookingsStyle}
+              PrdChildGroups={PrdChildGroups}
+              SelectedChildGroupIndex={SelectedChildGroupIndex}
+              _selectChildGroup={(item,index) => this._selectChildGroup(item,index)}
             />
           </View>
           <View style={styles.pnCenter,{width:Center.width,height:Center.height}}>
@@ -1388,6 +1370,7 @@ if (ProductChoise==null) {
             setState={(state) => this.setState(state)}
             settings={Config}
             BookingsStyle={BookingsStyle}
+            ProductsOrdered={ProductsOrdered}
             onGetInfor={() => this._getTicketInfor()}
             onSendOrder={() => this._sendOrder()}
           />
@@ -1408,15 +1391,21 @@ if (ProductChoise==null) {
         { 
         /* Hiển thị Edit Set */
         (CartItemSelected != undefined &&  CartItemSelected != null && CartProductIndex >= 0 && CartItemSelected.PrdIsSetMenu && this.state.showSetInCart)? ( 
-            <View name='pnListSetmenuView' style={{ width: Bordy.width,height: Bordy.height, backgroundColor: "rgba(98,98,98,0.6)", position: "absolute",justifyContent: "center", alignItems: "center",   }}  > 
-              <View style={[{ position: "absolute",width:(Bordy.width*0.85),height:(Bordy.height-Header.height),top: Header.height,  borderColor:'gray',backgroundColor:'gray',  borderWidth: 2, borderRadius: 6}]} >
+            <View name='pnListSetmenuView' style={{ width: Bordy.width,height: Bordy.height, backgroundColor: "rgba(98,98,98,0.6)", 
+             position: "absolute",
+            justifyContent: "center", alignItems: "center",   }}  > 
+              <View style={[{ 
+                 position: "absolute",
+                width:(Bordy.width*0.85),height:(Bordy.height-Header.height),top: Header.height,  borderColor:'gray',backgroundColor:'gray',  borderWidth: 2, borderRadius: 6}]} >
                 <View  name='pnShowSetHeader' style={{ flexDirection: "row", justifyContent: "center", alignItems: "center",  borderTopLeftRadius: 4,
                     borderTopRightRadius: 4,  backgroundColor: "#333D4C",  height: Bordy.height*0.07
                   }} > 
                   <Text style={{  fontSize: H1FontSize, color: colors.white, textAlign: "center" }}> 
                     {this.translate.Get("Chi tiết Set - Combo")}
                   </Text>
-                  <View style={{ position: "absolute", right: 5, borderRadius: 2 }}>
+                  <View style={{ 
+                     position: "absolute", 
+                  right: 5, borderRadius: 2 }}>
                     <TouchableOpacity style={{ width: '100%'}}
                       onPress={() =>
                         this.setState({  showSetInCart: false,  CartItemSelected: null, CartProductIndex: -1 })
@@ -1506,7 +1495,7 @@ const styles = StyleSheet.create({
   },
   BottonMenu: {
   
-    position: "absolute",
+     position: "absolute",
     flexDirection: "row",
     bottom: 0,
     right: 0,
@@ -1588,7 +1577,7 @@ const styles = StyleSheet.create({
   BackgroundMash: {
     height: SCREEN_HEIGHT + Constants.statusBarHeight,
     width: SCREEN_WIDTH,
-    position: "absolute",
+     position: "absolute",
     flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",

@@ -21,11 +21,11 @@ export class _Header extends React.Component {
   componentDidMount() {
   }
   render() {
-    const {isShowBack, state, table, language, BookingsStyle, _searchProduct, onPressBack, translate, name, titleSet, setState, lockTable,islockTable,backgroundColor } = this.props;
+    const {isShowBack, state, table, language, BookingsStyle, _searchProduct, onPressBack, translate, name, titleSet, setState, lockTable,islockTable,backgroundColor,iheight,isShowFlag } = this.props;
     
     return (
-      <View style={[BookingsStyle.header,{  backgroundColor: backgroundColor, width:SCREEN_WIDTH, }]}>
-        <View style={{ paddingTop: 1, width: "20%", flexDirection: 'row', justifyContent: "space-between" }}>
+      <View style={[BookingsStyle.header,{  backgroundColor: backgroundColor, width:SCREEN_WIDTH,height:iheight }]}>
+        <View style={{ height:iheight,paddingTop: 1, width: "20%", flexDirection: 'row', justifyContent: "space-between" }}>
         {(isShowBack==true)? 
           <TouchableOpacity  onPress={() => { onPressBack.apply(null, []); }}  style={{ width: '14%', justifyContent: 'center', alignItems: 'center' }}>
             <Image  resizeMode="contain" 
@@ -49,8 +49,8 @@ export class _Header extends React.Component {
               BookingsStyle.header_logo,
               {
                 maxWidth: '56%',
-                height: SCREEN_HEIGHT * 0.085,
-                justifyContent: "center",
+                height:iheight*0.98, 
+                justifyContent: "center", 
                 alignItems: "center"
               }
             ]} />
@@ -78,7 +78,7 @@ export class _Header extends React.Component {
             }
         </View>
 
-        <View style={{ width: "68%", flexDirection: "row", justifyContent: "center", alignItems: 'center', }}>
+        <View style={{ height:iheight,width: "68%", flexDirection: "row", justifyContent: "center", alignItems: 'center', }}>
           <View style={[BookingsStyle.header_search, { flexDirection: "row" }]}>
             {name == 'OrderView' ?
               <TextInput

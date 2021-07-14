@@ -12,15 +12,15 @@ import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 
 const MainRoot = createAppContainer(createSwitchNavigator(
   {
-    Login: {
+    LoginView: {
       path: '/LoginView',
       screen: LoginView,
      },
-     Logout: {
+     LogoutView: {
        path: '/LogoutView',
        screen: LogoutView,
       },
-     Areas: {
+      TableView: {
       path: '/TableView',
       screen: TableView,
      },
@@ -46,7 +46,7 @@ const MainRoot = createAppContainer(createSwitchNavigator(
      },
   },
   {
-    initialRouteName: 'Login',
+    initialRouteName: 'LoginView',
     headerMode: 'none',
   }
   ));
