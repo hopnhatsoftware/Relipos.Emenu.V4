@@ -75,6 +75,7 @@ export default class RequestView extends Component {
       state:{},
       user:{},
       tableStatus:2,
+      RowIndex:-1
     };
     this.translate=new translate();
   }
@@ -137,12 +138,12 @@ export default class RequestView extends Component {
   }
   static getDerivedStateFromProps =  (props, state) =>{
     if (props.navigation.getParam('ReturnScreen', state.ReturnScreen) != state.ReturnScreen||
-    props.navigation.getParam('Product', state.Product) != state.Product) {
-      console.log('received product', props.navigation.getParam("Product", state.Product));
-      
+    props.navigation.getParam('Product', state.Product) != state.Product||
+    props.navigation.getParam('Product', state.RowIndex) != state.RowIndex) {
       return {
         ReturnScreen: props.navigation.getParam('ReturnScreen', state.ReturnScreen),
-        Product: props.navigation.getParam("Product", state.Product)
+        Product: props.navigation.getParam("Product", state.Product),
+        Product: props.navigation.getParam("RowIndex", state.RowIndex)
       };
     }
     // Return null if the state hasn't changed
@@ -238,13 +239,13 @@ export default class RequestView extends Component {
           <View style={{backgroundColor:colors.white, height:'90%'}}>
             <View style={[styles.header,{flexDirection:'row', backgroundColor:colors.grey5, height:  '10%',}]}>
               <View style={{backgroundColor:colors.grey5, justifyContent:'flex-start', paddingTop: ITEM_FONT_SIZE/2,}}>
-                <FlatList
+                {/* <FlatList
                   horizontal={true}
                   data={Product.itemDescription}
                   style={{width:SCREEN_WIDTH, height:  ITEM_FONT_SIZE*2}}
                   renderItem={({item, index}) =>
                   <Text style={{height:  ITEM_FONT_SIZE*2, fontSize: 17, paddingLeft:10, color:colors.primary, }}>{item.MrqDescription}</Text>}
-                />
+                /> */}
               </View>
               <View style={{position:'absolute',right:ITEM_FONT_SIZE*3, borderRadius:ITEM_FONT_SIZE, paddingTop: ITEM_FONT_SIZE/2,}}> 
                 <TouchableOpacity style={{width: ITEM_FONT_SIZE*1.5, height: ITEM_FONT_SIZE*2,}} 

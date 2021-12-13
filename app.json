@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "SOS OfflineMenu",
-    "slug": "SOS-OfflineMenu",
+    "name": "Relipos eMenu",
+    "slug": "relipos-EmenuV4",
     "privacy": "public",
     "sdkVersion": "40.0.0",
     "platforms": [
@@ -9,11 +9,11 @@
       "android",
       "web"
     ],
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "landscape",
-   "icon": "./assets/LogoSOS.png",
+    "icon": "./assets/icons/Logo_Emenu_BG_White_3.png",
     "splash": {
-      "image": "./assets/LogoSOS.png",
+     "image": "./assets/icons/Logo_Emenu_BG_Red_3.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -56,11 +56,11 @@
 
     },
       "supportsTablet": true,
-      "bundleIdentifier": "com.SOS.OfflineMenu"
+      "bundleIdentifier": "com.relipos.Emenu"
     },
     "android": {
-      "versionCode": 1,
-      "package": "com.SOS.OfflineMenu",
+      "versionCode": 4,
+      "package": "com.relipos.Emenu",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
@@ -87,6 +87,6 @@
         "com.sonyericsson.home.permission.BROADCAST_BADGE"
       ]
     },
-    "description": "New Version"
+    "description": "update version 2.0 fixed the product images"
   }
 }

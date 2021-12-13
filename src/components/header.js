@@ -22,7 +22,7 @@ export class _Header extends React.Component {
   }
   render() {
     const {isShowBack, state, table, language, BookingsStyle, _searchProduct, onPressBack, translate, name, titleSet, setState, lockTable,islockTable,backgroundColor,iheight,isShowFlag } = this.props;
-    
+   
     return (
       <View style={[BookingsStyle.header,{  backgroundColor: backgroundColor, width:SCREEN_WIDTH,height:iheight }]}>
         <View style={{ height:iheight,paddingTop: 1, width: "20%", flexDirection: 'row', justifyContent: "space-between" }}>
@@ -42,12 +42,12 @@ export class _Header extends React.Component {
             />
           </TouchableOpacity> :null
          }
-          <Image resizeMode="contain" 
-          source={require('../../assets/LogoSos.jpg')}
-          //source={ require('../../assets/icons/logo1_ngang.png')  }
+          <Image resizeMode='contain'
+         source={{uri:state.endpoint+'/Resources/Images/View/HeaderLogo.jpg'}}
             style={[
               BookingsStyle.header_logo,
               {
+                width:iheight*0.98*6/4,
                 maxWidth: '56%',
                 height:iheight*0.98, 
                 justifyContent: "center", 

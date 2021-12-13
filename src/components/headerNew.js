@@ -1,82 +1,112 @@
 import React from "react";
-import { View, TouchableOpacity, TextInput, StyleSheet, Text,Image,Dimensions} from "react-native";
+import {ActivityIndicator, View, TouchableOpacity, TextInput, StyleSheet, Text,Image,Dimensions} from "react-native";
 import colors from "../config/colors";
 import { Button, Icon } from "react-native-elements";
-//import { Sound} from "react-native-sound";
 import Constants from "expo-constants";
 import {ITEM_FONT_SIZE, BUTTON_FONT_SIZE} from "../config/constants";
-
+import { Audio } from 'expo-av';
 import { _storeData } from "../services/storages";
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SCREEN_HEIGHT =
   Dimensions.get("window").height - Constants.statusBarHeight;
 
-export class _HeaderNew extends React.Component {
-  componentDidMount() {
+export class _HeaderNew extends React.Component  {
+  constructor(props) {
+    super(props);
+    this.state = {
+      IsLoaded:false,
+      sound:null
+    }
+  }
+  _onPlaybackStatusUpdate = playbackStatus => {
+    if (!playbackStatus.isLoaded) {
+     ;
+    } else {
+      if (playbackStatus.isPlaying) {
+        // Update your UI for the playing state
+      } else 
+      {
+        // Update your UI for the paused state
+      }
+      if (playbackStatus.isBuffering) {
+        // Update your UI for the buffering state
+      }
+      if (playbackStatus.didJustFinish) {
+        this.props.setState({ showCall:false })
+      }
+    }
   };
-  _CallServices= async () => {
-    setState({ showCall: !state.showCall })
-//    // var Sound = require('react-native-sound');
-// // Enable playback in silence mode
-// Sound.setCategory('Playback');
-// var whoosh = new Sound('whoosh.mp3', Sound.MAIN_BUNDLE, (error) => {
-//   if (error) {
-//     console.log('failed to load the sound', error);
-//     return;
-//   }
-//   // loaded successfully
-//   console.log('duration in seconds: ' + whoosh.getDuration() + 'number of channels: ' + whoosh.getNumberOfChannels());
- 
-//   // Play the sound with an onEnd callback
-//   whoosh.play((success) => {
-//     if (success) {
-//       console.log('successfully finished playing');
-//     } else {
-//       console.log('playback failed due to audio decoding errors');
-//     }
-//   });
-// });
- 
-// // Reduce the volume by half
-// whoosh.setVolume(0.5);
- 
-// // Position the sound to the full right in a stereo field
-// whoosh.setPan(1);
- 
-// // Loop indefinitely until stop() is called
-// whoosh.setNumberOfLoops(-1);
- 
-// // Get properties of the player instance
-// console.log('volume: ' + whoosh.getVolume());
-// console.log('pan: ' + whoosh.getPan());
-// console.log('loops: ' + whoosh.getNumberOfLoops());
- 
-// // Seek to a specific point in seconds
-// whoosh.setCurrentTime(2.5);
- 
-// // Get the current playback point in seconds
-// whoosh.getCurrentTime((seconds) => console.log('at ' + seconds));
- 
-// // Pause the sound
-// whoosh.pause();
- 
-// // Stop the sound and rewind to the beginning
-// whoosh.stop(() => {
-//   // Note: If you want to play a sound after stopping and rewinding it,
-//   // it is important to call play() in a callback.
-//   whoosh.play();
-// });
- 
-// // Release the audio player resource
-// whoosh.release();
+  componentWillUnmount= async () => 
+  {
+    let { sound} = this.state;
+    if (sound!=null) {
+      await sound.unloadAsync();
+        this.setState({sound:null})
+    }
+  }
+  componentDidMount= async () => {
+   
+    await this._LoadSound();
+    this.setState({IsLoaded:true });
+  };
+ _LoadSound= async () => {
+  try
+  {
+    const { state} = this.props;
+    let { sound} = this.state;
+    if (sound==null) {
+    sound= new Audio.Sound();
+    await sound.loadAsync({uri:state.endpoint+ '/Resources/Sound/RingSton.mp3'});
+    await sound.setOnPlaybackStatusUpdate(this._onPlaybackStatusUpdate);
+    this.setState({ sound})
+  return sound;
+    }
+  }
+  catch(ex){
+    console.log('_LoadSound Error :'+ex)
+    this.setState({ sound:null})
+    
+  }
+  return null;
+}
+  _HandleSound= async () => {
+    let { sound } = this.state;
     try{
+    
+      if (sound==null) 
+         sound=  await this._LoadSound();
+      const { onCallServices } = this.props; 
+    if (sound==null)
+         return;
+      if (this.props.state.showCall) 
+      {
+        await sound.stopAsync();
+        this.props.setState({ showCall: false });
+        return;
+      }  
+      this.props.setState({ showCall: true  });
+         await sound.setPositionAsync(0);
+         await sound.playAsync();
+         await onCallServices(); 
   }catch(ex){
-    console.log('_BindingMeta Error :'+ex)
+    this.props.setState({ showCall:false })
+   console.log('_HandleSound Error :'+ex)
   }
   }
   render() {
-    const { state, language, table, BookingsStyle, _searchProduct, onPressBack, translate, name, titleSet, setState, lockTable,backgroundColor } = this.props;
-    
+   
+    const { state, table, BookingsStyle, _searchProduct, onPressBack, translate, name, titleSet, setState,backgroundColor,changeLanguage } = this.props;
+    if (state.showCall==undefined||state.showCall==null) {
+      state.showCall=false;
+    }
+    if (!this.state.IsLoaded) {
+      return (
+        <View style={[styles.pnbody, styles.horizontal]}>
+          <ActivityIndicator size="large" color="#0000ff"
+          />
+        </View>
+      );
+    }
     return (
       <View style={[BookingsStyle.header,{ backgroundColor: backgroundColor, width: '100%' }]}>
         <View style={{ paddingTop: 1, width: "20%", flexDirection: 'row', justifyContent: "space-between" }}>
@@ -95,8 +125,8 @@ export class _HeaderNew extends React.Component {
           </View>
           <View style={{ flexDirection: 'column', width: '60%', justifyContent: "center", alignItems: 'center', }}>
             <TouchableOpacity style={{ width: '100%', justifyContent: "center", alignItems: 'center', }}
-              onPress={() => { this._CallServices(); }}>
-            
+              onPress={() => { 
+              this._HandleSound(); }}>
              {(state.showCall==false)?
               <View style={{ flexDirection: 'row', width: '100%', justifyContent: "center", alignItems: 'center', }}>
               <Image  resizeMode="contain" source={ require('../../assets/icons/IconCall.png') }
@@ -159,7 +189,7 @@ export class _HeaderNew extends React.Component {
               </TouchableOpacity>
               : <View style={{ width: ITEM_FONT_SIZE * 2, }}>
               </View>}
-            {!lockTable ?
+            {!state.lockTable ?
               <TouchableOpacity style={{ paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
                 onPress={() => {
                   setState({ lockTable: true })
@@ -169,16 +199,15 @@ export class _HeaderNew extends React.Component {
               : <View style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}>
                 <Icon name="lock" iconStyle={{ color: colors.red, paddingLeft: ITEM_FONT_SIZE * 1, }} fontSize={ITEM_FONT_SIZE * 1.4} type="antdesign"></Icon>
               </View>}
-            {
-              language == 1 ?
+            {state.language == 1 ?
                 <TouchableOpacity style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
-                  onPress={() => setState({ IsShowCustomerSendNotification: !state.IsShowCustomerSendNotification })}>
+                  onPress={() => changeLanguage(2)}>
                   <Image resizeMode="stretch" source={require('../../assets/icons/iconNew/TiengViet-10.png')}
                     style={{ width: ITEM_FONT_SIZE * 2, height: ITEM_FONT_SIZE * 1.4, }} />
                 </TouchableOpacity>
                 :
                 <TouchableOpacity style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
-                  onPress={() => setState({ IsShowCustomerSendNotification: !state.IsShowCustomerSendNotification })}>
+                  onPress={() => changeLanguage(1)}>
                   <Image resizeMode="stretch" source={require('../../assets/icons/iconNew/TiengAnh-10.png')}
                     style={{ width: ITEM_FONT_SIZE * 2, height: ITEM_FONT_SIZE * 1.4, }} />
                 </TouchableOpacity>

@@ -1,7 +1,6 @@
 export { ProductDetails } from './Modals/_ProductDetails';
 export { ProductSetDetails } from './Modals/_ProductSetDetails';
 export { CardDetailView } from './Modals/CardDetailView';
-export { _CustomerSendNotification } from './Modals/_CustomerSendNotification';
 export { _CallOptions } from './Modals/_CallOptions';
 export { _Infor } from './Modals/_Infor';
 export { _TotalInfor } from './Modals/_TotalInfor';

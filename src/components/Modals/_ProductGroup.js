@@ -41,8 +41,9 @@ export class _ProductGroup extends React.Component {
               borderRadius: 1, borderWidth: 1, borderColor: index == SelectedGroupIndex ? '#F87D26' : '#333D4C',
               height: H3FontSize*2.5, backgroundColor: index == SelectedGroupIndex ? '#F87D26' : '#333D4C',
             }}> 
-              <Text style={{ fontSize: H4FontSize,marginLeft:2, textAlign:'left',width:'89%', color: index == SelectedGroupIndex ? colors.white : colors.grey4,
-                fontFamily: index == SelectedGroupIndex ? 'RobotoBold' : 'RobotoRegular',
+              <Text style={{ fontSize: H4FontSize,marginLeft:1, textAlign:'left',width:'89%', 
+              color: index == SelectedGroupIndex ? colors.white : colors.grey4,
+                fontWeight: index == SelectedGroupIndex ? 'bold': 'normal',
               }}>{item.PrgName}</Text>
               {index == SelectedGroupIndex ?
                <Image resizeMode='center' source={require('../../../assets/icons/IconDown.png')}
@@ -50,15 +51,17 @@ export class _ProductGroup extends React.Component {
               }
             </View>
           </TouchableOpacity>
-          {SelectedGroupIndex== index ? PrdChildGroups.map((ChildItem, Childindex) => { 
+          {SelectedGroupIndex== index ? 
+          PrdChildGroups.map((ChildItem, Childindex) => { 
             return ( 
               <TouchableOpacity key={Childindex}  style={{ width: '100%', justifyContent: 'center', alignItems: 'center',backgroundColor: Childindex == SelectedChildGroupIndex ? '#F99751' : '#48515E', }}
                 onPress={() => { _selectChildGroup(ChildItem, Childindex); }}  >
-              <View style={{ flexDirection: 'row', width: '100%',marginLeft:10, justifyContent: 'flex-start', alignItems:'center', 
-              height: H4FontSize*0.9*2.5, 
-              borderTopWidth:1,borderTopColor:colors.grey5
+              <View style={{ flexDirection: 'row', width: '100%',marginLeft:H4FontSize, justifyContent: 'flex-start', alignItems:'center', 
+              height: H4FontSize*2.5, 
+              borderTopWidth:1,borderTopColor:colors.grey4
             }}>  
-              <Text style={{ fontSize: H4FontSize*0.9,marginRight:5,textAlign:'left', color: Childindex == SelectedChildGroupIndex ? colors.white : colors.grey4,
+              <Text style={{ fontSize: H4FontSize*0.9,textAlign:'left', 
+              color: Childindex == SelectedChildGroupIndex ? colors.white : colors.grey4,
                 fontFamily: Childindex == SelectedChildGroupIndex ? 'RobotoBold' : 'RobotoRegular',
               }}>{ChildItem.PrgName}</Text>
             </View>

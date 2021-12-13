@@ -33,14 +33,14 @@ export const getToken = async () => {
   return token;
 }
 
-export const login = async (endpoint, userName, passWord) => {
+export const login = async (userName, passWord) => {
+  let endpoint = await _retrieveData('APP@BACKEND_ENDPOINT', JSON.stringify(ENDPOINT_URL));
+  endpoint = endpoint.replace("/api/", "").replace("/api", "");
+  endpoint = JSON.parse(endpoint);
+  endpoint=endpoint+'/api'
+  //console.log('endpoint:'+endpoint)
   let settings = await _retrieveData('settings', JSON.stringify({ PosId: 1, PosIdName: 'Thu ngân' }));
   settings = JSON.parse(settings);
-  if (userName == 'apple' && passWord == '123456') {
-    return new Promise(resolve => {
-      resolve(loginData);
-    });
-  }
   const moonLanding = new Date();
   moonLanding.getTime();
   let token = 'c5JHSe7PTp2dGPuMZnJ08k:APA91bG8ODmZ5FmEWlcXoCp0-qYWEewlUOubfqn5b2NFHgCOjLH3QFM6JWH8cU-yr5wiDYIzzmPyu0cwFcYboQgjzrmhQp6LUR-ORQhfq-' + formatDate1(moonLanding, 8);

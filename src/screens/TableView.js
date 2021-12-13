@@ -34,7 +34,6 @@ export default class TableView extends Component {
     //const data = Array.apply(null, {length: 20}).map(Number.call, Number);
 
     this.state = {
-      isLoading: false,
       selectedType: null,
       fontLoaded: false,
       data: [],
@@ -92,44 +91,53 @@ export default class TableView extends Component {
   }
 
   async componentDidMount() {
-    this.translate = await this.translate.loadLang();
-    this.GetListCustomer();
+    try {
+      this.translate = await this.translate.loadLang();
     await cacheFonts({
       RobotoLight: require("../../assets/fonts/Roboto-Light.ttf"),
       RobotoBold: require("../../assets/fonts/Roboto-Bold.ttf"),
       RobotoLightItalic: require("../../assets/fonts/Roboto-LightItalic.ttf"),
       RobotoRegular: require("../../assets/fonts/Roboto-Regular.ttf"),
     });
-    let settings = await _retrieveData('settings', JSON.stringify({"PosId": 1, "PosIdName": "Thu ngân"}));
+    let settings = await _retrieveData('settings', JSON.stringify({}));
+    if (settings!='{}') 
       settings = JSON.parse(settings);
     let user = await _retrieveData('APP@USER', JSON.stringify({}));
+    if(user!='{}')
     user = JSON.parse(user);
-    let user_linking = await _retrieveData('APP@USER_LINKING', JSON.stringify({}));
-    user_linking = JSON.parse(user_linking);
     let endpoint = await _retrieveData('APP@BACKEND_ENDPOINT', JSON.stringify({endpoint : ENDPOINT_URL}));
     endpoint = JSON.parse(endpoint);
     let Config = await _retrieveData('APP@CONFIG', '{}');
     if (Config!='{}')
-    this.setState({ Config :JSON.parse(Config) });  
-
-    this.setState({ settings, user });
-    this.getlistArea(() => this.loadTables(0));
+    Config=JSON.parse(Config);
+    this.setState({ Config,settings, user });
+    await this.GetListCustomer();
+    await this.getlistArea(()=> this.loadTables(0));
     StatusBar.setHidden(true);
     this.defaultFonts();
+    this.setState({ fontLoaded:true})
+      
+    } catch (error) {
+      Question.alert( this.translate.Get('Notice'),error, [
+        {
+          text: "OK", onPress: () => {
+            this.setState({ fontLoaded:true});
+          }
+        }
+      ]);
+    }
   }
-
   GetListCustomer = async () => {
     const { ObjType, KeySearch, OgId, isGetOrg } = this.state;
     this.setState({ isWorking: true });
     Object_Search(ObjType, KeySearch, OgId, isGetOrg).then((res) => {
       let CustomerList = res.Data;
-      this.setState({ CustomerList, fontLoaded: true, isWorking: false, isLoading: false });
+      this.setState({ CustomerList, isWorking: false });
     }).catch(async (err) => {
-      this.setState({ CustomerList: [], fontLoaded: true, isWorking: false, isLoading: false });
+      this.setState({ CustomerList: [],  isWorking: false });
     });
-    this.setState({ isLoading: false, isWorking: false, fontLoaded: true, });
+    this.setState({ isWorking: false,  });
   }
-
   defaultFonts() {
     const customTextProps = {
       style: {
@@ -138,7 +146,6 @@ export default class TableView extends Component {
     }
     setCustomText(customTextProps)
   }
-
   static getDerivedStateFromProps = (props, state) => {
     if (props.navigation.getParam('user', state.user) != state.user) {
       return {
@@ -161,106 +168,81 @@ export default class TableView extends Component {
       that.props.navigation.navigate('LoginView') ;
     });
   }
-
+/**
+ * Load thông tin khu
+ * @param {*} callback 
+ */
   getlistArea = async (callback) => {
-    let settings = await _retrieveData('settings', JSON.stringify({}));
-    if (settings == '{}') {
-      settings = { "PosId": 1, "PosIdName": "Thu ngân" };
-    }
-    else {
-      settings = JSON.parse(settings);
-    }
-    let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
-    Config = JSON.parse(Config);
-    let language = await _retrieveData('culture', 1);
+    let { settings,Config} = this.state;
     Config.PosId = settings.PosId;
     Config.I_BusinessType = 1;
+    this.setState({ isWorking: true,showFilterPanel: false});
     ListArea(Config).then((res) => {
       if (res.Data.length > 0) {
         this.setState({ AreasList: res.Data, selectedAreaIndex: 0 }, callback);
       }
       else {
-        this.setState({ fontLoaded: true, language, isLoading: false, showFilterPanel: false });
+        this.setState({ isWorking: false });
       }
     }).catch(async (err) => {
-      _remove('APP@USER',
-        () => { this.props.navigation.navigate("LoginView"); });
+      Question.alert( this.translate.Get('Notice'),err, [
+        {
+          text: "OK", onPress: () => {
+            this.setState({ isWorking: false });
+          }
+        }
+      ]);
+     
     });
   }
-
   loadTables = async (selectedAreaIndex) => {
-    let { AreasList, tableStatus } = this.state;
-    let settings = await _retrieveData('settings', JSON.stringify({}));
-    if (settings == '{}') {
-      settings = { "PosId": 1, "PosIdName": "Thu ngân" };
-    }
-    else {
-      settings = JSON.parse(settings);
-    }
-    let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
-    Config = JSON.parse(Config);
+    let { AreasList, tableStatus,settings,Config } = this.state;
     let AreaId = AreasList[selectedAreaIndex].AreID;
     Config.PosId = settings.PosId;
     Config.I_BusinessType = 1;
+    this.setState({  isWorking: true});
     ListTables(Config, AreaId, tableStatus).then((res) => {
-      this.setState({ selectedAreaIndex, TablesList: res.Data.Table, fontLoaded: true, isLoading: false, showFilterPanel: false });
+      this.setState({ selectedAreaIndex, TablesList: res.Data.Table, isWorking: false });
     }).catch(async (err) => {
-      this.setState({ selectedAreaIndex, fontLoaded: true, isLoading: false, showFilterPanel: false });
+      this.setState({ selectedAreaIndex, isWorking: false});
     });
-    this.setState({ isLoading: false, isWorking: false, fontLoaded: true, });
   }
-
   filter = (status) => {
-    this.setState({ showFilterPanel: false, tableStatus: status }, () => { this.loadTables(this.state.selectedAreaIndex) });
+    this.setState({ tableStatus: status }, () => { this.loadTables(this.state.selectedAreaIndex) });
   }
   _onPressTable = async (item, index) => {
-    const { user, AreasList, OrdPlatform, selectedAreaIndex } = this.state;
-    let settings = await _retrieveData('settings', JSON.stringify({}));
-    if (settings == '{}') {
-      settings = { "PosId": 1, "PosIdName": "Thu ngân" };
-    }
-    else {
-      settings = JSON.parse(settings);
-    }
+    const { user, AreasList, OrdPlatform, selectedAreaIndex,settings } = this.state;
     if (item == null || item.TicketID <= 0) {
       this.setState({
-        sItemTable: item, sIndexTable: index, isShowTicketInfor: true, fontLoaded: true,
-        isLoading: false, isWorking: false
+        sItemTable: item, sIndexTable: index, isShowTicketInfor: true, isWorking: false
       });
     }
     else {
+      this.setState({ isLoading: true });
       CheckAndGetOrder(item, OrdPlatform).then((res) => {
         item.OrderId = res.Data;
         item.AreaID = AreasList[selectedAreaIndex].AreID;
+        this.setState({ isLoading: false });
         _storeData('APP@TABLE', JSON.stringify(item),
           () => {
             this.props.navigation.navigate("OrderView", { settings, user, table: item });
           });
       }).catch((error) => {
-        console.log(error);
-        Question.alert( this.translate.Get('Notice'),
-        this.translate.Get("ServerError"+':'+error), [
+        Question.alert( 'System Error',error, [
           {
             text: "OK", onPress: () => {
               this.setState({ isLoading: false });
             }
           }
-        ],
-          { cancelable: false }
-        )
-        this.setState({ isLoading: false, });
+        ]);
+       
       });
     }
   }
 
   _handleChangeButton = async () => {
-    let { TicketInfor, sItemTable, B_UseOrderDefault, OrdPlatform, group, AreasList, selectedAreaIndex } = this.state;
-    let user = await _retrieveData('APP@USER', JSON.stringify({}));
-    user = JSON.parse(user);
-    let settings = await _retrieveData('settings', JSON.stringify({}));
-    settings = JSON.parse(settings);
-    let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
-    Config = JSON.parse(Config);
+    let {user,settings,Config, TicketInfor, sItemTable, B_UseOrderDefault, OrdPlatform, group, AreasList, selectedAreaIndex } = this.state;
+  
     Config.PosId = settings && settings.PosId ? settings.PosId : 1;
     Config.I_BusinessType = 1;
     sItemTable.AreaID = AreasList[selectedAreaIndex].AreID;
@@ -288,31 +270,29 @@ export default class TableView extends Component {
                     });
                 }
                 else {
-                  this.setState({ isLoading: false, fontLoaded: true, isWorking: false, });
+                  this.setState({ isWorking: false, });
                 }
               });
             });
           }
           else {
-            this.setState({ isLoading: false, fontLoaded: true, isWorking: false, });
+            this.setState({ isWorking: false, });
           }
         });
       }
       else {
-        this.setState({ isLoading: false, fontLoaded: true, isWorking: false, })
+        this.setState({ isWorking: false, })
       }
     }).catch((error) => {
-      Question.alert(
-        this.translate.Get('Notice'),
-        this.translate.Get('Vui lòng kiểm tra lại thông tin!'), [
+      Question.alert('System Error',error, [
         {
           text: "OK", onPress: () => {
-            this.setState({ isLoading: false, fontLoaded: true, isWorking: false, });
+            this.setState({ isWorking: false, });
           }
         }
       ]
       )
-      this.setState({ isLoading: false, fontLoaded: true, isWorking: false, });
+      this.setState({ isWorking: false, });
     });
   }
   _setItemCustomer = async (item, index) => {

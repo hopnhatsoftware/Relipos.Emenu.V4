@@ -39,6 +39,7 @@ export default class LogoutView extends LoginView {
     };
   }
   async componentDidMount() {
+    //await this.props.componentDidMount();
     let settings = await _retrieveData('settings', JSON.stringify({}));
     if (settings == undefined) {
       settings = {};
@@ -55,7 +56,9 @@ export default class LogoutView extends LoginView {
     });
     let dictionary = await _retrieveData('dictionary');
     let language = await _retrieveData('culture', 1);
-    this.setState({ fontLoaded: true, language: language, dictionary: dictionary, settings });
+    let endpoint =await _retrieveData( "APP@BACKEND_ENDPOINT",  JSON.stringify(ENDPOINT_URL));
+    endpoint=JSON.parse(endpoint);
+    this.setState({ fontLoaded: true,endpoint, language: language, dictionary: dictionary, settings });
     StatusBar.setHidden(true);
   }
 

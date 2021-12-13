@@ -57,7 +57,7 @@ export class _Infor extends React.Component {
         <View style={{flexDirection:'row', height: SCREEN_HEIGHT /2 - BUTTON_FONT_SIZE * 2.5 - ITEM_FONT_SIZE, width:'100%',justifyContent:'center'}}>
           <WebView
           originWhitelist={['*']}
-          source={{ uri: endpoint.replace("api/", "") +'/EmenuHtml/TicketInfo' }}
+          source={{ uri: endpoint +'/EmenuHtml/TicketInfo' }}
           style={{ marginTop: 20 }}
         />
         </View>

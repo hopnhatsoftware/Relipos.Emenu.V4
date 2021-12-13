@@ -15,6 +15,7 @@ export default class Question extends React.Component {
       <View style={{
         backgroundColor: "rgba(98,98,98,0.6)",
         position: 'absolute',
+        zIndex:999999999,
         flexDirection: 'column',
         width: SCREEN_WIDTH,
         height: SCREEN_HEIGHT + Constants.statusBarHeight + 100,

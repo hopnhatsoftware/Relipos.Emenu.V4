@@ -14,7 +14,7 @@ export const MARGIN_TOP = Platform.OS =='ios'?  Constants.statusBarHeight    :10
 export const TITLE_FONT_SIZE= SCREEN_HEIGHT*0.06>32?32: SCREEN_HEIGHT*0.06;
 
 export const HEADER_HEIGHT = Constants.statusBarHeight + TITLE_FONT_SIZE + 8;
- export const ENDPOINT_URL="http://demo.relipos.com/api/";
+ export const ENDPOINT_URL="http://demo.relipos.com";
 //export const ENDPOINT_URL="http://192.168.1.102:8081/api/";
 export const IMAGE_MAP_LOCATION ="../../resources/";
 export const ICON_SIZE = 10;

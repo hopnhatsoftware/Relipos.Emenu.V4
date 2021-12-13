@@ -61,16 +61,22 @@ export const GetPrdChildGroups = async (settings, item, group) => {
     PrgLevel: group.PrgLevel == null ? 0 : group.PrgLevel, Culture: culture
   });
 }
-
-export const GetProductByGroupParent = async (settings, item, group, KeySearch) => {
+export const getProductByGroup = async (Config,settings, TicketID,AreaID, PrgId, KeySearch) => {
   const culture = await _retrieveData('culture', 1);
-  const URL = '/Emenu/getProductByGroupParent';
+  const URL = '/Product/Emenu_getProductByGroup';
+  
   return await execFetch(URL, 'GET', {
-    TicketID: item.TicketID, PrdId: -1, KeySearch: KeySearch, PrgId: group.PrgId, AreaId: item.AreaID,
-    BustId: settings.I_BusinessType ? settings.I_BusinessType : 1, BranchId: settings.I_BranchId, PosId: settings.PosId ? settings.PosId : 1, Culture: culture
+    BustId: Config.I_BusinessType ? Config.I_BusinessType : 1 , 
+    TicketID: TicketID, 
+    PrdId: -1, 
+    KeySearch: KeySearch, 
+    PrgId: PrgId, 
+    AreaId: AreaID,
+    BranchId: Config.I_BranchId, 
+    PosId: settings.PosId ,
+     Culture: culture
   });
 }
-
 export const loadOrderInformation = async (settings, item) => {
   const culture = await _retrieveData('culture', 1);
   const URL = '/Emenu/getOrderInformation';
@@ -89,12 +95,8 @@ export const sendOrder = async (settings, table, OrdPlatform, details) => {
       product.Json = '';
     if (typeof product.subItems == 'undefined') 
     product.Json = JSON.stringify(product.subItems);
+    if (typeof product.OrddDescription == 'undefined' || product.OrddDescription==null) 
     product.OrddDescription = '';
-    if (typeof product.itemDescription != 'undefined' && product.itemDescription) {
-      product.itemDescription.forEach((item, index) => {
-        product.OdsdDescription += item.MrqDescription + ' ';
-      });
-    }
     OrderDetails.push({
       ...product,
       OrddVatPercent: typeof product.PrdVatPercent != 'undefined' && product.PrdVatPercent ? product.PrdVatPercent : 0 ,
@@ -105,7 +107,7 @@ export const sendOrder = async (settings, table, OrdPlatform, details) => {
     //console.log("product"+JSON.stringify(product));
     
   });
- // console.log("OrderDetails"+JSON.stringify(OrderDetails))
+  //console.log("OrderDetails"+JSON.stringify(OrderDetails))
   let ParramOrders = {
     OrdId: table.OrderId,
     TicketID: table.TicketID,
@@ -161,15 +163,28 @@ export const SetMenu_gettemDefault = async (settings, item) => {
   return await execFetch(URL, 'GET', { PrdId: item.PrdId, BranchId: settings.I_BranchId, Culture: culture, TkdBasePrice: item.TkdBasePrice });
 }
 
-export const getAllItembyChoiceId = async (chsId, settings, item, KeySearch) => {
+export const getByChoiceId = async (chsId, settings, item, KeySearch) => {
   const culture = await _retrieveData('culture', 1);
-  const URL = '/Emenu/getAllItembyChoiceId';
+  const URL = '/Product/getByChoiceId';
   return await execFetch(URL, 'GET', {
     chsId, BranchId: settings.I_BranchId, Culture: culture, PosId: settings.PosId ? settings.PosId : 1,
     TkdBasePrice: item.TkdBasePrice, KeySearch: KeySearch,
   });
 }
-
+/**
+ * Gọi dịch vụ 
+ * @param {*} OrgId : Mã chi nhánh
+ * @param {*} TabId : mã bàn
+ * @param {*} TicketId :mã phiếu
+ * @param {*} AppType : loại 
+ * @param {*} ObjCreateBy : người Thực hiện
+ * @returns : true
+ */
+export const CallServices = async (OrgId,TabId,TicketId,AppType,ObjCreateBy) => {
+  const culture = await _retrieveData('culture', 1);
+  const URL = '/TableView/CallServices';
+  return await execFetch(URL, 'GET', {OrgId,TabId,TicketId,AppType,ObjCreateBy,Culture:culture });
+}
 export const SetMenu_getChoiceCategory = async (settings, item) => {
   const culture = await _retrieveData('culture', 1);
   const URL = '/Emenu/SetMenu_getChoiceCategory';

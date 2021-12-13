@@ -1,5 +1,6 @@
 
 export default en = {
+    'Alert':'Alert',
     'username': 'Username',
     'password': 'Pasword',
     'branch': 'Branch',
@@ -75,9 +76,12 @@ export default en = {
     'Chọn mua': 'Select Options',
     'Thông Báo!': 'Notice!',
     'Thông Báo': 'Notice',
+    'SystemError': 'System Error',
     'Gọi nhân viên':'Call staff',
+    'Đang gọi ..':'Calling...',
     'Vui lòng xem lại bản quyền!':'Please review copyright!',
     'Bạn đã nhập code sai, vui lòng liên hệ với nhân viên!':'You entered the wrong code, please contact the staff!',
+    'Vui lòng nhập mã trước khi gửi Order !':'Please enter the code before submitting the Order !',
     'Bạn không có quyền gọi order, vui lòng liên hệ với nhân viên!':'You do not have the right to order, please contact the staff!',
     'Mật khẩu hoặc tài khoản không đúng!': 'Password or account is incorrect!',
     'Bàn này chưa mở phiếu, vui lòng liên hệ thu ngân để mở phiếu!': 'This table has not been opened yet, please contact the cashier to open it!',
@@ -124,6 +128,7 @@ export default en = {
     'Bàn tạm tính': 'Billing table',
     'Bàn thanh toán': 'Paid table',
     'Đặt chỗ': 'Ordered',
+    'ChoiseOrderlimited':'Your quantity is limited, Please check in!',
     'Limited Quantity!': 'Limited Quantity!',
     'Your quantity is limited, Please check in!': 'Your quantity is limited, Please check in!',
     'Limited Products!': 'Limited Products!',

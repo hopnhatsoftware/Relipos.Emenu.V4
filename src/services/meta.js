@@ -5,6 +5,8 @@ import { ENDPOINT_URL } from '../config/constants';
 export const GetPosList = async () => {
   let endpoint = await _retrieveData('APP@BACKEND_ENDPOINT', JSON.stringify(ENDPOINT_URL));
   endpoint = JSON.parse(endpoint);
+  endpoint = endpoint.replace("/api/", "").replace("/api", "");
+  endpoint=endpoint+'/api'
   const URL = endpoint + "/Config/PosList";
   return fetch(URL, {
     method: 'GET',
@@ -20,6 +22,8 @@ export const GetPosList = async () => {
 export const loadPosConfig = async (posId) => {
   let endpoint = await _retrieveData('APP@BACKEND_ENDPOINT', JSON.stringify(ENDPOINT_URL));
   endpoint = JSON.parse(endpoint);
+  endpoint = endpoint.replace("/api/", "").replace("/api", "");
+  endpoint=endpoint+'/api'
   const URL = endpoint + "/Config/getAllConfig?posId=" + posId;
   return fetch(URL, {
     method: 'GET',

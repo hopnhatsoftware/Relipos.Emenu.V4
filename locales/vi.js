@@ -1,5 +1,6 @@
 
 export default en={
+    'Alert':'Thông báo',
     'username':'Tên Đăng Nhập',
     'password':'Mật Khẩu',
     'branch':'Chi Nhánh',
@@ -102,7 +103,7 @@ export default en={
     "order_time":"Thời Gian Đặt",
     'ticket_info':'Thông Tin Phiếu',
     'Limited Quantity!':'Quá Số Lượng!',
-    
+    'ChoiseOrderlimited':'Số lượng Lựa chọn đã vượt quá số lượng cho phép!',
     'Your quantity is limited, Please check in!':'Số lượng món ăn vượt quá giới hạn cho phép, vui lòng gọi món!',
     'Limited Products!':'Thực đơn quá nhiều món!',
     'Your products number is limited, Please check in!':'Món ăn vượt quá giới hạn cho phép, vui lòng gọi món!',
@@ -114,5 +115,6 @@ export default en={
     'About': 'Thông tin',
     'Support platform:': 'Nền tảng hỗ trợ:',
     'This amount does not include tax, discount, services and other fees.' : 'Số tiền này chưa bao gồm thuế VAT, giảm giá và các chi phí khác.',
-    'Contact cashiers for the final amount.' : 'Vui lòng liên hệ thu ngân để biết thêm chi tiết.'
+    'Contact cashiers for the final amount.' : 'Vui lòng liên hệ thu ngân để biết thêm chi tiết.',
+    'SystemError.' : 'Lỗi Hệ thống.'
 }

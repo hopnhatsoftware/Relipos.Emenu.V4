@@ -9,6 +9,8 @@ export const fetchFile = async (Path, Data) => {
   let endpoint = await _retrieveData('APP@BACKEND_ENDPOINT', JSON.stringify(ENDPOINT_URL));
   let user = await _retrieveData('APP@USER', JSON.stringify({}));
   endpoint = JSON.parse(endpoint);
+  endpoint = endpoint.replace("/api/", "").replace("/api", "");
+  endpoint=endpoint+'/api'
   user = JSON.parse(user);
 
   return new Promise((resolve, reject) => {
@@ -75,14 +77,16 @@ export const fetchFile = async (Path, Data) => {
 export const execFetch = async (Path, Method, Data) => {
   let endpoint = await _retrieveData('APP@BACKEND_ENDPOINT', JSON.stringify(ENDPOINT_URL));
   endpoint = JSON.parse(endpoint);
+  endpoint = endpoint.replace("/api/", "").replace("/api", "");
+  endpoint=endpoint+'/api'
   let user = await _retrieveData('APP@USER', JSON.stringify({}));
   user = JSON.parse(user);
   let JwtToken = await _retrieveData('APP@JWT', JSON.stringify({}));
   JwtToken = JSON.parse(JwtToken);
-  let URL = endpoint + '/' + Path;
-
+  let URL = endpoint +'/'+ Path;
   if (Method == 'GET') {
     URL = URL + '?' + serialize(Data);
+    
     return fetch(URL, {
       method: Method,
       headers: {
@@ -104,8 +108,7 @@ export const execFetch = async (Path, Method, Data) => {
       }
       return data;
     }).catch(async (error) => {
-      Alert.alert(
-        "Error",
+      Alert.alert( "System Error",
         URL + " " + error,
       )
     });
@@ -144,12 +147,13 @@ export const execFetch = async (Path, Method, Data) => {
 export const execFetchNoMessenger = async (Path, Method, Data) => {
   let endpoint = await _retrieveData('APP@BACKEND_ENDPOINT', JSON.stringify(ENDPOINT_URL));
   endpoint = JSON.parse(endpoint);
+  endpoint = endpoint.replace("/api/", "").replace("/api", "");
+  endpoint=endpoint+'/api'
   let user = await _retrieveData('APP@USER', JSON.stringify({}));
   user = JSON.parse(user);
   let JwtToken = await _retrieveData('APP@JWT', JSON.stringify({}));
   JwtToken = JSON.parse(JwtToken);
   let URL = endpoint + '/' + Path;
-
   if (Method == 'GET') {
     URL = URL + '?' + serialize(Data);
     return fetch(URL, {

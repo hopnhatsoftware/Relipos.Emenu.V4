@@ -8,7 +8,7 @@ import { login, CheckCasherIn } from '../services';
 import { _retrieveData, _storeData, _remove } from '../services/storages';
 import { cacheFonts } from "../helpers/AssetsCaching";
 import { Input, Button } from 'react-native-elements';
-import { LOGIN_INPUT_FONT_SIZE, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, BACKGROUND_COLOR, ENDPOINT_URL,H1FontSize,H2FontSize,H3FontSize } from '../config/constants';
+import {ENDPOINT_URL, LOGIN_INPUT_FONT_SIZE, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, BACKGROUND_COLOR,H1FontSize,H2FontSize,H3FontSize } from '../config/constants';
 import translate from '../services/translate';
 import colors from "../config/colors";
 import { setCustomText } from 'react-native-global-props';
@@ -24,7 +24,6 @@ export default class LoginView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      isConnected: false,
       isLoading: false,
       branchId: -1,
       fontLoaded: false,
@@ -43,18 +42,15 @@ export default class LoginView extends Component {
       lockTable: false,
       isWorking: false,
       showDropdown: false,
+      endpoint:''
     };
     this.translate = new translate();
   }
 
-  async componentDidMount() {
+  async componentDidMount()  {
+    try{
     let { username } = this.state;
     let settings = await _retrieveData('settings', JSON.stringify({}));
-
-    let user_linking = await _retrieveData('APP@USER_LINKING', JSON.stringify({}));
-    if (user_linking != "{}") {
-      user_linking = JSON.parse(user_linking);
-    }
     let user = await _retrieveData('APP@USER', JSON.stringify({}));
     if (typeof user !== 'undefined') {
       user = JSON.parse(user);
@@ -84,7 +80,6 @@ export default class LoginView extends Component {
         return;
       }
     }
-
     this.translate = await this.translate.loadLang();
     await cacheFonts({
       RobotoLight: require("../../assets/fonts/Roboto-Light.ttf"),
@@ -93,15 +88,23 @@ export default class LoginView extends Component {
       RobotoRegular: require("../../assets/fonts/Roboto-Regular.ttf"),
     });
     let language = await _retrieveData('culture', 1);
-    let network = await Network.getNetworkStateAsync();
-    if (!network.isInternetReachable) {
-      Alert.alert('Message', 'Please connect to internet!');
-    }
-    this.setState({ fontLoaded: true, isConnected: network.isInternetReachable, username, language: language, settings });
+   
+   /* let network = await Network.getNetworkStateAsync();
+      if (!network.isInternetReachable) {
+       Alert.alert('Message', 'Please connect to internet!');
+     }
+    */
+
+    let endpoint =await _retrieveData( "APP@BACKEND_ENDPOINT",  JSON.stringify(ENDPOINT_URL));
+    endpoint=JSON.parse(endpoint);
+ 
     StatusBar.setHidden(true);
     this.defaultFonts();
+    this.setState({ fontLoaded: true,endpoint, username, language: language, settings });
+  } catch (ex) {
+    console.log('LoginView componentDidMount Error:' + ex);
   }
-
+  }
   static getDerivedStateFromProps = (props, state) => {
     if (props.navigation.getParam('lockTable', state.lockTable) != state.lockTable) {
       return {
@@ -126,14 +129,12 @@ BingdingConfig = async (user,Config,JwtToken) => {
   user.BranchId = Config.I_BranchId;
   //console.log('Config.I_ItemGroupLevel:'+JSON.stringify(Config.I_ItemGroupLevel))
   _storeData('APP@USER', JSON.stringify(user), () => {
-    _storeData('APP@USER_LINKING', JSON.stringify(user), () => {
       _storeData('APP@CONFIG', JSON.stringify(Config), () => {
         _storeData('APP@JWT', JSON.stringify(JwtToken), () => {
           CheckCasherIn(Config).then(res => { 
-            
             if (res.Status == 1) 
             {
-              this.setState({ isLoading: false, fontLoaded: true, isWorking: false, }, () => {
+              this.setState({ isLoading: false, isWorking: false, }, () => {
                 this.props.navigation.navigate("TableView", { settings, user });
               });
             }
@@ -144,11 +145,10 @@ BingdingConfig = async (user,Config,JwtToken) => {
               {
                 text: "OK", onPress: () => {
                   _remove('APP@USER');
-                  _remove('APP@USER_LINKING');
                 }
               }
             ]);
-              this.setState({ fontLoaded: true, isWorking: false, isLoading: false, });
+              this.setState({  isWorking: false, isLoading: false, });
             }
           }).catch((error) => {
             Question.alert( this.translate.Get('Notice'),
@@ -157,10 +157,8 @@ BingdingConfig = async (user,Config,JwtToken) => {
                 text: "OK", onPress: () => {}
               }
             ]);
-            this.setState({ fontLoaded: true, isWorking: false, isLoading: false, });
+            this.setState({ isWorking: false, isLoading: false, });
           });
-          
-        });
       });
     });
   });
@@ -168,20 +166,26 @@ BingdingConfig = async (user,Config,JwtToken) => {
   login = async () => {  
     let {  username, password } = this.state;
     let that = this;
-      const usernameValid = this.ValidaUsername();
-      const passwordValid = this.validatePassword();
+    if (username == undefined)
+    username=''
+    if (typeof(password) == undefined)
+    password=''
+if (this.has_back_button==false &&((username=='cauhinh'&&password=='')||(username==''&&password=='cauhinh')))
+{
+  this.props.navigation.navigate('Settings');
+  return;
+}
+//console.log('login in form LoginView:');
+const usernameValid = this.ValidaUsername();
+const passwordValid = this.validatePassword();
       if (!usernameValid || !passwordValid)
         return;
-     
-      let endpoint = await _retrieveData('APP@BACKEND_ENDPOINT', JSON.stringify(ENDPOINT_URL));
-      endpoint = JSON.parse(endpoint);
     this.setState({  isWorking: true, });
-        login(endpoint, username, password).then((res) => {
-        //  console.log('login in form LoginView:'+JSON.stringify(res));
+        login(username, password).then((res) => {
+         // console.log('login in form LoginView:'+JSON.stringify(res));
           if (res.Status != 1)
           {
-            Question.alert(
-              this.translate.Get('Notice'),
+            Question.alert(  this.translate.Get('Notice'),
               res.Exception_Message ? res.Exception_Message : res.LicenseAlert, [
               {
                 text: this.translate.Get('AlertOK'), onPress: () => {
@@ -227,8 +231,7 @@ BingdingConfig = async (user,Config,JwtToken) => {
               }
             
         }).catch((error) => {
-          Question.alert( this.translate.Get('Notice'),
-            this.translate.Get('Có lỗi trong quá trình xử lý :'+error), [
+          Question.alert( this.translate.Get('Notice'),error [
             {
               text: "Cancel", onPress: () => {
                
@@ -282,10 +285,10 @@ _CombackView = () => {
     let { lockTable } = this.state;
     this.props.navigation.navigate('OrderView', { lockTable });
   }
-
   render = () => {
     const { manifest } = Constants;
-    const {  isLoading, fontLoaded,  password,  passwordValid,  username,  lockTable,  secureTextEntry,  usernameValid, } = this.state;
+    const {endpoint,  isLoading, fontLoaded,  password,  passwordValid,  username,  lockTable,  secureTextEntry,  usernameValid, } = this.state;
+let ImageWidth=SCREEN_WIDTH*0.12
 
     if (!fontLoaded) {
       return (
@@ -294,18 +297,9 @@ _CombackView = () => {
     return (
       <View style={styles.container}>
           <StatusBar hidden={true} />
-        
-      
         <KeyboardAvoidingView  keyboardType='light' behavior="position" contentContainerStyle={styles.formContainer}  >
-          <View style={{ flexDirection: 'column', width: SCREEN_WIDTH, alignItems: "center", height: SCREEN_HEIGHT * 0.27 }}>
-            <Image resizeMode="contain" 
-            //source={require('../../assets/icons/logo1_doc.png')}
-            source={require('../../assets/LogoSos.jpg')}
-              style={{ height: SCREEN_HEIGHT * 0.25 - 20 }}></Image>
-            <View style={{ width: SCREEN_WIDTH, alignItems: "center", height: 20 }}><Text style={{ color: colors.white }}>Version: {manifest.version} - Build: {Platform.OS == 'ios' ? manifest.ios.buildNumber : manifest.android.versionCode}</Text></View>
-          </View>
-          <View style={styles.BorderLogin}>
          
+          <View style={styles.BorderLogin}>
             <View style={styles.BorderFormLogin}>
             <View><Text style={{ color: BACKGROUND_COLOR, textAlign: 'center', fontSize: H1FontSize, }}>{this.translate.Get('Đăng nhập hệ thống')}</Text></View> 
               <FormInput leftIcon={  <Icon  name="user"  type="antdesign"
@@ -454,12 +448,12 @@ _CombackView = () => {
             <ActivityIndicator color={colors.primary} size="large"></ActivityIndicator>
           </View>
           : null}
-           {this.has_back_button==false ?
-           <View style={{position:'absolute',bottom:0,right:0}}>
-        <TouchableOpacity onPress={() => this.props.navigation.navigate('Settings')}>
-                    <Image resizeMode='center' source={require('../../assets/icons/IconSetting.png')} style={{ width: 30, height: 30, opacity: this.state.language == 1 ? 1 : 0.5 }}></Image>
-                  </TouchableOpacity>
-                  </View>:null}
+           <View position='absolute'  style={{width:ImageWidth, alignItems:'baseline',top:5,left:0,opacity:0.7  }}>
+            <Image resizeMode='contain' source={{uri:endpoint+'/Resources/Images/View/Logo.jpg'}}
+              style={{ width:ImageWidth,height:ImageWidth*4/6 }}></Image>
+           <View style={{ width:'100%',alignItems:'center'}}>
+             <Text style={{ color: colors.white }}>V.{manifest.version} _ {Platform.OS == 'ios' ?manifest.ios.buildNumber :manifest.android.versionCode}</Text></View>
+          </View> 
       </View>
 
     );
@@ -492,7 +486,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#333D4C',
-    width: SCREEN_WIDTH,
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'space-around',
   },

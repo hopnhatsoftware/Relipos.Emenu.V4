@@ -8,10 +8,10 @@ import { _retrieveData, _storeData, _remove } from "../services/storages";
 import { FlatList } from "react-native";
 import { Input, Button, Icon } from "react-native-elements";
 import { setCustomText } from "react-native-global-props";
-import { ProductDetails, CardDetailView, _CustomerSendNotification, _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor } from '../components';
-import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize,H2FontSize,H3FontSize,H4FontSize,FontSize } from "../config/constants";
+import { ProductDetails, CardDetailView, _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor } from '../components';
+import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize,H2FontSize,H3FontSize,H4FontSize,H5FontSize,FontSize } from "../config/constants";
 import translate from "../services/translate";
-import {GetViewGroup,GetPrdChildGroups,GetProductByGroupParent,getTicketInfor, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getAllItembyChoiceId,CancelOrder} from "../services";
+import {GetViewGroup,GetPrdChildGroups,getProductByGroup,getTicketInfor, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getByChoiceId,CancelOrder,CallServices} from "../services";
 import { formatCurrency } from "../services/util";
 import colors from "../config/colors";
 import BookingsStyle from "../styles/bookings";
@@ -20,7 +20,7 @@ import Question from '../components/Question';
 UIManager.setLayoutAnimationEnabledExperimental &&
   UIManager.setLayoutAnimationEnabledExperimental(true);
 
-const SCREEN_WIDTH = Dimensions.get("window").width;
+const SCREEN_WIDTH = Dimensions.get("screen").width;
  const SCREEN_HEIGHT = Dimensions.get("window").height //- Constants.statusBarHeight;
  const Bordy={width:SCREEN_WIDTH,height:SCREEN_HEIGHT};
 const pnLeft={ width:Bordy.width*0.17,height:SCREEN_HEIGHT };  
@@ -29,7 +29,8 @@ const Header={width:Center.width,height:Bordy.height* 0.085};
 
 const Booton={width:Center.width,height:Center.height* 0.07};
 const ProductList={width:Center.width,height:Center.height-Header.height-Booton.height,ColumnNum:2,RowNum:3}
-export default class OrderView extends Component {constructor(props) {
+export default class OrderView extends Component {
+  constructor(props) {
     super(props);
     this._button = null;
     this._buttonFrame = null;
@@ -38,6 +39,7 @@ export default class OrderView extends Component {constructor(props) {
     this.flatListRef = null;
     this.textInput = null;
     this.state = {
+      showCall:false,
       isRenderProduct: true,
       selectedType: null,
       isPostBack: false,
@@ -56,18 +58,12 @@ export default class OrderView extends Component {constructor(props) {
       Ticket: {},
       table: {},
       settings: {},
-      showDropdown: false,
       buttontext: props.defaultValue,
       keysearch: "",
       ShowFullCart: true,
-      isShowButtonBar: false,
+      isShowFormCard: false,
       FullCartWidth: new Animated.Value(0),
       CartWidth: new Animated.Value(SCREEN_WIDTH * 0.82),
-      tableStatus: -1,
-      isBooking: true,
-      IsShowCustomerSendNotification: false,
-      showCall: false,
-     
       /*Dòng mặt hàng đang chọn trong giỏ hàng */
       CartItemSelected: null,
       CartProductIndex: -1,
@@ -87,38 +83,33 @@ export default class OrderView extends Component {constructor(props) {
       /*Danh Sách Set được tìm thấy */
       SetItemsFilter:[],
       lockTable: false,
-      iconCheck: false,
-      ShowFeesInfo: false,
       OrdPlatform: 1,
       endpoint: "",
       showSetInCart: false,
       ShowTotalInfo: false,
       ProductImagePrefix: "",
-      Config:{
-
-      }
+      Config:{}
     };
     this.translate = new translate();
   }
-  componentWillUnmount() {
-  // clearInterval(this.interval);
+  componentWillUnmount= async () => {
+    clearInterval(this.interval);
   }
   componentDidMount = async () => {
     try{
     this.translate = await this.translate.loadLang();
+    await  this._BindingFont();
     StatusBar.setHidden(true);
     that = this;
     let state = await _retrieveData("OrderView@STATE", "");
     if (state!='') 
       state = JSON.parse(state);
-else  state = this.state;
-let CartInfor = await _retrieveData("APP@CART",'');
-if (CartInfor!='')
+    else  state = this.state;
+  let CartInfor = await _retrieveData("APP@CART",'');
+    if (CartInfor!='')
         CartInfor = JSON.parse(CartInfor);
         else CartInfor=this.state.CartInfor;
-
         state.CartInfor = CartInfor;
-       // console.log(' OrderView componentDidMount CartInfor:' + JSON.stringify(CartInfor));
         state.Product = that.state.Product;
         state.FullCartWidth = new Animated.Value(0);
         state.CartWidth = new Animated.Value(SCREEN_WIDTH * 0.82);
@@ -129,17 +120,18 @@ if (CartInfor!='')
       await this._getTicketInfor();
       await this.fetchData();
       await this.CaculatorCardInfor();
+      this.setState({  isPostBack: true, });
     //  this.interval = setInterval(() => {
     //    this.setState({ TimeToNextBooking: this.state.TimeToNextBooking - 1 });
     //  }, 1000);
    // console.log(' OrderView componentDidMount CartInfor:' + JSON.stringify(state.CartInfor));
   } catch (ex) {
+    this.setState({ isPostBack: true, });
     console.log('OrderView componentDidMount Error:' + ex);
   }
   };
   onPressBack = async() => {
     let { lockTable,table } = this.state;
-    
     if (lockTable == true) {
        this.props.navigation.navigate("LogoutView", { lockTable });
       
@@ -154,7 +146,13 @@ if (CartInfor!='')
   
   });
 }
-  }
+}
+onCallServices= async() => {
+  let { settings,table } = this.state;
+  let user = await _retrieveData('APP@USER', JSON.stringify({ObjId:-1}));
+    user = JSON.parse(user);
+  await CallServices(settings.I_BranchID,table.TabId,table.TicketID,1,user.ObjId);
+}
   _loadProductsIsSet = async (item) => {
     let language = await _retrieveData('culture', 1);
     let { settings, Config, } = this.state;
@@ -163,32 +161,32 @@ if (CartInfor!='')
       if (res.Data.Table.length > 0) {
         let ChoiceCategory = res.Data.Table;
         let itemSetGroups = res.Data.Table[0];
-        await getAllItembyChoiceId(itemSetGroups.chsId, Config, item, '', language).then(res => {
+        await getByChoiceId(itemSetGroups.chsId, Config, item, '', language).then(res => {
           if ("Table" in res.Data && res.Data.Table.length > 0) {
             let ChoisetDetails = res.Data.Table;
-            this.setState({ ChoiceCategory, ChoisetDetails, isShowMash: false, isPostBack: true });
+            this.setState({ ChoiceCategory, ChoisetDetails, isShowMash: false});
           }
           else {
-            this.setState({ ChoiceCategory, ChoisetDetails: [], isShowMash: false, isPostBack: true });
+            this.setState({ ChoiceCategory, ChoisetDetails: [], isShowMash: false});
           }
         }).catch(async (error) => {
-          this.setState({ ChoisetDetails: [], isShowMash: false, isPostBack: true });
+          this.setState({ ChoisetDetails: [], isShowMash: false });
         });
       }
       else {
-        this.setState({isPostBack: true, language, endpoint, Config, });
+        this.setState({ language, endpoint, Config, });
       }
     }).catch(error => {
       this.setState({
-        language, endpoint, settings,  isPostBack: true,
+        language, endpoint, settings, 
       });
     });
-    this.setState({  isShowMash: false, isPostBack: true, });
+    this.setState({  isShowMash: false });
     return;
   };
-  _loadProductsByGroup = async group => {
-    let { table, keysearch,Config } = this.state;
-    await GetProductByGroupParent(Config, table, group, keysearch).then(res => {
+  _getProductByGroup = async group => {
+    let { table, keysearch,Config,settings } = this.state;
+    await getProductByGroup(Config,settings, table.TicketID,table.AreaID, group.PrgId, keysearch).then(res => {
       if ("Table" in res.Data) {
         let Products = res.Data.Table;
         let ProductImagePrefix = res.Data1;
@@ -200,9 +198,9 @@ if (CartInfor!='')
   _searchProduct = () => {
     let {  SelectedGroupIndex, ProductGroupList, PrdChildGroups, SelectedChildGroupIndex } = this.state;
     if (SelectedChildGroupIndex > -1 && PrdChildGroups.length > 0) {
-      this._loadProductsByGroup(PrdChildGroups[SelectedChildGroupIndex]);
+      this._getProductByGroup(PrdChildGroups[SelectedChildGroupIndex]);
     } else if (SelectedGroupIndex > -1 && ProductGroupList.length > 0) {
-      this._loadProductsByGroup(ProductGroupList[SelectedGroupIndex]);
+      this._getProductByGroup(ProductGroupList[SelectedGroupIndex]);
     }
   };
   /*Vẽ nhóm cấp 2 */
@@ -219,30 +217,30 @@ if (CartInfor!='')
             group = PrdChildGroups[SelectedChildGroupIndex];
             this.setState(
               { PrdChildGroups, SelectedChildGroupIndex, isShowMash: true },
-              () => this._loadProductsByGroup(group)
+              () => this._getProductByGroup(group)
             );
           } else {
             this.setState(
               { PrdChildGroups: [], SelectedChildGroupIndex: -1 },
-              () => this._loadProductsByGroup(group)
+              () => this._getProductByGroup(group)
             );
           }
         })
           .catch(error => {
-            this._loadProductsByGroup(group);
+
+            this._getProductByGroup(group);
           });
       }
     }
-    this.setState({  isShowMash: false, isPostBack: true, });
+    this.setState({  isShowMash: false });
   };
   _setConfig = async () => {
     try{
-    let endpoint = await _retrieveData( "APP@BACKEND_ENDPOINT",  JSON.stringify(ENDPOINT_URL) );
-    endpoint = JSON.parse(endpoint);
-    endpoint = endpoint.replace("api/", "");
+    let endpoint = await _retrieveData( "APP@BACKEND_ENDPOINT",  JSON.stringify(ENDPOINT_URL));
+    endpoint=JSON.parse(endpoint);
     let language = await _retrieveData("culture", 1);
-   
-    let settings = await _retrieveData('settings', JSON.stringify({ "PosId": 1, "PosIdName": "Thu ngân" }));
+    let settings = await _retrieveData('settings', JSON.stringify({}));
+    if (settings!='{}') 
     settings = JSON.parse(settings);
     let Config = await _retrieveData('APP@CONFIG', JSON.stringify({
           'PosId':settings.PosId,
@@ -250,8 +248,9 @@ if (CartInfor!='')
           }));
     Config = JSON.parse(Config);
     this.setState({endpoint,language,settings,Config});
-  }catch(ex){
-    console.log('_BindingFont Error :'+ex)
+  }
+  catch(ex){
+    console.log('_setConfig Error :'+ex)
   }
     return true;
   };
@@ -289,6 +288,8 @@ if (CartInfor!='')
           table = JSON.parse(table);
         }
         if ("TicketID" in table && table.TicketID > 0) {
+          
+          this.setState( { isShowMash:true});
           CheckAndGetOrder(table, OrdPlatform).then(res => {
             table.OrderId = res.Data;
             _storeData("APP@TABLE", JSON.stringify(table), () => {
@@ -296,21 +297,28 @@ if (CartInfor!='')
                 if (res.Data.Table.length > 0) {
                   ProductGroupList = res.Data.Table;
                   SelectedGroupIndex = SelectedGroupIndex < 0 ? 0 : SelectedGroupIndex;
-                  this.setState( { table,   ProductGroupList,  SelectedGroupIndex },
+                  this.setState( { table,isShowMash:false,   ProductGroupList,  SelectedGroupIndex },
                     () => {  this._loadChildGroups(SelectedGroupIndex);  }
                   );
                 }
               }).catch(error => {
-                Question.alert(  this.translate.Get("Thông báo"),   this.translate.Get(  "Không thể truy cập dữ liệu, vui lòng kiểm tra kết nối!" ),
+                Question.alert('System Error', error,
                   [{
                       text: "OK",
-                      onPress: () => {   }
+                      onPress: () => {  this.setState( { isShowMash:false});  }
                     }
                   ]
                 );
               });
             });
           }).catch(error => {
+            Question.alert('System Error', error,
+            [{
+                text: "OK",
+                onPress: () => {  this.setState( { isShowMash:false});  }
+              }
+            ]
+          );
           });
         }
       }catch(ex){
@@ -319,10 +327,10 @@ if (CartInfor!='')
         return true;
   } ; 
   fetchData = async () => {
-    await  this._BindingFont();
+   
     await this._setConfig();
     await this._BindingMeta();
-    this.setState({  isShowMash: false, isPostBack: true, });
+   
   };
   defaultFonts() {
     const customTextProps = {
@@ -351,15 +359,14 @@ if (CartInfor!='')
           }
         }
         table.Ticket = Ticket;
-        //console.log('table.ProductsOrdered:'+JSON.stringify(ProductsOrdered));
         _storeData("APP@TABLE", JSON.stringify(table), () => {
-          this.setState({ Ticket, table, ProductsOrdered, isBooking: false });
+          this.setState({ Ticket, table, ProductsOrdered});
         });
       }).catch(error => {
-        this.setState({ empty: true, isShowMash: false, isPostBack: true, });
+        this.setState({ empty: true, isShowMash: false });
       });
     }
-    this.setState({  isShowMash: false, isPostBack: true, });
+    this.setState({  isShowMash: false });
   };
   static getDerivedStateFromProps = (props, state) => {
     if (
@@ -476,16 +483,14 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
   };
   _selectChildGroup = (item, index) => {
     this.setState({ SelectedChildGroupIndex: index, isShowMash: true }, () => {
-      this._loadProductsByGroup(item);
+      this._getProductByGroup(item);
     });
   };
   _sendOrder = async () => {
     let { table, CartInfor, OrdPlatform,Config } = this.state;
-   
     if (CartInfor.TotalQuantity<=0) 
       return;
     this.setState({ isShowMash: true }); 
-    console.log('CartInfor.items :'+JSON.stringify(CartInfor.items)); 
     await sendOrder(Config, table, OrdPlatform, CartInfor.items).then(async res => {
       if (res.Status == 1) {
         await _remove("APP@CART", async () => {
@@ -520,8 +525,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
         });
       }
     }).catch(error => {
-      Question.alert( this.translate.Get("Notice"),
-        this.translate.Get("ServerError"+':'+error),
+      Question.alert( 'System Error',error,
         [
           {
             text: "OK",
@@ -656,32 +660,31 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
       useNativeDriver: true
     }).start(() => this.setState({ ShowFullCart: isShow }));
   }
-  CartToggleHandle(isShow) {
-    const endWidth = !this.state.isShowButtonBar ? SCREEN_WIDTH * 0.75 : 0;
+  CartToggleHandle = async (isShow) =>{
+    const endWidth = !this.state.isShowFormCard ? SCREEN_WIDTH * 0.75 : 0;
     if (isShow) {
-      this.setState({ isShowButtonBar: isShow, isBooking: true });
+      await this._getTicketInfor();
+      this.setState({ isShowFormCard: isShow});
     }
     Animated.timing(this.state.FullCartWidth, {
       toValue: endWidth,
       duration: 1000,
       easing: Easing.linear
-    }).start(() => this.setState({ isShowButtonBar: isShow }));
+    }).start(() => this.setState({ isShowFormCard: isShow }));
   }
   _buy = item => {
     this.setState({ CartItemSelected: null, CartProductIndex: -1 }, () =>
       this.CartToggleHandle(true)
     );
   };
-  _addExtraRequestToItem = (item) => {
-    if (item == null) {
+  _addExtraRequestToItem = (item, RowIndex) => {
+    if (item == null) 
       return;
-    }
-    let {CartFilter}= this._getCartItems(item,'');
     let state = this.state;
-    state.CartProductIndex = CartFilter.FirstIndex;
+    //console.log('_addExtraRequestToItem:'+JSON.stringify(item));
     _storeData("OrderView@STATE", JSON.stringify(state), async () => {
       this.props.navigation.navigate('RequestView', { ReturnScreen: "OrderView", 
-      Product: DataCurrent.DataRow, UpdateDescription: async (item) => this._updateItemDescription(item) });
+      Product: item,RowIndex:RowIndex, UpdateDescription: async (item,RowIndex) => this._updateItemDescription(item) });
     });
   };
   _addExtraRequestToSetItemDetail = (item, ind, cartDetailIndex) => {
@@ -729,9 +732,6 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
       this.props.navigation.navigate('RequestView', { ReturnScreen: "OrderView", Product: item, UpdateDescription: async (item) => this._updateItemDetailDescription(item) });
     });
   }
-  sendNotice = status => {
-    this.setState({ showCall: false, IsShowCustomerSendNotification: false, isShowMash: false, tableStatus: status });
-  };
 /*Mở màn hình Set */
   _SetMenuViewOpen = async (item, index) => {
     await _storeData("OrderView@STATE", JSON.stringify(this.state), () => {});
@@ -847,7 +847,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
      }
     }
     if(isLoadProduct){
-    await this._loadProductsByGroup(ProductGroupList[SelectedGroupIndex]);
+    await this._getProductByGroup(ProductGroupList[SelectedGroupIndex]);
     Products = this.state.Products;
     if ((this.state.Products.length<=0)&&NumberRun<=10) {
       NumberRun++;
@@ -922,12 +922,12 @@ if (ProductChoise==null) {
             Json:''
             }
           }
-          this.setState({ CartItemHandle ,CartItemSelected,CartProductIndex,ProductChoise,ProductChoiseIndex,SelectedGroupIndex}, () => {
+          this.setState({ CartItemHandle ,CartItemSelected,CartProductIndex,ProductChoise,ChoisetDetails:[],ProductChoiseIndex,SelectedGroupIndex}, () => {
             if (ProductChoise.PrdViewSetMenuType && ProductChoise.PrdViewSetMenuType == 2) 
             this._loadProductsIsSet(ProductChoise);
           });
           //console.log('_ProductDetailsAccept CartProductIndex:'+JSON.stringify(CartProductIndex));
-          this.setState({showSetInCart:false,isPostBack: true});
+          this.setState({showSetInCart:false});
   };
   RenderSetmenusEditViewSub = (item, index, cartDetailIndex) => {
     return (
@@ -950,9 +950,7 @@ if (ProductChoise==null) {
               />
             </View>
           </View>
-          <View style={{ 
-             position: "absolute",
-             right: H3FontSize * 3, flexDirection: "row" }}>
+          <View style={{position: "absolute",right: H3FontSize * 3, flexDirection: "row" }}>
             <Text style={{ color: "#000000", paddingRight: 5, fontSize: H3FontSize * 0.8 }}>
               {item.TksdPrice > 0 ? (<Text>+{formatCurrency(item.TksdPrice, "")}</Text>) : null}{" "}
             </Text>
@@ -1086,7 +1084,6 @@ if (ProductChoise==null) {
       let { ProductChoise,CartProductIndex,CartItemHandle,ChoisetDetails,ProductChoiseIndex } = this.state;
       if (ProductChoise == null||CartItemHandle==null) 
         return null;
-      //  console.log('renderProductModal ProductChoiseIndex:'+ProductChoiseIndex)
       return (
         <ProductDetails
           endpoint={this.state.ProductImagePrefix == '' ? 
@@ -1109,23 +1106,20 @@ if (ProductChoise==null) {
   };
   renderProduct = ({ item, index }) => {
     let { Config } = this.state;
-    let iWith=(ProductList.width/ProductList.ColumnNum)-2;
-    //let iHeight=(ProductList.height/ProductList.RowNum)-2;
+    let iWith=(ProductList.width/ProductList.ColumnNum);
     let iHeight=iWith*3/6;
     let {CartFilter}= this._getCartItems(item,null);
-   // console.log("CartFilter TotalQuantity:"+JSON.stringify( CartFilter.TotalQuantity));
     item.OrddQuantity=CartFilter.TotalQuantity;
     this.state.isRenderProduct=true;
     return (
-      <TouchableHighlight   style={ { borderBottomWidth: 1, borderLeftWidth: 1,borderTopWidth: 1,borderColor: colors.grey5,width:iWith-2,height: iHeight, }}>
+      <TouchableHighlight   style={ { borderBottomWidth: 1,borderColor: colors.grey2,width:iWith,height: iHeight,marginBottom:2 }}>
         <View style={{ flexDirection: "row", flexWrap: "wrap", width: "100%", height: '100%' }}>
           <View style={{ width: "60%", height: '100%' }}>
             <TouchableOpacity name='dvImage' style={{ flexDirection: "row", width: '100%', height: '100%' }}
               onPress={() => { this.PrerenderProductModal(item,CartFilter,index);
             }}> 
               <ImageBackground  resizeMode="stretch"
-                source={ item.PrdImageUrl ? {uri: this.state.ProductImagePrefix == '' ? this.state.endpoint + "/Resources/Images/Product/" +
-                        item.PrdImageUrl : this.state.ProductImagePrefix + '/' + item.PrdImageUrl
+                source={ item.PrdImageUrl ? {uri: this.state.endpoint + "/Resources/Images/Product/" + item.PrdImageUrl
                   }: require("../../assets/icons/ReliposEmenu_4x.png")
                 }
                 style={[{ width: '100%', height: '100%', backgroundColor: colors.grey1 }]} >
@@ -1150,35 +1144,33 @@ if (ProductChoise==null) {
           <View style={{ flexDirection: "column", flexWrap: "wrap", width: "40%", height: '100%',paddingLeft:5,paddingRight:5,backgroundColor: "#EEEEEE" }}>
           <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:'100%'}}>
              {Config.B_ViewProductNo?
-               <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:iHeight-(H4FontSize+H2FontSize+10)}}>
-              <View name='pnProductNo' style={{width: '100%',height:H3FontSize*1.5 ,paddingTop:2 }}>
+               <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:iHeight-(H2FontSize+10)}}>
+              <View name='pnProductNo' style={{width: '100%',height:H3FontSize*1.5 ,marginTop:5 }}>
                 <Text style={{ color: "#0d65cd", textAlign: 'center', width: '95%',fontSize: H3FontSize, fontFamily: "RobotoBold"}} numberOfLines={2}> 
                   {item.PrdNo}
                 </Text>
               </View>
               <View name='pnProductName' style={{width: '100%',paddingTop:2 }}>
-                <Text style={{color: "#000000",width: '100%',textAlign:'left',fontSize:H4FontSize,flexWrap:"wrap"}} numberOfLines={5}>
+                <Text style={{color: "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H4FontSize,flexWrap:"wrap"}} numberOfLines={5}>
                   {item.PrdName} 
+                </Text>
+                <Text style={{fontStyle:'italic',color: "#af3037",marginLeft:7,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left',marginTop:3}}>
+              {this.translate.Get("Giá")}:{" "}{formatCurrency(item.UnitPrice, "")}
                 </Text>
               </View>
               </View>
               :
-              <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:iHeight-(H4FontSize+H2FontSize+10)}}>
-            <View name='pnProductName' style={{width: '100%',paddingTop:2 }}>
-              <Text style={{color: "#000000",width: '100%',textAlign:'left',fontSize:H4FontSize,flexWrap:"wrap"}} numberOfLines={5}>
+              <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:iHeight-(H2FontSize+10)}}>
+            <View name='pnProductName' style={{width: '100%',marginTop:5}}>
+              <Text style={{color: "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H3FontSize,fontWeight:'bold',flexWrap:"wrap"}} numberOfLines={5}>
                 {item.PrdName} 
               </Text>
+              <Text style={{fontStyle:'italic',color: "#af3037",marginLeft:7,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left',marginTop:3}}>
+              {this.translate.Get("Giá")}:{" "}{formatCurrency(item.UnitPrice, "")}
+                </Text>
             </View>
             </View>
              }
-              <View  name='lbPrice' style={{height:H4FontSize,width:'100%' }}>
-                <Text style={{color: "#af3037",width: "100%",textAlign:'center',fontSize: H4FontSize}}>
-                  {this.translate.Get("Giá")}:{" "}
-                  <Text style={{ fontFamily: "RobotoItalic" }}>
-                    {formatCurrency(item.UnitPrice, "")}
-                  </Text>
-                </Text>
-              </View>
               <View style={{width: "100%", height: H2FontSize,paddingTop:5}}>
                 <View style={{ flexDirection: "row", justifyContent: 'space-evenly',  width: "100%", height: '100%'}}  >
                   {item.OrddQuantity> 0 ?
@@ -1203,9 +1195,9 @@ if (ProductChoise==null) {
                     </View>
                   }
                   <View style={{ width:(iWith-4)*0.4*0.6, height: H2FontSize, justifyContent: 'center' }}>
-                 {( item.PrdIsSetMenu != true && item.OrddQuantity>0)?
+                 {( (item.PrdIsSetMenu != true|| item.PrdViewSetMenuType != 1) && item.OrddQuantity>0)?
                       <TextInput ref={input => this.textInput = input}
-                        style={{  color: "#af3037",width: '100%',fontSize:H2FontSize,textAlign:"center",fontFamily: "RobotoBold", }}
+                        style={{  color: "#af3037",width: '100%',fontSize:H2FontSize*0.8,textAlign:"center",fontFamily: "RobotoBold", }}
                         autoFocus={false}
                         autoCapitalize="none"
                         autoCorrect={false}
@@ -1266,55 +1258,59 @@ if (ProductChoise==null) {
         </View>
       );
     }
-    const {ProductGroupList,PrdChildGroups,Products,CartInfor,CartItemSelected,CartProductIndex,IsShowCustomerSendNotification,SelectedChildGroupIndex,SelectedGroupIndex, Config, lockTable,ProductsOrdered} = this.state; 
+   
+    const {ProductGroupList,endpoint,PrdChildGroups,Products,CartInfor,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config, lockTable,ProductsOrdered} = this.state; 
+   
     return (
-      <View style={styles.pnbody,{height:Bordy.height,width:Bordy.width}}>
-        <View style={styles.Container}>
-         
-          <View name='pbLeft' style={[styles.pnLeft, { backgroundColor: "#333D4C",width:pnLeft.width }]}>
-            <View style={{ justifyContent: 'center', alignItems: 'center', height: pnLeft.width, }}>
-              <Image resizeMode="stretch" 
+      <View style={{height:Bordy.height,width:Bordy.width}}>
+        <View style={{flexDirection: "row"}}>
+          <View name='pbLeft' style={[{ backgroundColor: "#333D4C",width:pnLeft.width, flexDirection: "column",
+    height: "94%" }]}>
+            <View style={{ justifyContent: 'center', alignItems: 'center', height: pnLeft.width*4/6, }}>
+              <Image resizeMode='contain' 
               //source={require('../../assets/icons/Logo_Emenu_BG_Red_3.png')}
-               source={require('../../assets/LogoSos.jpg')}
-                style={{ width: '67%', height: '67%' }} />
+               source={{uri:endpoint+'/Resources/Images/View/Logo.jpg'}}
+                style={{ width: '99%', height: '99%' }} />
             </View> 
-            <_ProductGroup  state={this.state}  
+            <_ProductGroup state={this.state}  
               translate={this.translate}
               ProductGroupList={ProductGroupList}
               SelectedGroupIndex={SelectedGroupIndex}
               _GroupClick={(index) => this._GroupClick(index)}
               setState={(state) => this.setState(state)}
-              pnheight={Bordy.height-pnLeft.width}
+              pnheight={Bordy.height-pnLeft.width*4/6}
               BookingsStyle={BookingsStyle}
               PrdChildGroups={PrdChildGroups}
               SelectedChildGroupIndex={SelectedChildGroupIndex}
               _selectChildGroup={(item,index) => this._selectChildGroup(item,index)}
             />
           </View>
-          <View style={styles.pnCenter,{width:Center.width,height:Center.height}}>
+          <View style={{width:Center.width,height:Center.height, flexDirection: "column"}}>
             <_HeaderNew
               state={this.state}
               backgroundColor="#333D4C"
               table={this.state.table}
               onPressBack={() => { this.onPressBack(); }}
               _searchProduct={(val) => this._searchProduct(val)}
+              changeLanguage={(lang) => this.changeLanguage(lang)}
+              
+              onCallServices={() => { this.onCallServices(); }}
+
               translate={this.translate}
               name={'OrderView'}
-              lockTable={lockTable}
-              language={this.state.language} 
               setState={(state) => this.setState(state)}
               BookingsStyle={BookingsStyle}
                style={{height:Header.height}}  />
-            <View styles={{ height:ProductList.height,width:ProductList.width,paddingTop:1,backgroundColor: "#333D4C"}} >
-              <FlatList   data={Products}  numColumns={2}
+            <View styles={{ height:ProductList.height,width:ProductList.width,flexDirection: "column"}} >
+              <FlatList   data={Products}  numColumns={ProductList.ColumnNum}
                 extraData={this.state.isRenderProduct==false}
-                renderItem={this.renderProduct}
+                renderItem={this.renderProduct}  style={{width:'100%'}}
                 contentContainerStyle={{paddingBottom: ProductList.height/ProductList.RowNum}}
               />
             </View>
           </View>
         </View>
-        {!this.state.isShowButtonBar ? (
+        {!this.state.isShowFormCard ? (
          //Bottonbar 
           <Animated.View style={[styles.BottonMenu, { width:Center.width,height:Booton.height }]}>
             {this.state.ShowFullCart ? (
@@ -1336,7 +1332,7 @@ if (ProductChoise==null) {
                     {formatCurrency(CartInfor.TotalAmount, "")}
                   </Text>
                 </View>
-                <TouchableOpacity onPress={() => this.CartToggleHandle(true)}>
+                <TouchableOpacity onPress={() =>{this.CartToggleHandle(true)}}>
                   <View style={[BookingsStyle.bottombar, { width: (Center.width/4), flexDirection: "row", color: "white", alignItems: "center", justifyContent: "center", 
                   backgroundColor: "#0D66CE"
                   }]}> 
@@ -1371,23 +1367,14 @@ if (ProductChoise==null) {
             settings={Config}
             BookingsStyle={BookingsStyle}
             ProductsOrdered={ProductsOrdered}
-            onGetInfor={() => this._getTicketInfor()}
             onSendOrder={() => this._sendOrder()}
+            onCallServices={() => { this.onCallServices(); }}
+            _addExtraRequestToItem={(item, RowIndex) => { this._addExtraRequestToItem(item, RowIndex); }}
           />
         )}
-        {this.renderProductModal()}
-        {IsShowCustomerSendNotification ? (
-        <_CustomerSendNotification  table={this.state.table} BookingsStyle={BookingsStyle}  settings={Config}
-          endpoint={this.state.endpoint}  language={this.state.language}  changeLanguage={(lang) => this.changeLanguage(lang)}
-          sendNotice={(status) => this.sendNotice(status)} setState={(state) => this.setState(state)}
-          translate={this.translate} tableStatus={this.state.tableStatus}
-        />
-        ) : null}
-        {/* {
-        // Gọi phục vụ
-        showCall ? (<_CallOptions  table={this.state.table}  BookingsStyle={BookingsStyle} settings={Config} endpoint={this.state.endpoint}  call={this.state.call}  setState={(state) => this.setState(state)}  translate={this.translate} tableStatus={this.state.tableStatus}
-        />
-        ) : null} */}
+        {/* /*hiển thị chi tiết */}
+        {this.renderProductModal()
+        }
         { 
         /* Hiển thị Edit Set */
         (CartItemSelected != undefined &&  CartItemSelected != null && CartProductIndex >= 0 && CartItemSelected.PrdIsSetMenu && this.state.showSetInCart)? ( 
@@ -1461,11 +1448,11 @@ if (ProductChoise==null) {
               </View>
             </View>
           ) : null}
-        {this.state.isShowMash ?
-          <View style={styles.BackgroundMash}>
-            <ActivityIndicator color={colors.primary} size="large"></ActivityIndicator>
-          </View>
-          : null}
+        {this.state.isShowMash?
+      <View style={styles.BackgroundMash}>
+      <ActivityIndicator color={colors.primary} size="large"></ActivityIndicator>
+    </View>
+      :null}
       </View>
     );
 }

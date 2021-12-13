@@ -6,10 +6,10 @@ import { _retrieveData, _storeData, _remove } from "../services/storages";
 import { FlatList } from "react-native";
 import { Icon } from "react-native-elements";
 import { setCustomText } from 'react-native-global-props';
-import { _CustomerSendNotification, _Header, _ChoiceCategory } from '../components';
+import {  _Header, _ChoiceCategory } from '../components';
 import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, H1FontSize, H2FontSize, H3FontSize, H4FontSize } from "../config/constants";
 import translate from "../services/translate";
-import { SetMenu_getChoiceCategory, getAllItembyChoiceId, SetMenu_gettemDefault, } from "../services";
+import { SetMenu_getChoiceCategory, getByChoiceId, SetMenu_gettemDefault, } from "../services";
 import { formatCurrency } from "../services/util";
 import colors from "../config/colors";
 import BookingsStyle from "../styles/bookings";
@@ -18,7 +18,7 @@ import Question from '../components/Question';
 UIManager.setLayoutAnimationEnabledExperimental &&
   UIManager.setLayoutAnimationEnabledExperimental(true);
 const SCREEN_WIDTH = Dimensions.get("window").width;
-const SCREEN_HEIGHT = Dimensions.get("window").height - Constants.statusBarHeight;
+const SCREEN_HEIGHT = Dimensions.get("window").height //- Constants.statusBarHeight;
 const Header={height:SCREEN_HEIGHT* 0.085};
 
 export default class SetMenuView extends Component {
@@ -29,6 +29,7 @@ export default class SetMenuView extends Component {
     this._nextValue = null;
     this._nextIndex = null;
     this.state = {
+      endpoint: '',
       language: 1,
       IsPostBack: false,
       ProductGroupList: [],
@@ -76,7 +77,6 @@ export default class SetMenuView extends Component {
       },
       selectedItemIndex: 0,
       index: 0,
-      endpoint: '',
       isMakeDetault: false,
       lStyle:{
         TitleCorlor:'',
@@ -170,8 +170,7 @@ export default class SetMenuView extends Component {
 
         });
         let endpoint = await _retrieveData('APP@BACKEND_ENDPOINT', JSON.stringify(ENDPOINT_URL));
-        endpoint = JSON.parse(endpoint);
-        endpoint = endpoint.replace('api/', '');
+        endpoint=JSON.parse(endpoint);
         state.endpoint=endpoint;
         let settings = await _retrieveData('settings', JSON.stringify({}));
           state.settings=settings;
@@ -205,7 +204,7 @@ export default class SetMenuView extends Component {
   _getAllItembyChoiceId = async group => {
     try{
     const { ProductSet,language,Config } = this.state;
-    await getAllItembyChoiceId(group.chsId, Config, ProductSet, '', language).then(res => {
+    await getByChoiceId(group.chsId, Config, ProductSet, '', language).then(res => {
       if ("Table" in res.Data)
         this.setState({ ChoiceSet: res.Data.Table });
     });
@@ -331,7 +330,7 @@ export default class SetMenuView extends Component {
     let { ProductSet, ProductGroupList, CategorySelectedIndex,Config } = this.state;
     let group = ProductGroupList[CategorySelectedIndex];
     if (('OrddQuantity' in group && group.OrddQuantity + OrddQuantity > group.ChcgMaxQuantity) || group.ChcgMaxQuantity <= 0) {
-      Question.alert(this.translate.Get("Limited OrddQuantity!"), this.translate.Get("Your OrddQuantity is limited, Please check in!"));
+      Question.alert(this.translate.Get("Alert"), this.translate.Get("ChoiseOrderlimited"));
       //console.log('Limited OrddQuantity:'+ JSON.stringify(group));
       return null;
     }
@@ -477,7 +476,7 @@ export default class SetMenuView extends Component {
       });
       CartInfor.OrddQuantity = TotalQuantity;
       CartInfor.Amount += parseFloat(TotalAmount);
-     console.log('CartInfor :'+JSON.stringify(CartInfor)); 
+     //console.log('CartInfor :'+JSON.stringify(CartInfor)); 
       _storeData("APP@CART", JSON.stringify(CartInfor), () => 
       {  this.setState({ isShowMash:false });
         
@@ -544,7 +543,7 @@ export default class SetMenuView extends Component {
   };
   RenderRowDetail = ({ item, index }) => {
     return (
-      <View style={{ width: '99%',paddingTop:1,paddingBottom:1, flexDirection: "row", paddingLeft: 10, justifyContent: "space-around", borderBottomWidth: 0.5, borderBottomEndRadius: 1, borderBottomColor: colors.grey4}}>
+      <View style={{ width: '100%',paddingTop:5,paddingBottom:5, flexDirection: "row", borderBottomWidth: 1, borderBottomEndRadius: 1, borderBottomColor: colors.grey4}}>
         <View key={index} style={{ width: '10%', justifyContent: 'center', alignItems: 'center', }}>
           <Text style={{ color: "#000000", width: '100%', fontSize: H4FontSize, textAlign: 'center' }} numberOfLines={2}>
           {this._showQty(item)} 
@@ -557,7 +556,7 @@ export default class SetMenuView extends Component {
             </Text>  
           </View>
           <View style={{ flexDirection: "row", justifyContent: "center", alignContent: 'center', alignItems: 'center', width: '35%', paddingRight: 5, }}>
-            <Text style={{ textAlign: 'right', fontSize: H4FontSize, color: "#000000", }}>
+            <Text style={{color: "#000000", paddingRight: 5, fontSize: H3FontSize * 0.8 }}>
               {formatCurrency(item.TksdPrice, '')}</Text>
           </View>
           {item.SmnId && item.SmnId > 0 ?
@@ -589,20 +588,16 @@ export default class SetMenuView extends Component {
     return { prd, ind };
   };
   renderProduct = ({ item, index }) => {
-    let { lStyle } = this.state;
+    let { lStyle,Config } = this.state;
+    let width=lStyle.PnCenter.ItemWidth;
+    let LeftWidth=lStyle.PnCenter.ItemWidth*0.6;
+    let RightWidth=lStyle.PnCenter.ItemWidth*0.4;
     return ( 
-      <TouchableHighlight style={{borderLeftWidth: 4, borderTopWidth: 4, borderColor: colors.grey5, width:lStyle.PnCenter.ItemWidth,height: lStyle.PnCenter.ItemHeight,}}>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", width: "100%", height: '100%' }}>
-          <View style={{ backgroundColor: "grey", width: "60%", height: '100%' }}>
+      <TouchableHighlight style={{borderWidth:1, borderColor: colors.grey5, width:width,height: lStyle.PnCenter.ItemHeight,}}>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", width: width, height: '100%' }}>
+          <View style={{ backgroundColor: "grey", width: LeftWidth, height: '100%' }}>
             <ImageBackground resizeMode="stretch"
-              source={item.PrdImageUrl
-                ? {
-                  uri:
-                    this.state.ProductImagePrefix == '' ?
-                      this.state.endpoint +
-                      "/Resources/Images/Product/" +
-                      item.PrdImageUrl :
-                      this.state.ProductImagePrefix + '/' + item.PrdImageUrl
+              source={item.PrdImageUrl ? {  uri:this.state.endpoint + "/Resources/Images/Product/" +  item.PrdImageUrl 
                 } : require("../../assets/icons/ReliposEmenu_4x.png")
               }
               style={[{ width: '100%', height: '100%', backgroundColor: colors.grey1 }]} >
@@ -629,44 +624,55 @@ export default class SetMenuView extends Component {
               </View>
             </ImageBackground>
           </View>
-          <View style={{ flexDirection: "column", flexWrap: "wrap", width: "40%", height: '100%', backgroundColor: "#EEEEEE" }}>
-            <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%", backgroundColor: "#EEEEEE" }}>
+          <View style={{ flexDirection: "column", flexWrap: "wrap", width:RightWidth, height: '100%', backgroundColor: "#EEEEEE" }}>
+            <View style={{ flexDirection: "column",marginLeft:2,marginRight:2, flexWrap: "wrap", width: "100%"}}>
+           
+            {Config.B_ViewProductNo?
+             <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:lStyle.PnCenter.ItemHeight-(H3FontSize*1.2+5+H3FontSize )}}>
               <View style={{ height: H3FontSize*1.2, width: '100%',paddingTop:5}}>
                 <Text style={{ color: "#0d65cd", textAlign: 'center', width: '99%', fontSize: H3FontSize, fontFamily: "RobotoBold"  }} numberOfLines={5}>
                   {item.PrdNo} 
                 </Text>
               </View> 
-              <View style={{ height: lStyle.PnCenter.ItemHeight-(H3FontSize*1.2+5+H3FontSize+H3FontSize*1.2 ), width: '100%',textAlign:'center',paddingTop:10 }}>
-                <Text style={{ width: '99%',fontSize: H4FontSize, alignContent:'center',textAlign: 'center', flexWrap: "wrap" }} numberOfLines={15}>
+              <View style={{  width: '100%',paddingTop:5 }}>
+                <Text style={{ width: '99%',fontSize: H4FontSize,textAlign:'left', alignContent:'center', flexWrap: "wrap" }} numberOfLines={15}>
                   {item.PrdName}
                 </Text>    
               </View> 
-              <View style={{ height: H3FontSize, width: '100%' }}>
-              <Text style={{ fontFamily: "RobotoItalic",fontSize: H3FontSize  }}>
-                    {item.TksdPrice>0? this.translate.Get("Giá")+' '+formatCurrency(item.TksdPrice, ""):''}
+               </View>
+              :
+              <View style={{  width: '99%',textAlign:'left',paddingTop:10 }}>
+                <Text style={{ marginLeft:2,marginRight:2,fontSize: H4FontSize*1.1,textAlign: 'left', flexWrap: "wrap" ,fontWeight:'bold'}} numberOfLines={15}>
+                  {item.PrdName}
+                </Text>    
+              </View> 
+            }
+              <View style={{ height: H3FontSize, width: '100%',marginTop:5 }}>
+              <Text style={{ color: "#000000",marginLeft:10, fontSize: H3FontSize * 0.8 ,fontStyle:'italic'}}>
+                    {item.TksdPrice>0? this.translate.Get("Giá :")+' '+formatCurrency(item.TksdPrice, ""):''}
                   </Text>
               </View> 
             </View> 
-            <View style={{ position: "absolute", bottom: 0, right: 0, width: "90%", height: H2FontSize*1.2 , }}>
-              <View style={{ flexDirection: "row", justifyContent: 'space-evenly', width: "100%", height: H3FontSize*1.2  }}>
-                  <View style={{ width: H2FontSize*1.2, height: H2FontSize*1.2,  justifyContent: 'center', alignItems: 'center',
+            <View style={{ position: "absolute", bottom: 0, right: 0, width: RightWidth-10, height: H2FontSize*1.2,marginLeft:5,marginRight:5  }}>
+              <View style={{ flexDirection: "row", justifyContent: 'space-evenly', width: RightWidth-10, height: H3FontSize*1.2 }}>
+                  <View style={{ width: H2FontSize, height: H2FontSize*1.2,  justifyContent: 'center', alignItems: 'center',
                   }}>
                     {this._showQty(item) > 0 ?
                   <TouchableOpacity onPress={() => this._HandleQuantityDetail(item, -1, false)} > 
                     <Image resizeMode="stretch" source={require('../../assets/icons/IconDelete.png')}
-                      style={{ width: H2FontSize*1.2  , height: H2FontSize*1.2  , }} />
+                      style={{ width: H2FontSize , height: H2FontSize , }} />
                   </TouchableOpacity>
                   : null
                   }
                   </View>
-                <View style={{ flex:1, justifyContent: 'center' }}>
-                  <Text style={{ color: "#af3037", width: '100%', fontSize: H2FontSize , textAlign: "center" }} >
+                <View style={{ width:RightWidth-10-(H2FontSize*2), justifyContent: 'center', }}>
+                  <Text style={{ color: "#af3037", width: '100%', fontSize: H2FontSize*0.8 , textAlign: "center" }} >
                     {this._showQty(item)} 
                   </Text>
                 </View> 
                 <TouchableOpacity style={{}} onPress={() => this._HandleQuantityDetail(item, 1, false)}>
                   <Image resizeMode="stretch" source={require('../../assets/icons/IconAdd.png')}
-                    style={{ width: H2FontSize*1.2, height: H2FontSize*1.2 }} />
+                    style={{ width: H2FontSize, height: H2FontSize }} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -683,7 +689,8 @@ export default class SetMenuView extends Component {
         </View>
       )
     }  
-    console.log('Header.height:'+Header.height);
+    let GridHeight=SCREEN_HEIGHT-Header.height;
+  //  console.log('Header.state:'+JSON.stringify(this.state));
     return (
       <View style={styles.container}>
         <StatusBar hidden={true} />
@@ -692,32 +699,38 @@ export default class SetMenuView extends Component {
           BookingsStyle={BookingsStyle} islockTable={false} backgroundColor="#333D4C"
           iheight={Header.height} language={language}   style={{height:Header.height}}  />
         <View style={styles.mainContainer}> 
-          <View style={{ width: lStyle.PnLeft.width, backgroundColor: '#FFFFFF',borderRightColor: colors.grey4, borderRightWidth: 0.5, borderRightRadius: 1 }}>
-            <View name='pnGridDetail' style={{ flexDirection: 'column', width: "100%", backgroundColor: colors.white, height: '70%' }}>
-
-              <View name='pnRowDetail' style={{ flexDirection: "row", width: '100%', backgroundColor: colors.white, height: '90%', paddingBottom: 24 }}>
-                <FlatList
+          <View style={{ width: lStyle.PnLeft.width, height: GridHeight , backgroundColor: '#FFFFFF',borderRightColor: colors.grey4, borderRightWidth: 0.5, borderRightRadius: 1 }}>
+            <View name='pnGridDetail' style={{ flexDirection: 'column', width: "100%",  height: GridHeight-(H2FontSize*2+H2FontSize*2) }}>
+            <FlatList
                   keyExtractor={(item, index) => index.toString()}
                   data={ProductSet.subItems}
                   extraData={this.state.ProductSet}
                   renderItem={this.RenderRowDetail}
-                  contentContainerStyle={{ backgroundColor: colors.white, borderColor: colors.grey4 }}
+                  contentContainerStyle={{ backgroundColor: colors.white}}
                 />
-              </View>
             </View> 
-           
-            <View style={[{ width: "100%", backgroundColor: colors.white, flexDirection: 'column', height: '21%' }]}>
-              <View style={{ width: '100%', height: '100%', borderColor: colors.white, borderRadius: 1, borderWidth: 1, backgroundColor: colors.grey5, flexDirection: 'row' }}>
-                <View style={{ flexDirection: 'column', width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center', }}>
-                  <View style={{ flexDirection: 'column', width: '90%', }}>
-                    <Text style={{ color: '#000000', textAlign: 'left', fontSize: H3FontSize, }}> 
+            <View style={{ height:H2FontSize+H2FontSize*1.5,backgroundColor: colors.grey5, flexDirection: 'row', width: '100%',alignItems: "center", justifyContent: "center"}}>
+            <View style={{ height:'100%', flexDirection: 'row', width: '98%',alignItems: "center", justifyContent: "center"}}>
+                    <Text style={{ color: '#000000', textAlign: 'left', fontSize: H3FontSize,width:'30%',marginLeft:5 }}> 
                       {this.translate.Get('Số lượng :')}
                     </Text>
-                    <View style={{ flexDirection: 'row', alignItems: "center", justifyContent: "center", width: '100%', borderColor: colors.grey3, borderWidth: 1, }}>
-                      <View style={{ flexDirection: 'row', alignItems: "center", justifyContent: "center", width: '78%', height: H2FontSize+2, backgroundColor: colors.white, }}>
+                    <View style={{width:'10%'}}>
+                    {ProductSet.OrddQuantity > 1 ?
+                          <TouchableOpacity onPress={() => {this._HandleQuantity(-1) }} >
+                            <Image resizeMode="stretch" source={require('../../assets/icons/v2/icon_btnGiam.png')}
+                              style={{ width: H2FontSize, height:H2FontSize }} />
+                          </TouchableOpacity>
+                          :
+                          <View style={{ justifyContent: 'center', alignItems: 'center', }}>
+                            <Image resizeMode="stretch"  size={H2FontSize}   source={require('../../assets/icons/v2/icon_btnGiamGrey.png')}
+                              style={{ width: H2FontSize, height:H2FontSize}} />
+                          </View>
+                        }
+                      </View>
+                    <View style={{ flexDirection: 'row',marginLeft:5, alignItems: "center", justifyContent: "center", width: '47%',borderColor: colors.grey4, borderWidth: 1, height:H2FontSize*1.3}}>
                       <TextInput ref={input => this.textInput = input}
-                        style={{  color: "#af3037",paddingLeft: 10, 
-                        fontSize: H2FontSize, width: '100%', textAlign: 'left', }}
+                        style={{  color: "#af3037",
+                        fontSize: H2FontSize*0.8, width: '100%', textAlign: 'left', }}
                         autoFocus={false}
                         autoCapitalize="none"
                         autoCorrect={false}
@@ -748,44 +761,22 @@ export default class SetMenuView extends Component {
                         }}
                       />
                       </View>
-                      <View style={{flexDirection: 'row',alignItems: "center",justifyContent: "center",width: '22%',height: SCREEN_HEIGHT * 0.04,backgroundColor: colors.white, }}>
-                        {ProductSet.OrddQuantity > 1 ?
-                          <TouchableOpacity onPress={() => {this._HandleQuantity(-1) }} >
-                            <Image resizeMode="stretch" source={require('../../assets/icons/v2/icon_btnGiam.png')}
-                              style={{ width: H2FontSize, height: H2FontSize, }} />
-                          </TouchableOpacity>
-                          :
-                          <View style={{ justifyContent: 'center', alignItems: 'center', }}>
-                            <Image resizeMode="stretch" source={require('../../assets/icons/v2/icon_btnGiamGrey.png')}
-                              style={{ width: H2FontSize, height: H2FontSize, }} />
-                          </View>
-                        }
-                        <View style={{ width: '2%' }}></View>
-                        <TouchableOpacity onPress={() => { this._HandleQuantity(1) }}>
+                      <View style={{width:'10%',paddingLeft:5}}>
+                      <TouchableOpacity onPress={() => { this._HandleQuantity(1) }}>
                           <Image resizeMode="stretch" source={require('../../assets/icons/v2/icon_btnTang.png')}
-                            style={{ width: H2FontSize, height: ITEM_FONT_SIZE * 1.2, }} />
+                            style={{ width: H2FontSize*1.2, height:H2FontSize*1.2}} />
                         </TouchableOpacity>
-                      </View>
-                    </View>
-
-                  </View>
-                </View>
-              </View>
+                        </View>
+                   </View>  
             </View>
-            <View style={[styles.navigationBar, { width: "100%", backgroundColor: colors.white, flexDirection: 'column', height: '9%' }]}>
-              <View style={{ width: '100%', height: '100%', borderColor: colors.white, borderRadius: 1, borderWidth: 1, backgroundColor: '#dc7d46', flexDirection: 'row' }}>
-                <View style={[styles.item_text_right_end, styles.item_text_center, { paddingLeft: H2FontSize, alignItems: "flex-start" }]}>
-                  <Text style={{ fontSize: H2FontSize, color: colors.white, fontFamily: 'RobotoBold', }}>
-                    {this.translate.Get('Tổng tiền')}:
+            <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center',height: H2FontSize*2, borderColor: colors.white,  backgroundColor: '#dc7d46', flexDirection: 'row' }}>
+            <Text style={{ width:'49%',marginLeft:5, fontSize: H2FontSize, color: colors.white,fontWeight:'bold', }}>
+                    {this.translate.Get('Tổng tiền')} :
                     </Text>
-                </View>
-                <View style={[styles.item_text_right_end, styles.item_text_center, { paddingRight: H2FontSize * 0.25, alignItems: "flex-end" }]}>
-                  <Text style={{ fontSize: H2FontSize, color: colors.white }}>
+                    <Text style={{ width:'50%',fontSize: H2FontSize, color: colors.white,textAlign:'right',marginRight:5 }}>
                     {formatCurrency(this.state.ProductSet.TkdTotalAmount, '')}
                   </Text>
-                </View>
               </View>
-            </View>
           </View>
           <View style={{ width: lStyle.PnCenter.width, backgroundColor: '##FFFFFF' }}>
             <_ChoiceCategory  state={this.state} translate={this.translate} ProductGroupList={ProductGroupList}
@@ -922,14 +913,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "flex-end",
     paddingRight: BUTTON_FONT_SIZE * 0.25,
-  },
-  item_text_end: {
-    height: SCREEN_HEIGHT * 0.08,
-    // paddingTop:BUTTON_FONT_SIZE * 0.12,
-  },
-  item_text_right_end: {
-    height: SCREEN_HEIGHT * 0.08,
-    // paddingTop:BUTTON_FONT_SIZE * 0.12,
   },
   item_text_center: {
     width: '50%',

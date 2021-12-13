@@ -4,13 +4,13 @@ import {
   Animated, Platform, FlatList, ActivityIndicator, KeyboardAvoidingView, Keyboard,
   Dimensions
 } from "react-native";
+import { Audio } from 'expo-av';
 import colors from "../../config/colors";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button, Icon } from "react-native-elements";
 import Constants from "expo-constants";
 import { H1FontSize,H2FontSize,H3FontSize,H4FontSize } from "../../config/constants";
-import { _storeData } from "../../services/storages";
-import { formatCurrency } from "../../services/util";
+import { formatCurrency, formatNumber } from "../../services/util";
 import Question from '../Question';
 
 const Bordy={
@@ -33,21 +33,101 @@ const ContentRowcf={
   width:Bordy.width * 0.75,  
   height:Bordy.height * 0.06
 }
-
 const TabTitle={
   width:0,
   height:Bordy.height*0.06
 }
-
 export class CardDetailView extends React.Component {
   textInput = null; 
-  
+  constructor(props) {
+    super(props);
+    this.state = {
+      IsLoaded:false,
+      KeyCode:'',
+      showCall:false,
+      sound:null,
+      showS_CodeHandleData:false
+    }
+  }
+
+  _onPlaybackStatusUpdate = playbackStatus => {
+    
+    if (!playbackStatus.isLoaded) {
+     ;
+    } else {
+      if (playbackStatus.isPlaying) {
+        // Update your UI for the playing state
+      } else 
+      {
+        // Update your UI for the paused state
+      }
+      if (playbackStatus.isBuffering) {
+        // Update your UI for the buffering state
+      }
+      if (playbackStatus.didJustFinish && !playbackStatus.isLooping) {
+        
+        this.setState({ showCall:false })
+      }
+    }
+  };
+  _LoadSound= async () => {
+    try{
+      const { state} = this.props;
+      let { sound} = this.state;
+      if (sound==null) {
+      sound= new Audio.Sound();
+    await sound.loadAsync({uri:state.endpoint+ '/Resources/Sound/RingSton.mp3'});
+    await sound.setOnPlaybackStatusUpdate(this._onPlaybackStatusUpdate);
+    this.setState({ sound})
+    return sound;
+      }
+    }catch(ex){
+      console.log('_LoadSound Error :'+ex)
+      this.setState({ sound:null})
+    }
+    return null;
+  }
+    _HandleSound= async () => {
+    try{
+        let { showCall,sound } = this.state;
+        if (sound==null) 
+        sound=  await this._LoadSound();
+        const { onCallServices } = this.props; 
+      if (sound==null)
+          return;
+        if (showCall) 
+        {
+          await sound.stopAsync();
+          this.setState({ showCall: false })
+        }  
+        else {
+          onCallServices(); 
+          this.setState({ showCall: true });
+          sound.setPositionAsync(0);
+        await sound.playAsync();
+     }
+    }catch(ex){
+      this.setState({ showCall:false })
+      console.log('_HandleSound Error :'+ex)
+    }
+    }
+  componentWillUnmount= async () => 
+  {
+    let { sound} = this.state;
+    if (sound!=null) {
+      await sound.unloadAsync();
+        this.setState({ showCall: false,sound:null})
+    }
+  }
+    componentDidMount= async () => {
+      this.setState({IsLoaded:true ,KeyCode:''});
+      await this._LoadSound();
+      
+    };
   _HandleQuantity = async (item,OrddQuantity,isReplace) => {
     try {
       const { HandleQuantity,state  } = this.props;
-      
       HandleQuantity(item,OrddQuantity,isReplace);
-     
       state.iLoadNumber=state.iLoadNumber+1;
      setState({state });
     } catch (error) {
@@ -55,26 +135,65 @@ export class CardDetailView extends React.Component {
       return null;
     } 
   };
+  _AcceptCode= async () => {
+    let { setState, onSendOrder, translate, settings} = this.props;
+    Keyboard.dismiss();
+    this.setState({ showS_CodeHandleData: false});
+    if (this.state.KeyCode==null||this.state.KeyCode=='') 
+    { 
+      Question.alert( translate.Get("Thông báo"),
+      translate.Get("Vui lòng nhập mã trước khi gửi Order !"),
+      [
+        {
+          text: "OK",
+          onPress: () => {
+            this.setState({ showS_CodeHandleData: true});
+          }
+        }
+      ]
+    );
+    return;
+    }
+      if (settings.S_CodeHandleData != this.state.KeyCode) 
+      { 
+        Question.alert( translate.Get("Thông báo"),
+        translate.Get("Bạn đã nhập code sai, vui lòng liên hệ với nhân viên!"),
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              this.setState({ showS_CodeHandleData: true});
+            }
+          }
+        ]
+      );
+      return;
+      }
+      onSendOrder();
+    }
   // Đã Order
   renderOrdered= ({ item, RowIndex }) => {
     const { BookingsStyle } = this.props;
-    console.log('Render renderOrdered'+JSON.stringify(item))
-    if (item.TkdQuantity <= 0)
+    if (item.TkdQuantity <= 0&&item.TksdQuantity<=0)
     return null;
+   
       return (
         <View style={{ width: Contentcf.width, justifyContent:'flex-start', borderBottomColor: colors.grey5, borderBottomWidth: 1,paddingTop:1,paddingBottom:1, marginLeft: 2 }}>
+       
+       {item.TkdType==0||item.TkdType==1?
         <View style={{ width: Contentcf.width, flexDirection: "row"}}> 
-            <Text  style={{  color: "#000000", width: Bordy.width * 0.05, fontSize: H2FontSize,  }} >
-              {item.TkdQuantity}
+            <Text  style={{  color: "#000000", width: Contentcf.width * 0.05, fontSize: H3FontSize,textAlign:'right',paddingRight:5  }} >
+              {formatNumber(item.TkdQuantity)}
             </Text>
             <Text  style={[ BookingsStyle.left_menu_Item,
                 {
                   color: "#000000",
                   marginRight: 10,
-                  width: Bordy.width * 0.5 - 25,
+                  width: Contentcf.width-(Contentcf.width * 0.05+Contentcf.width*0.1*2+20),
                   justifyContent: "center",
                   alignItems: "center",
-                  fontSize: H2FontSize
+                  fontSize: H3FontSize,
+                 
                 }
               ]}
             >
@@ -82,37 +201,83 @@ export class CardDetailView extends React.Component {
             </Text>
             <Text style={{
                 color: "#000000",
-                width: Bordy.width * 0.2,
+                width:Contentcf.width*0.1,
                 justifyContent: 'center',
                 fontSize: H3FontSize,
-                paddingRight: 15,
+                textAlign: "right"
+              }}>
+              {formatCurrency(item.TkdBasePrice, "")}
+            </Text>
+            <Text style={{
+                color: "#000000",
+                width:Contentcf.width*0.1,
+                justifyContent: 'center',
+                fontSize: H3FontSize,
                 textAlign: "right"
               }}>
               {formatCurrency(item.TkdTotalAmount, "")}
             </Text>
           </View>
+          :
+          <View style={{ width: Contentcf.width, flexDirection: "row"}}> 
+         
+          <Text  style={[ BookingsStyle.left_menu_Item,
+              {
+                color: "#000000",
+                marginRight: 10,
+               width: Contentcf.width-(Contentcf.width*0.1*2+20),
+                justifyContent: "center",
+                alignItems: "center",
+                fontSize: H4FontSize,
+                paddingLeft: Bordy.width * 0.03
+              }
+            ]}
+          >
+            {'  #'+formatNumber(item.TksdQuantity)} {item.PrdName}
+          </Text>
+          <Text style={{
+                color: "#000000",
+                width:Contentcf.width*0.1,
+                justifyContent: 'center',
+                fontSize: H3FontSize,
+                textAlign: "right"
+              }}>
+              {formatCurrency(item.TkdBasePrice, "")}
+            </Text>
+          <Text style={{
+              color: "#000000",
+              width:Contentcf.width*0.1,
+              justifyContent: 'center',
+              fontSize: H4FontSize,
+             
+              textAlign: "right"
+            }}>
+            {formatCurrency(item.TkdBasePrice*item.TksdQuantity, "")}
+          </Text>
+        </View>}
         </View>
       ); 
   };
   // Đang Order
   renderOrder = ({ item, RowIndex }) => {
+    let {_addExtraRequestToItem} = this.props;
     const Column1=Contentcf.width* 0.17;
-    const ImageWidth=Column1*0.3;
-    const QuantityWidth=Column1*0.4;
+    const QuantityWidth=Column1-H2FontSize*3;-2
     return (
       <View style={{ width: Contentcf.width,height:'auto', justifyContent:'flex-start', borderBottomColor: colors.grey5, borderBottomWidth: 1, marginLeft: 1 }}>
-        <View style={{ width: Contentcf.width, flexDirection: "row", paddingTop:1,paddingBottom:1}}> 
+        <View style={{ width: Contentcf.width, paddingTop:1,paddingBottom:1}}> 
+        <View style={{ width: Contentcf.width, flexDirection: "row"}}> 
         <View style={{  flexDirection: "row",  justifyContent: "center", width: Column1 }} >
          { (!item.PrdIsSetMenu) ?
-            <TouchableOpacity  style={{width: ImageWidth, justifyContent: "center", alignItems: 'flex-start'  }} onPress={() => this._HandleQuantity(item, -1, false)}>
+            <TouchableOpacity  style={{width: H2FontSize, justifyContent: "center", alignItems: 'flex-start'  }} onPress={() => this._HandleQuantity(item, -1, false)}>
               <Image resizeMode="stretch" source={require('../../../assets/icons/IconDelete.png')} 
-              style={{ width: ImageWidth*0.7,height: ImageWidth*0.7,  }} />
+              style={{ width: H2FontSize,height: H2FontSize,  }} />
             </TouchableOpacity>:   
-            <TouchableOpacity style={{ width: ImageWidth,justifyContent: "center", alignItems: "flex-start" }}  onPress={() => { this._HandleQuantity(item,-1,false) }}>
-            <Icon name="close"  type="antdesign" size={ImageWidth*0.7}  iconStyle={{ color: colors.red,  fontFamily: "RobotoBold",width:ImageWidth*0.7,height:ImageWidth*0.7}} />
+            <TouchableOpacity style={{ width: H2FontSize,justifyContent: "center", alignItems: "flex-start" }}  onPress={() => { this._HandleQuantity(item,-1,false) }}>
+            <Icon name="close"  type="antdesign" size={H2FontSize}  iconStyle={{ color: colors.red,  fontFamily: "RobotoBold",height:H2FontSize}} />
           </TouchableOpacity> 
           }
-            <View style={{ width: QuantityWidth,  height: 'auto',  justifyContent: 'center', alignItems: 'center'}}>
+            <View style={{ width: QuantityWidth,marginLeft:2,  height: 'auto',  justifyContent: 'center', alignItems: 'center'}}>
           
               <TextInput ref={input => this.textInput = input}  style={{  color: "#af3037", width: '100%',  fontSize: H3FontSize, textAlign:'left',fontFamily: "RobotoBold",}}
                 autoFocus={false}  autoCapitalize="none" autoCorrect={false} keyboardAppearance="dark"
@@ -128,24 +293,36 @@ export class CardDetailView extends React.Component {
                 }}
               />
             </View>
-          
-            <TouchableOpacity name='btnAddQuantity' style={{width: ImageWidth, height: ImageWidth, justifyContent: "center", alignItems: "center" }} onPress={() =>{
+           
+           <TouchableOpacity name='btnAddQuantity' style={{width: H2FontSize, height: H2FontSize, justifyContent: "center", alignItems: "center" }} onPress={() =>{
                if (item.PrdIsSetMenu)
                return;
                this._HandleQuantity(item, 1, false)
                }}>
             {!item.PrdIsSetMenu ? 
             <Image resizeMode="stretch" source={require('../../../assets/icons/IconAdd.png')} 
-            style={{ width: ImageWidth*0.7, height: ImageWidth*0.7, }} />
+            style={{ width: H2FontSize, height: H2FontSize, }} />
            : null
           }
            </TouchableOpacity>
-            
-          </View>
+           <TouchableOpacity style={{ width: H2FontSize,justifyContent: "center", alignItems: "flex-start" }}  onPress={() => { 
+            // _addExtraRequestToItem(item, RowIndex);
+              }}>
+            <Icon name='edit'  type="antdesign" size={H2FontSize}  iconStyle={{ color: colors.red,  fontFamily: "RobotoBold",height:H2FontSize}} />
+          </TouchableOpacity> 
+            </View>
+
           <View style={{ width: Contentcf.width* 0.555, justifyContent:'center', }}>
             <Text style={{  width: Contentcf.width* 0.555, fontSize: H3FontSize,  flexWrap: "wrap",textAlign:'left', }} numberOfLines={5}>
               {item.PrdName}
             </Text> 
+            {item.OrddDescription?
+            <Text style={{  width: Contentcf.width* 0.555, fontSize: H3FontSize,  flexWrap: "wrap",textAlign:'left', }} numberOfLines={5}>
+               {item.OrddDescription}
+            </Text> 
+            :null
+            }
+           
           </View>
           <View style={{  justifyContent:'center',width: Contentcf.width* 0.1 ,}}>
             <Text style={{ fontSize: H3FontSize ,textAlign:'right' }}>
@@ -165,26 +342,34 @@ export class CardDetailView extends React.Component {
           <View style={{ width: Bordy.width * 0.75 - 13, flexDirection: "row", }}>
             <FlatList keyExtractor={(item, RowIndex) => RowIndex.toString()}
               data={item.subItems && typeof item.subItems != 'undefined' ? item.subItems : []}
-              renderItem={this.renderCurrentItem}
+              renderItem={this.RenderSubItem}
               contentContainerStyle={{ backgroundColor: colors.white, borderColor: colors.grey4 }}
             />
           </View>:null
         }
       </View>
+      </View>
     );
   };
-  renderCurrentItem = ({ item, RowIndex }) => {
+  RenderSubItem = ({ item, RowIndex }) => {
     const { translate } = this.props;
     return (
         <View style={{ width: Contentcf.width, flexDirection: "row",paddingBottom:2,paddingTop:2 }}>
         <View style={{  flexDirection: "row",  justifyContent: "center", width: Contentcf.width* 0.17 }} >
             <View style={{ width: Contentcf.width*0.07,  justifyContent: 'center', alignItems: 'center'}}>
-           
+            <Text style={{  width: '100%', fontSize: H4FontSize,  flexWrap: "wrap",textAlign:'left'}}>
+            </Text> 
             </View>
           </View>
-          <View style={{ width: Contentcf.width* 0.555, justifyContent:'center', marginLeft: Contentcf.width* 0.005, }}>
-            <Text style={{  width: '100%', fontSize: H4FontSize,  flexWrap: "wrap",textAlign:'left'}}>
-           {item.TksdQuantity}{translate.Get('.')}{item.PrdName}
+          <View style={{ width: Contentcf.width* 0.555,flexDirection: "row",alignContent:'center', justifyContent:'flex-start', marginLeft: Contentcf.width* 0.005, }}>
+          <Text style={{  fontSize: H4FontSize,textAlign:'left'}}>
+           {item.TksdQuantity}
+            </Text> 
+            <Text style={{  fontSize: H4FontSize,textAlign:'left',textAlignVertical:'bottom'}}>
+            {'# '}
+            </Text> 
+            <Text style={{ fontSize: H4FontSize,  flexWrap: "wrap",textAlign:'left'}}>
+         {item.PrdName}
             </Text> 
           </View>
           <View style={{  justifyContent:'center',width: Contentcf.width* 0.1 ,}}>
@@ -197,13 +382,16 @@ export class CardDetailView extends React.Component {
           </View>
           </View>
       )};
-  componentDidMount(){
-    console.log('componentDidMount');
-  };
   render() {
-    
-    let { state,setState, onGetInfor, onSendOrder, BookingsStyle, CartToggleHandle, translate, settings, ProductsOrdered} = this.props;
+    let { state,setState, onSendOrder, BookingsStyle, CartToggleHandle, translate, settings, ProductsOrdered} = this.props;
    
+    if (!this.state.IsLoaded) {
+      return (
+        <View style={[styles.pnbody, styles.horizontal]}>
+          <ActivityIndicator size="large" color="#0000ff"/>
+        </View>
+      );
+    }
     if(typeof(state.isHavingOrder)==undefined||state.isHavingOrder ==null)
     state.isHavingOrder=true; 
     return ( 
@@ -239,14 +427,11 @@ export class CardDetailView extends React.Component {
                 buttonStyle={{  borderRadius: 0, backgroundColor: state.isHavingOrder?  '#dc7d46': colors.grey3 }}
                 onPress={() =>{
                  setState({ isHavingOrder: true,iLoadNumber:state.iLoadNumber+1 });
-                  console.log('state.isHavingOrder:'+state.isHavingOrder)
+                  //console.log('state.isHavingOrder:'+state.isHavingOrder)
                 } } />
               <Button
                 onPress={() => {
-                  setState({isHavingOrder:false, iLoadNumber:state.iLoadNumber+1 } ,() => {
-                    onGetInfor();
-                    console.log('state.isHavingOrder:'+state.isHavingOrder)
-                  });
+                  setState({isHavingOrder:false, iLoadNumber:state.iLoadNumber+1 });
                 }}
                 title={translate.Get("Đã Order")}
                 containerStyle={{ width: "50%" }}
@@ -298,7 +483,10 @@ export class CardDetailView extends React.Component {
                   title={translate.Get("Gửi Order")}
                   containerStyle={{ backgroundColor: "#af3037", width: "50%" }}
                   onPress={() => {
-                    if (settings.B_CustomerSendOrder == true) {
+                    if (settings.B_CustomerSendOrder != true) 
+                    {
+                      this.setState({ showS_CodeHandleData: true });
+                     } else {
                       Question.alert(translate.Get("Notice"),
                         translate.Get("Bạn có muốn gọi order không?"),
                         [
@@ -309,13 +497,9 @@ export class CardDetailView extends React.Component {
                               onSendOrder();
                             }
                           }
-                        ],
-                        { cancelable: false }
+                        ]
                       );
 
-                    }
-                    else {
-                     setState({ showS_CodeHandleData: true });
                     }
                   }}
                  
@@ -323,94 +507,43 @@ export class CardDetailView extends React.Component {
               </View>
             </View>
           ) : (
-            <View
-              style={{
-                height: (!isNaN(state.table.Ticket.TkServiceChargeAmout) && state.table.Ticket.TkServiceChargeAmout > 0) ? Bordy.height * 0.16 : Bordy.height * 0.08,
-                width: "100%",
-                position: "absolute",
-                flexDirection: "column",
-                bottom: 0,
-                right: 0,
-                borderTopColor: colors.grey5,
-                borderTopWidth: 1,
-                backgroundColor: colors.grey5
-              }}
-            >
-              {
-                (!isNaN(state.table.Ticket.TkServiceChargeAmout) && state.table.Ticket.TkServiceChargeAmout > 0) ?
-                  <View style={{ width: "100%", height: Bordy.height * 0.08, flexDirection: "row" }}>
-                    <View style={[styles.item_text_right_end,
-                    { paddingLeft: H1FontSize * 0.25, width: "60%", justifyContent: "center", alignItems: "flex-start" }]}>
-                      <View style={{ flexDirection: "row" }}>
-                        <Text style={{ fontSize: H1FontSize, color: colors.orange4 }}>
-                          {translate.Get("Thuế và Phí")}
-                        </Text>
-                        <TouchableOpacity onPress={() => setState({ ShowFeesInfo: true })}>
-                          <Icon
-                            name="questioncircle"
-                            type="antdesign"
-                            containerStyle={{
-                              marginLeft: H2FontSize ,
-                              justifyContent: "center"
-                            }}
-                            size={H2FontSize}
-                            iconStyle={{
-                              color: colors.primary,
-                              fontFamily: "RobotoBold"
-                            }}
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                    <View style={[styles.item_text_right_end, styles.item_text_center, { paddingRight: H1FontSize * 0.25, alignItems: "flex-end" }]}>
-                      <Text style={{ fontSize: H1FontSize, color: colors.orange4 }}>
-                        {state.table.Ticket ? formatCurrency(state.table.Ticket.TkServiceChargeAmout, "") : ""}
-                      </Text>
-                    </View>
-                  </View>
-                  : null
-              }
-              <View style={{ width: "100%", height: H2FontSize*1.5, flexDirection: "row", borderTopColor: colors.white, borderTopWidth: 1 }}>
-                <View style={[styles.item_text_right_end, styles.item_text_center, { width: "50%", paddingLeft: H2FontSize * 0.25, justifyContent: 'center', alignItems: "center" }]}>
-                  <View style={{ flexDirection: "row", width: '100%', }}>
-                    <Text style={{ fontSize: H2FontSize }}>
+            <View  style={{height:H2FontSize*1.5,width: "100%",
+                position: "absolute", flexDirection: "row",
+                bottom: 0,right: 0,borderTopColor: colors.grey5,
+                borderTopWidth: 1,backgroundColor: colors.grey5,
+                alignContent:'center',justifyContent:'flex-start'
+              }}>
+               <Text style={{ fontSize: H2FontSize,marginLeft:10 }}>
                       {translate.Get("Tạm tính")}:
                       </Text>
                     <Text style={{ fontSize: H2FontSize, color: colors.red,marginLeft:10 }}>
                     {state.table.Ticket ? formatCurrency(state.table.Ticket.TkTotalAmount, "") : ""}
                   </Text>
-                  </View>
-                </View>
-              </View>
             </View>
           )}
           </View>
-         
-
-          {state.showS_CodeHandleData ?
+          {this.state.showS_CodeHandleData ?
             <View style={{
-              backgroundColor: "rgba(98,98,98,0.6)", height: Bordy.height + Constants.statusBarHeight + 100,
+              backgroundColor: "rgba(98,98,98,0.6)", height: Bordy.height ,
               width: Bordy.width,
               position: 'absolute',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               bottom: 0,
-              right: 0,
-              borderTopColor: '#5FA323',
-              borderTopWidth: 1
+              right: 0
             }}>
               <KeyboardAvoidingView
                 keyboardType='light'
                 behavior="position"
                 contentContainerStyle={styles.formContainer}
               >
-                <View style={[{ borderTopLeftRadius: 16, borderTopRightRadius: 16, borderWidth: 2, borderColor: '#5FA323', backgroundColor: '#5FA323', width: Bordy.width / 2 }]}>
+                <View style={[{ borderTopLeftRadius: 5, borderTopRightRadius: 5, borderWidth: 1, borderColor: '#333D4C', backgroundColor: '#333D4C', width: Bordy.width*0.4}]}>
                   <View style={{
-                    flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: '#5FA323', width: '100%',
-                    height: H1FontSize * 2.5, borderTopLeftRadius: 16, borderTopRightRadius: 16, borderColor: '#5FA323', borderRadius: 2, borderWidth: 2,
+                    flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: '#333D4C', width: '100%',
+                    height: H2FontSize * 2, borderTopLeftRadius: 5, borderTopRightRadius: 5, borderColor: '#333D4C', borderRadius: 2, borderWidth: 2,
                   }}>
-                    <Text style={{ fontSize: 18, color: colors.white, textAlign: 'center' }}>{translate.Get("NHẬP CODE")}</Text>
+                    <Text style={{ fontSize: H3FontSize, color: colors.white, textAlign: 'center' }}>{translate.Get("NHẬP CODE")}</Text>
                   </View>
                   <View style={{ backgroundColor: colors.white, justifyContent: 'center', alignItems: 'center', height: H1FontSize * 2.5, width: '100%', paddingTop: 5, }}>
                     <TextInput
@@ -425,62 +558,54 @@ export class CardDetailView extends React.Component {
                       autoCorrect={false}
                       blurOnSubmit={false}
                       numberOfLines={5}
-                      onChangeText={(KeyCode) => {
-                       setState({ KeyCode })
+                      onChangeText={(Values) => {
+                       this.setState({ KeyCode :Values})
                       }}
                       onSubmitEditing={() => {
                         Keyboard.dismiss();
                       }}
-                      value={KeyCode}
+                      value={this.state.KeyCode}
                       placeholderTextColor="#7384B4"
                     />
                   </View>
-                  <View style={{
-                    width: '100%', flexDirection: 'row', justifyContent: 'space-evenly',
-                    alignItems: 'center', height: H1FontSize * 2.5, backgroundColor: colors.white,
-                  }}>
-                    <View style={{ width: '40%', paddingVertical: 10 }}>
+                  <View style={{  width: '100%', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', height: H1FontSize * 2.5, backgroundColor: colors.white }}>
+                      <View style={{ flexDirection: 'column', width: '30%', justifyContent: "center", alignItems: 'center'}}>
+            <TouchableOpacity style={{ width: '100%', justifyContent: "center", alignItems: 'center',backgroundColor:'#333D4C', borderWidth: 1, borderRadius: 5, borderColor: "#333D4C" }}
+                onPress={() => {  this._HandleSound();
+                }}>
+              <View style={{ flexDirection: 'row', width: '100%', justifyContent: "center", alignItems: 'center', }}>
+              <Image  resizeMode="contain" source={ this.state.showCall==false?require('../../../assets/icons/IconCall.png'):require('../../../assets/icons/iconCall_While.png') }
+                style={[ BookingsStyle.header_logo,{ maxWidth: '20%',  height:H1FontSize*1.2,
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }
+                ]}
+              />
+              <Text style={[{ color: "#FFFFFF", textAlign: 'center', fontSize: H2FontSize * 0.6 }]}> {this.state.showCall==false?translate.Get("Gọi nhân viên"):translate.Get("Đang gọi ..")} </Text>
+            </View>
+             </TouchableOpacity>
+            </View>
+                    <View style={{ width:'30%', paddingVertical: 5 }}>
                       <LinearGradient
                         colors={["#EB353B", "#ED1E24", "#ED131A"]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
-                        style={{ borderWidth: 1, borderRadius: 16, borderColor: "#ED1E24", height: 32, alignItems: 'center', justifyContent: 'center', }}>
-                        <TouchableOpacity onPress={() => {setState({ showS_CodeHandleData: false, }) }} style={[{ alignItems: 'center', justifyContent: 'center', width: '100%' }]}>
+                        style={{ borderWidth: 1, borderRadius: 5, borderColor: "#ED1E24", height:  H1FontSize*1.2, alignItems: 'center', justifyContent: 'center', }}>
+                        <TouchableOpacity onPress={() => {this.setState({ showS_CodeHandleData: false, }) }} style={[{ alignItems: 'center', justifyContent: 'center', width: '100%' }]}>
                           <Text style={{ textAlign: 'center', width: '100%', color: 'white', }}>{translate.Get('BỎ QUA')}</Text>
                         </TouchableOpacity>
                       </LinearGradient>
                     </View>
-                    <View style={{ width: '40%', paddingVertical: 10 }}>
+                    <View style={{ width:'30%', paddingVertical: 5 }}>
                       <LinearGradient
                         colors={["#5FA323", "#5FA323", "#5FA323"]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
-                        style={{ borderWidth: 1, borderRadius: 16, borderColor: "#5FA323", height: 32, alignItems: 'center', justifyContent: 'center', }}>
-                        <TouchableOpacity onPress={() => {
-                          if (settings.S_CodeHandleData) {
-                            if (settings.S_CodeHandleData == KeyCode) {
-                             setState({ showS_CodeHandleData: false, }, () => {
-                                onSendOrder();
-                              });
-                            }
-                            else {
-                             setState({ showS_CodeHandleData: true, }, () => {
-                                Question.alert(
-                                  translate.Get("Thông báo"),
-                                  translate.Get("Bạn đã nhập code sai, vui lòng liên hệ với nhân viên!")
-                                )
-                              });
-                            }
-                          }
-                          else {
-                           setState({ showS_CodeHandleData: true, }, () => {
-                              Question.alert(
-                                translate.Get("Thông báo"),
-                                translate.Get("Bạn không có quyền gọi order, vui lòng liên hệ với nhân viên!")
-                              )
-                            });
-                          }
-                        }} style={[{ alignItems: 'center', justifyContent: 'center', width: '100%' }]}>
+                        style={{ borderWidth: 1, borderRadius: 5, borderColor: "#5FA323", height: H1FontSize*1.2, alignItems: 'center', justifyContent: 'center', }}>
+                        <TouchableOpacity  style={[{ alignItems: 'center', justifyContent: 'center', width: '100%' }]}
+                        onPress={() => {
+                          this._AcceptCode();
+                       }} >
                           <Text style={{ textAlign: 'center', width: '100%', color: 'white', }}>{translate.Get('AlertOK')}</Text>
                         </TouchableOpacity>
                       </LinearGradient>

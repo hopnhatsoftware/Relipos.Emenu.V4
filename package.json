@@ -9,6 +9,7 @@
   "dependencies": {
     "@expo/vector-icons": "^12.0.0",
     "expo": "^40.0.0",
+    "expo-av": "^8.7.0",
     "expo-barcode-scanner": "^9.1.0",
     "expo-constants": "^9.3.5",
     "expo-image-picker": "^9.2.1",
@@ -28,6 +29,7 @@
     "react-native-root-modal": "^5.0.0",
     "react-native-screens": "^2.15.1",
     "react-native-sound": "^0.11.0",
+    "react-native-sound-player": "^0.10.9",
     "react-native-tab-view": "^2.15.2",
     "react-native-webview": "^11.0.0",
     "react-navigation": "^3.11.1"

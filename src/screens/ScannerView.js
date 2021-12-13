@@ -14,8 +14,7 @@ import Question from '../components/Question';
 export default class Scanner extends React.Component {
   state = {
     hasCameraPermission: null,
-    scanned: false,
-    data: '',
+    IsScaned: false
   };
   constructor(props) {
     super(props);
@@ -35,10 +34,10 @@ export default class Scanner extends React.Component {
   };
 
   render() {
+    const { hasCameraPermission, IsScaned } = this.state;
     const { height, width } = Dimensions.get('window');
-    const maskRowHeight = Math.round((height - 300) / 20);
-    const maskColWidth = (width - 300) / 2;
-    const { hasCameraPermission, scanned } = this.state;
+    const maskRowHeight = Math.round((height ) / 20);
+    const maskColWidth = (width ) / 2;
 
     if (hasCameraPermission === null) {
       return <Text style={{ paddingTop: Constants.statusBarHeight, textAlign: 'center' }}>Requesting for camera permission</Text>;
@@ -54,51 +53,33 @@ export default class Scanner extends React.Component {
           justifyContent: 'flex-end',
         }}>
         <BarCodeScanner
-          onBarCodeScanned={scanned ? undefined : this.handleBarCodeScanned}
+          onBarCodeScanned={IsScaned ? undefined : this.handleBarCodeScanned}
           style={StyleSheet.absoluteFillObject}
         />
-        <View style={styles.maskOutter}>
-          <View style={[{ flex: maskRowHeight }, styles.maskRow, styles.maskFrame]} />
-          <View style={[{ flex: 30 }, styles.maskCenter]}>
-            <View style={[{ width: maskColWidth }, styles.maskFrame]} />
-            <View style={styles.maskInner} />
-            <View style={[{ width: maskColWidth }, styles.maskFrame]} />
-          </View>
-          <View style={[{ flex: maskRowHeight }, styles.maskRow, styles.maskFrame]} />
-        </View>
-        {scanned && (
-          <Button title={'Tap to Scan Again'} onPress={() => this.setState({ scanned: false })} />
+        {IsScaned && (
+          <Button title={'Tap to Scan Again'} onPress={() => this.setState({ IsScaned: false })} />
         )}
       </View>
     );
   }
-
   handleBarCodeScanned = (data) => {
-    this.setState({ scanned: true, data }, () => {
-      try {
-        let settings = data.data;
-        Question.alert(
-          this.translate.Get('Notice'),
-          this.translate.Get('Bạn có thật sự muốn sử dụng dữ liệu đã được quét không?'),
-          [
-            { text: 'Cancel', onPress: () => { this.setState({ scanned: false }) } },
-            {
-              text: 'OK', onPress: () => {
-                _storeData('APP@BACKEND_ENDPOINT', JSON.stringify(settings), () => {
-                  this.props.navigation.navigate('Settings');
-                });
-              }
-            },
-          ],
-          { cancelable: false }
-        );
+    try {
+        let endpoint = data.data;
+        endpoint = endpoint.replace("/api/", "").replace("/api", "");
+        _storeData('APP@BACKEND_ENDPOINT', JSON.stringify(endpoint), () => {
+          this.props.navigation.navigate('Settings');
+        });
       }
       catch (ex) {
-        Question.alert(
-          this.translate.Get('Notice'),
-          this.translate.Get('QR code không hợp lệ?'));
+        Question.alert('System Error',ex,[
+          {
+            text: "Ok", onPress: () => {
+              this.setState({ IsScaned: true })
+            }
+          }
+        ],
+        );
       }
-    });
   };
 }
 

@@ -5,6 +5,7 @@ import {ITEM_FONT_SIZE,H1FontSize, H2FontSize, H3FontSize, H4FontSize  } from ".
 import * as Font from "expo-font";
 import { formatCurrency, getTableColor } from "../../services/util";
 import Question from '../../components/Question';
+import { Colors } from "react-native/Libraries/NewAppScreen";
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 export class ProductDetails extends React.Component {
@@ -39,7 +40,7 @@ export class ProductDetails extends React.Component {
         RobotoLight: require("../../../assets/fonts/Roboto-Light.ttf"),
       });
     } catch (ex) {
-      console.log('_BindingFont Error :' + ex)
+      
     }
     return true;
   };
@@ -60,15 +61,17 @@ CartItemHandle.Json = '';
 if (CartItemHandle.subItems.length>0)
 if (CartItemHandle.subItems.length>0)
 CartItemHandle.Json = JSON.stringify(CartItemHandle.subItems);
-console.log("CartItemHandle:"+JSON.stringify(CartItemHandle));
+
 this.setState({ CartItemHandle });
   };
   render() {
     const { iProduct,CartItemHandle,CartProductIndex,ProductDetailsAccept,translate,ChoisetDetails,endpoint,onRollBack,ProductChoiseIndex} = this.props;
     //console.log('ProductDetails ProductChoiseIndex:'+ProductChoiseIndex);
-    const pnBottonHeight=SCREEN_HEIGHT*0.2;
+    let pnBottonHeight=SCREEN_HEIGHT*0.15;
+    if (ChoisetDetails.length<=0)
+    pnBottonHeight=pnBottonHeight-H4FontSize;
     let pnBottonCenterHeight=pnBottonHeight-H3FontSize-20;
-    if (ChoisetDetails&&ChoisetDetails.length>0)
+    if (ChoisetDetails.length>0)
     pnBottonCenterHeight=pnBottonCenterHeight-H4FontSize;
     let SubWidth=(SCREEN_WIDTH*0.7)/ChoisetDetails.length;
     let SubContentWidth=SubWidth-H3FontSize;
@@ -82,13 +85,7 @@ this.setState({ CartItemHandle });
           }} >
           <View  style={{  justifyContent: "center",  alignItems: "center", flexDirection: "column", width: SCREEN_WIDTH,height: SCREEN_HEIGHT,backgroundColor: colors.white, }}>
             <ImageBackground resizeMode="stretch" 
-              source={ iProduct.PrdImageUrl
-                ? {
-                  uri:
-                    endpoint +
-                    iProduct.PrdImageUrl,
-                }
-                : require("../../../assets/icons/ReliposEmenu_4x.png")
+              source={ iProduct.PrdImageUrl ? { uri:  endpoint + iProduct.PrdImageUrl, } : require("../../../assets/icons/ReliposEmenu_4x.png")
               }
               style={[{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }]}/>
               {iProduct.SttId && iProduct.SttId == 3 ?
@@ -132,11 +129,13 @@ this.setState({ CartItemHandle });
                         {translate.Get('Price') + ': ' + formatCurrency(iProduct.UnitPrice, "")}
                       </Text>
                         </View>
-                        <View style={{ flexDirection: 'row', height: pnBottonCenterHeight, width:'100%'}}>
-                        <View style={{  width:SCREEN_WIDTH-pnBottonRightWidth-10, height: '100%',paddingTop:5}}>
-                        <Text style={{  color: "#FFFFFF", width: '100%', fontSize: H4FontSize,height:pnBottonCenterHeight- H4FontSize}} numberOfLines={4}>
+                        <View style={{ flexDirection: 'row', height: pnBottonHeight-H3FontSize, width:'100%'}}>
+                        <View style={{  width:SCREEN_WIDTH-pnBottonRightWidth-10, height: '100%'}}>
+                        <View style={{  width: '100%',height:pnBottonCenterHeight}}>
+                        <Text style={{  color: "#FFFFFF", fontSize: H4FontSize}} numberOfLines={4}>
                           {iProduct.PrdDescription}
                         </Text>
+                        </View>
                        {(ChoisetDetails&&ChoisetDetails.length>0)?
                         <View style={{ width: '100%',flexDirection: 'row',height:H4FontSize }}>
                               { 

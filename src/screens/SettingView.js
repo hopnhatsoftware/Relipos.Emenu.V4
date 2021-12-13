@@ -105,18 +105,8 @@ export default class Settings extends Component {
     res = JSON.parse(res);
     let language = await _retrieveData('culture', 1);
     const isEndpointValid = this.state.endpoint.length > 0 && validUrl(this.state.endpoint);
-    this.getPermissionAsync();
     this.setState({ settings, fontLoaded: true, isEndpointValid, endpoint: res, language, isReady: true }, () => this._retrievePos(settings));
     this.defaultFonts();
-  }
-
-  getPermissionAsync = async () => {
-    if (Constants.platform.ios) {
-      const { status } = await Permissions.askAsync(Permissions.CAMERA);
-      if (status !== 'granted') {
-        alert('Sorry, we need camera roll permissions to make this work!');
-      }
-    }
   }
   defaultFonts() {
     const customTextProps = {
@@ -126,7 +116,6 @@ export default class Settings extends Component {
     }
     setCustomText(customTextProps)
   }
-
   _retrievePos = async (settings) => {
     if (this.validateEndpoint()) {
       GetPosList().then((res) => {
@@ -160,11 +149,13 @@ export default class Settings extends Component {
       this.setState({ settings, showPosPicker: false });
     });
   }
-
   updateEndpoint = () => {
-    if (this.validateEndpoint()) {
-      const { endpoint, settings } = this.state;
+    if (!this.validateEndpoint())
+    return;
+    {
+      let { endpoint, settings } = this.state;
       let that = this;
+      endpoint = endpoint.replace("/api/", "").replace("/api", "");
       _storeData('APP@BACKEND_ENDPOINT', JSON.stringify(endpoint), () => { that._retrievePos(settings) });
     }
   }
@@ -179,7 +170,9 @@ export default class Settings extends Component {
   }
 
   _saveSettings = () => {
-    _storeData('settings', JSON.stringify(this.state.settings), () => { this.props.navigation.navigate("LoginView", { settings: this.state.settings }) });
+    _storeData('settings', JSON.stringify(this.state.settings), () => { 
+      this.props.navigation.navigate("LoginView", { settings: this.state.settings }) 
+    });
   }
 
   _clearSettings = () => {
@@ -194,19 +187,27 @@ export default class Settings extends Component {
     ],
       { cancelable: false }
     )
-    let settings = { "PosId": 1, "PosIdName": "Thu ngân", "I_BusinessType": 1, "I_BranchID": 3, "I_Currency": 1, "S_DepartmentName": "Nhà hàng HỢP NHẤT", "I_LimitTypeBooking": "5", "I_LimitQuntityBooking": "5", "I_Limit_Booking_Time": "5", "I_CounterName": "Thu ngân 1", "I_BusinessTypeName": "Restaurant | Coffee | Bar", "I_BranchIDName": "Mô hinh phức hợp", "I_CurrencyName": "VND" };
+    let settings = { 
+      "PosId": 1,
+       "PosIdName": "Thu ngân",
+        "I_BusinessType": 1, 
+        "I_BranchID": 3, 
+        "I_Currency": 1,
+         "S_DepartmentName": "Nhà hàng HỢP NHẤT", 
+         "I_LimitTypeBooking": "5", 
+         "I_LimitQuntityBooking": "5", 
+         "I_Limit_Booking_Time": "5",
+          "I_CounterName": "Thu ngân 1",
+           "I_BusinessTypeName": "Restaurant | Coffee | Bar",
+            "I_BranchIDName": "Mô hinh phức hợp", 
+            "I_CurrencyName": "VND" 
+          };
     _remove("APP@BACKEND_ENDPOINT", async () => {
-      _storeData('settings', JSON.stringify(settings), () => { this.setState({ settings, endpoint: ENDPOINT_URL }) });
+      _storeData('settings', JSON.stringify(settings), () => {
+         this.setState({ settings, endpoint: ENDPOINT_URL }) 
+        });
     });
   }
-
-  _setSetting = (id, value, key) => {
-    let { settings } = this.state;
-    settings[key] = id;
-    settings[key + 'Name'] = value;
-    this.setState({ settings });
-  }
-
   render() {
     let { endpoint, isEndpointValid, PosList, Data, settings, item, URL_LOGO } = this.state;
     if (!this.state.fontLoaded) {
@@ -232,7 +233,9 @@ export default class Settings extends Component {
                     refInput={input => (this.endpointInput = input)}
                     inputContainerStyle={[{ borderBottomWidth: 1, borderColor: '#EEEEEE', width: '75%' }]}
                     rightIcon={
-                      <TouchableOpacity style={{ paddingRight: 15, paddingTop: 5 }} onPress={() => { this.updateEndpoint(); Keyboard.dismiss(); }}>
+                      <TouchableOpacity style={{ paddingRight: 15, paddingTop: 5 }} onPress={() => { 
+                        this.updateEndpoint(); Keyboard.dismiss();
+                         }}>
                         <Icon
                           name={'check'}
                           type="Entypo"
@@ -259,7 +262,6 @@ export default class Settings extends Component {
                   />
                 </View>
               </View>
-
               <View style={{ flexDirection: "row", paddingBottom: 5, borderBottomColor: 'white', borderBottomWidth: 1 }}>
                 <View style={{ flexDirection: "row", justifyContent: 'flex-start', alignItems: 'center', paddingLeft: 10, width: '100%' }}>
                   <View style={{ width: '25%', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
