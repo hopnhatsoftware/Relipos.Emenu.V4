@@ -76,7 +76,7 @@ this.setState({ CartItemHandle });
     let SubWidth=(SCREEN_WIDTH*0.7)/ChoisetDetails.length;
     let SubContentWidth=SubWidth-H3FontSize;
     let pnBottonRightWidth=SCREEN_WIDTH*0.2;
-    30
+  
     return (
       <View  style={{  position: "absolute", right: 0,  top: 0, alignContent: "center", justifyContent: "center",  width: SCREEN_WIDTH, height: SCREEN_HEIGHT,  backgroundColor: "rgba(0, 0, 0, 0.6)" }}>
         <ScrollView horizontal={true} scrollEventThrottle={16}  scrollEnabled={true}  style={[{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, }]}
@@ -84,7 +84,7 @@ this.setState({ CartItemHandle });
             onRollBack(CartItemHandle, CartProductIndex,iProduct, ProductChoiseIndex, 1);
           }} >
           <View  style={{  justifyContent: "center",  alignItems: "center", flexDirection: "column", width: SCREEN_WIDTH,height: SCREEN_HEIGHT,backgroundColor: colors.white, }}>
-            <ImageBackground resizeMode="stretch" 
+            <ImageBackground resizeMode='contain' 
               source={ iProduct.PrdImageUrl ? { uri:  endpoint + iProduct.PrdImageUrl, } : require("../../../assets/icons/ReliposEmenu_4x.png")
               }
               style={[{ width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center' }]}/>

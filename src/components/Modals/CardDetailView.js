@@ -420,24 +420,26 @@ export class CardDetailView extends React.Component {
                 {translate.Get("Giỏ Hàng")}
               </Text>
             </View>
-            <View style={{ width: "100%", height: TabTitle.height, flexDirection: "row" }}>
-              <Button title={translate.Get("Đang Order")}
-                containerStyle={{ width: "50%" }}
-                titleStyle={styles.button_order,{fontSize: H2FontSize}}
-                buttonStyle={{  borderRadius: 0, backgroundColor: state.isHavingOrder?  '#dc7d46': colors.grey3 }}
-                onPress={() =>{
-                 setState({ isHavingOrder: true,iLoadNumber:state.iLoadNumber+1 });
-                  //console.log('state.isHavingOrder:'+state.isHavingOrder)
-                } } />
-              <Button
-                onPress={() => {
-                  setState({isHavingOrder:false, iLoadNumber:state.iLoadNumber+1 });
-                }}
-                title={translate.Get("Đã Order")}
-                containerStyle={{ width: "50%" }}
-                titleStyle={styles.button_order,{fontSize: H2FontSize}}
-                buttonStyle={{ borderRadius: 0, backgroundColor: !state.isHavingOrder ? '#dc7d46': colors.grey3  }}
-              />
+            <View style={{ width: Bordy.width * 0.75, height: TabTitle.height, flexDirection: "row" }}>
+            <TouchableOpacity style={{ borderRadius: 0, backgroundColor: state.isHavingOrder?  '#dc7d46': colors.grey3,width: "50%"
+            }}
+            onPress={() => {
+                setState({ isHavingOrder: true,iLoadNumber:state.iLoadNumber+1 });
+            }} >
+             <Text style={{ fontSize: H2FontSize,  color: "white",  textAlign: "center" }}>
+                {translate.Get("Đang Order")}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{ borderRadius: 0, backgroundColor: !state.isHavingOrder ? '#dc7d46': colors.grey3,width: "50%"
+            }}
+            onPress={() => {
+              setState({isHavingOrder:false, iLoadNumber:state.iLoadNumber+1 });
+            }} >
+             <Text style={{ fontSize: H2FontSize,  color: "white",  textAlign: "center" }}>
+                {translate.Get("Đã Order")}
+              </Text>
+            </TouchableOpacity>
+             
             </View>
             <View style={{ width: "100%",marginTop:1, height:Bordy.height-(Titlecf.height+TabTitle.height+(state.isHavingOrder ?TabTitle.height*2:0))}}>
             <FlatList
@@ -453,57 +455,61 @@ export class CardDetailView extends React.Component {
               <View style={{ width: "100%", height: TabTitle.height, flexDirection: "row", backgroundColor: colors.grey5 }}>
              
                   <View style={[styles.button_end_left_order, { width: "50%",textAlign:'left',paddingTop:(TabTitle.height-H2FontSize)/2  }]}> 
-                    <Text style={{ fontSize: H2FontSize, color: "#af3037",paddingLeft:H2FontSize*0.2 }}>
+                    <Text style={{ fontSize: H3FontSize, color: "#af3037",paddingLeft:10 }}>
                       {translate.Get("Số lượng")}: 
-                      <Text style={{ fontSize: H2FontSize, color: "black" }}>
+                      <Text style={{ fontSize: H3FontSize, color: "black" }}>
                       {state.CartInfor.TotalQuantity}
                     </Text>
                       </Text>
                   </View>
                   <View style={[styles.button_end_left_order, { width: "50%",textAlign:'left',paddingTop:(TabTitle.height-H2FontSize)/2  }]}> 
-                    <Text style={{ fontSize: H2FontSize, color: "#af3037",paddingLeft:H2FontSize*0.2 }}>
+                    <Text style={{ fontSize: H3FontSize, color: "#af3037",paddingLeft:H2FontSize*0.2 }}>
                     {translate.Get("Thành tiền")}:
-                      <Text style={{ fontSize: H2FontSize, color: "black",paddingLeft:5 }}>
+                      <Text style={{ fontSize: H3FontSize, color: "black",paddingLeft:5 }}>
                       {formatCurrency(state.CartInfor.TotalAmount, "")}
                     </Text>
                       </Text>
                   </View>
               </View>
               <View style={[BookingsStyle.bottombar, { width: "100%", flexDirection: "row" ,height:TabTitle.height}]}>
-                <Button
-                  onPress={() => CartToggleHandle(false)}
-                  title={translate.Get("Đặt thêm")}
-                  containerStyle={{ backgroundColor: "#dc7d46", width: "50%" }}
-                  titleStyle={{ fontSize: H2FontSize }}
-                  buttonStyle={{ backgroundColor: "#dc7d46", padding: H1FontSize * 0.25 }}
-                ></Button>
-                <Button  disabled={ !state.CartInfor.TotalQuantity||state.CartInfor.TotalQuantity <= 0   }
-                  titleStyle={{ fontSize: H2FontSize }}
-                  buttonStyle={{ backgroundColor: "#af3037", padding: H1FontSize * 0.25 }}
-                  title={translate.Get("Gửi Order")}
-                  containerStyle={{ backgroundColor: "#af3037", width: "50%" }}
-                  onPress={() => {
-                    if (settings.B_CustomerSendOrder != true) 
-                    {
-                      this.setState({ showS_CodeHandleData: true });
-                     } else {
-                      Question.alert(translate.Get("Notice"),
-                        translate.Get("Bạn có muốn gọi order không?"),
-                        [
-                          { text: translate.Get('BỎ QUA'), onPress: () => { } },
-                          {
-                            text: translate.Get('OK'),
-                            onPress: () => {
-                              onSendOrder();
-                            }
-                          }
-                        ]
-                      );
+              <TouchableOpacity style={{ borderRadius: 0, backgroundColor:'#dc7d46',width: "50%"
+            }}
+            onPress={() => {
+              CartToggleHandle(false);
+            }} >
+             <Text style={{ fontSize: H2FontSize,  color: "white",  textAlign: "center" }}>
+                {translate.Get("Đặt thêm")}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={{ borderRadius: 0, backgroundColor:!state.CartInfor.TotalQuantity||state.CartInfor.TotalQuantity <= 0 ?colors.grey0: '#af3037',width: "50%"
+            }}
+            onPress={() => {
+             if(!state.CartInfor.TotalQuantity||state.CartInfor.TotalQuantity <= 0 )
+             return;
+             if (settings.B_CustomerSendOrder != true) 
+             {
+               this.setState({ showS_CodeHandleData: true });
+              } else {
+               Question.alert(translate.Get("Notice"),
+                 translate.Get("Bạn có muốn gọi order không?"),
+                 [
+                   { text: translate.Get('BỎ QUA'), onPress: () => { } },
+                   {
+                     text: translate.Get('OK'),
+                     onPress: () => {
+                       onSendOrder();
+                     }
+                   }
+                 ]
+               );
 
-                    }
-                  }}
-                 
-                ></Button>
+             }
+            }} >
+             <Text style={{ fontSize: H2FontSize,  color: "white",  textAlign: "center" }}>
+                {translate.Get("Gửi Order")}
+              </Text>
+            </TouchableOpacity>
+
               </View>
             </View>
           ) : (

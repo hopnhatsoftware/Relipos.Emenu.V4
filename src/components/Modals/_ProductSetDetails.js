@@ -4,7 +4,6 @@ import {
   Dimensions, Image, TouchableHighlight, ImageBackground
 } from "react-native";
 import colors from "../../config/colors";
-import { Button, Icon } from "react-native-elements";
 import Constants from "expo-constants";
 import {
   ITEM_FONT_SIZE
@@ -117,7 +116,7 @@ export class ProductSetDetails extends React.Component {
                   <Text numberOfLines={5} style={{
                     color: "#FFFFFF", width: "95%",
                     fontSize: ITEM_FONT_SIZE * 1.2, fontFamily: "RobotoBold",
-                  }} numberOfLines={3}>
+                  }} >
                     {item.PrdName}
                   </Text>
                   <Text style={{ color: "#FFFFFF", width: "95%", paddingTop: ITEM_FONT_SIZE / 2, fontSize: ITEM_FONT_SIZE }} numberOfLines={3}>

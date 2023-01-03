@@ -88,7 +88,9 @@ export default class OrderView extends Component {
       showSetInCart: false,
       ShowTotalInfo: false,
       ProductImagePrefix: "",
-      Config:{}
+      Config:{},
+      isShowFullImage:false,
+      ImageUrl:'',
     };
     this.translate = new translate();
   }
@@ -959,6 +961,23 @@ if (ProductChoise==null) {
       </View>
     );
   };
+  /**
+   * Show Full Hình ảnh
+   * @param {*} Item 
+   * @param {*} isShow 
+   */
+  _ShowFullImage = async (Item,isShow) => {
+    try {
+      let { ImageUrl } = this.state;
+      ImageUrl='';
+      if(isShow&&Item!=null)
+        ImageUrl=Item.PrdImageUrl?Item.PrdImageUrl:'';
+        this.setState({isShowFullImage:isShow,ImageUrl});
+       
+    } catch (ex) {
+      console.log('_ShowFullImage Error :' + ex)
+    }
+  };
 /*Danh sách setmenu để chọn edit */
   RenderListSetmenuViewDetail = (CartItem, ind) => {
     let RowWidth=(Bordy.width*0.85)-10;
@@ -1079,11 +1098,15 @@ if (ProductChoise==null) {
     this.setState({CartItemHandle ,CartItemSelected:iCartItemSelected,CartProductIndex:iCartItemSelected,ProductChoise: item,ProductChoiseIndex:index, showSetInCart:ishowSetInCart});  
   }}
   renderProductModal = () => {
+
     if (this.state.showSetInCart==true)
     return null;
       let { ProductChoise,CartProductIndex,CartItemHandle,ChoisetDetails,ProductChoiseIndex } = this.state;
       if (ProductChoise == null||CartItemHandle==null) 
         return null;
+       
+
+
       return (
         <ProductDetails
           endpoint={this.state.ProductImagePrefix == '' ? 
@@ -1111,12 +1134,16 @@ if (ProductChoise==null) {
     let {CartFilter}= this._getCartItems(item,null);
     item.OrddQuantity=CartFilter.TotalQuantity;
     this.state.isRenderProduct=true;
+   // console.log(this.state.endpoint + "/Resources/Images/Product/" + item.PrdImageUrl)
     return (
       <TouchableHighlight   style={ { borderBottomWidth: 1,borderColor: colors.grey2,width:iWith,height: iHeight,marginBottom:2 }}>
         <View style={{ flexDirection: "row", flexWrap: "wrap", width: "100%", height: '100%' }}>
           <View style={{ width: "60%", height: '100%' }}>
             <TouchableOpacity name='dvImage' style={{ flexDirection: "row", width: '100%', height: '100%' }}
-              onPress={() => { this.PrerenderProductModal(item,CartFilter,index);
+              onPress={() =>
+              { 
+                this._ShowFullImage(item,true);
+                //this.PrerenderProductModal(item,CartFilter,index);
             }}> 
               <ImageBackground  resizeMode="stretch"
                 source={ item.PrdImageUrl ? {uri: this.state.endpoint + "/Resources/Images/Product/" + item.PrdImageUrl
@@ -1258,7 +1285,6 @@ if (ProductChoise==null) {
         </View>
       );
     }
-   
     const {ProductGroupList,endpoint,PrdChildGroups,Products,CartInfor,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config, lockTable,ProductsOrdered} = this.state; 
    
     return (
@@ -1310,18 +1336,16 @@ if (ProductChoise==null) {
             </View>
           </View>
         </View>
-        {!this.state.isShowFormCard ? (
+        {!this.state.isShowFormCard ? 
          //Bottonbar 
           <Animated.View style={[styles.BottonMenu, { width:Center.width,height:Booton.height }]}>
-            {this.state.ShowFullCart ? (
+            {this.state.ShowFullCart ? 
               <View style={{ width: "100%", flexDirection: "row" }}>
-                  <View style={{ flexDirection: "row",justifyContent: "center",alignItems: "center", width: (Center.width/2),}}>
-                    {
+                  <View style={{ flexDirection: "row",justifyContent: "center",alignItems: "center", width: (Center.width/2),}}>                    
                  <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-                   {/* { <Image resizeMode="contain" style={{ width: SCREEN_WIDTH * 0.35, maxWidth: 442 }}
-                       source={require('../../assets/icons/iconNew/PhatTrien2-10.png')} ></Image> } */}
+                    <Image resizeMode="contain" style={{width: '99%', height: '99%'}}
+                    source={{uri:endpoint+'/Resources/Images/View/MenuBaner.png'}} ></Image> 
                    </View>
-                  }
                 </View> 
                 <View style={[BookingsStyle.bottombar, styles.item_menu_order, { width: (Center.width/4), flexDirection: "row" }]}>
                   <View style={{ position: 'absolute', left: 10, paddingTop: 5, justifyContent: 'center', alignItems: 'center' }}>
@@ -1340,13 +1364,13 @@ if (ProductChoise==null) {
                       <Image resizeMode="stretch" source={require('../../assets/icons/v2/icon_GioHang.png')}
                         style={{ width: H3FontSize * 1.3, height: H3FontSize * 1.3, }} />
                     </View>
-                    <Text style={[{ color: "white", fontSize: H3FontSize, fontFamily: "RobotoBold", paddingLeft: 10 }]}>
+                    <Text style={[{ color: "white", fontSize: H3FontSize, paddingLeft: 10 }]}>
                       {this.translate.Get("Giỏ hàng")}
                     </Text>
                   </View>
                 </TouchableOpacity>
               </View>
-            ) : (
+             : 
               <TouchableOpacity
                 onPress={() => this.toggleWidth(true)}
                 style={[BookingsStyle.bottombar, { backgroundColor: "#29ade3", width: SCREEN_HEIGHT * 0.08 }]}>
@@ -1355,9 +1379,9 @@ if (ProductChoise==null) {
                   iconStyle={{ fontSize: ITEM_FONT_SIZE * 2, color: "white" }}
                 />
               </TouchableOpacity>
-            )}
+            }
           </Animated.View>
-        ) : (
+        : (
           <CardDetailView
             state={this.state}
             CartToggleHandle={(val) => this.CartToggleHandle(val)}
@@ -1453,6 +1477,20 @@ if (ProductChoise==null) {
       <ActivityIndicator color={colors.primary} size="large"></ActivityIndicator>
     </View>
       :null}
+       {(this.state.isShowFullImage==true&& this.state.ImageUrl!='')?
+            <View style={{ backgroundColor: "rgba(98,98,98,0.6)", position: "absolute", top: 0, left: 0, width: SCREEN_WIDTH, justifyContent: 'center', alignItems: 'center', height: SCREEN_HEIGHT }}>
+             <TouchableOpacity style={{}} onPress={() =>  this._ShowFullImage(null,false)}>
+            <ImageBackground resizeMode="contain"
+              source={{ uri:this.state.endpoint + "/Resources/Images/Product/" + this.state.ImageUrl}
+              }
+              style={[{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, backgroundColor: colors.grey1 }]} >
+
+              </ImageBackground>
+              </TouchableOpacity>
+          </View>
+          :null
+        
+        }
       </View>
     );
 }

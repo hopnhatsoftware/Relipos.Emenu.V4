@@ -341,8 +341,8 @@ export default class TableView extends Component {
               <Icon name="lock" iconStyle={{ color: colors.white, paddingLeft: H1FontSize * 1, }} fontSize={H1FontSize} type="antdesign"></Icon>
             </TouchableOpacity>
             <View style={{ color: colors.white, flex: 1, justifyContent: "center", alignItems: "center", flexDirection: 'row' }}>
-              <Text style={{ fontSize: H1FontSize, fontFamily: 'RobotoBold', color: colors.white, textAlign: 'center', paddingHorizontal: 4 }}>
-                {this.translate.Get('Sơ Đồ Bàn')}
+              <Text style={{ fontSize: H2FontSize, color: colors.white, textAlign: 'center'}}>
+                {this.translate.Get('SƠ ĐỒ BÀN')}
               </Text>
             </View>
             <TouchableOpacity onPress={() => this.setState({ showFilterPanel: !showFilterPanel })} >

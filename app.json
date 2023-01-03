@@ -1,19 +1,18 @@
 {
   "expo": {
-    "name": "Relipos eMenu",
-    "slug": "relipos-EmenuV4",
+    "name": "SOS OfflineMenu",
+    "slug": "SOS-OfflineMenu",
     "privacy": "public",
-    "sdkVersion": "40.0.0",
     "platforms": [
       "ios",
       "android",
       "web"
     ],
-    "version": "1.1.0",
+    "version": "1.0.0",
     "orientation": "landscape",
-    "icon": "./assets/icons/Logo_Emenu_BG_White_3.png",
+    "icon": "./assets/Customer/splash.png",
     "splash": {
-     "image": "./assets/icons/Logo_Emenu_BG_Red_3.png",
+      "image": "./assets/Customer/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -27,40 +26,42 @@
       "buildNumber": "1",
       "infoPlist": {
         "supportsTablet": true,
+        "UIBackgroundModes": [
+          "audio"
+        ],
         "NSLocationAlwaysUsageDescription": "needs gps data.",
         "NSLocationWhenInUseUsageDescription": "Emenu need your location to suggest nearest restaurant for you. Please allow Relipos.Emenu access your location!",
         "NSAppTransportSecurity": {
-          "NSExceptionDomains":{
-            "demo.relipos.com":{
+          "NSExceptionDomains": {
+            "demo.relipos.com": {
               "NSTemporaryExceptionAllowsInsecureHTTPLoads": true,
               "NSExceptionAllowsInsecureHTTPLoads": true,
-              "NSExceptionRequiresForwardSecrecy":false,
-              "NSExceptionMinimumTLSVersion":"TLSv1.1",
-              "NSIncludesSubdomains":true
+              "NSExceptionRequiresForwardSecrecy": false,
+              "NSExceptionMinimumTLSVersion": "TLSv1.1",
+              "NSIncludesSubdomains": true
             },
-            "relipos.com":{
+            "relipos.com": {
               "NSTemporaryExceptionAllowsInsecureHTTPLoads": true,
               "NSExceptionAllowsInsecureHTTPLoads": true,
-              "NSExceptionRequiresForwardSecrecy":false,
-              "NSExceptionMinimumTLSVersion":"TLSv1.1",
-              "NSIncludesSubdomains":true
+              "NSExceptionRequiresForwardSecrecy": false,
+              "NSExceptionMinimumTLSVersion": "TLSv1.1",
+              "NSIncludesSubdomains": true
             }
           },
           "NSAllowsArbitraryLoads": true,
           "NSAllowsArbitraryLoadsForMedia": true,
           "NSAllowsArbitraryLoadsInWebContent": true,
           "NSExceptionAllowsInsecureHTTPLoads": true,
-          "NSAllowsLocalNetworking":true,
-          "NSIncludesSubdomains":true
+          "NSAllowsLocalNetworking": true,
+          "NSIncludesSubdomains": true
         }
-
-    },
+      },
       "supportsTablet": true,
-      "bundleIdentifier": "com.relipos.Emenu"
+      "bundleIdentifier": "com.SOS.OfflineMenu"
     },
     "android": {
-      "versionCode": 4,
-      "package": "com.relipos.Emenu",
+      "versionCode": 1,
+      "package": "com.SOS.OfflineMenu",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
@@ -87,6 +88,6 @@
         "com.sonyericsson.home.permission.BROADCAST_BADGE"
       ]
     },
-    "description": "update version 2.0 fixed the product images"
+    "description": "New Version"
   }
 }

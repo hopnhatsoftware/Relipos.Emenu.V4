@@ -32,6 +32,8 @@ export default class SetMenuView extends Component {
       endpoint: '',
       language: 1,
       IsPostBack: false,
+      isShowFullImage:false,
+      ImageUrl:'',
       ProductGroupList: [],
       CategorySelectedIndex: -1,
       ChoiceSet: [],
@@ -325,6 +327,18 @@ export default class SetMenuView extends Component {
       console.log('_getItemDefault Error :' + ex)
     }
   };
+  _ShowFullImage = async (Item,isShow) => {
+    try {
+      let { ImageUrl } = this.state;
+      ImageUrl='';
+      if(isShow&&Item!=null)
+        ImageUrl=Item.PrdImageUrl?Item.PrdImageUrl:'';
+        this.setState({isShowFullImage:isShow,ImageUrl});
+       
+    } catch (ex) {
+      console.log('_ShowFullImage Error :' + ex)
+    }
+  };
   _HandleQuantityDetail = async (item, OrddQuantity, IsOveRight) => {
     //console.log('_HandleQuantityDetail'+ OrddQuantity);
     let { ProductSet, ProductGroupList, CategorySelectedIndex,Config } = this.state;
@@ -596,7 +610,8 @@ export default class SetMenuView extends Component {
       <TouchableHighlight style={{borderWidth:1, borderColor: colors.grey5, width:width,height: lStyle.PnCenter.ItemHeight,}}>
         <View style={{ flexDirection: "row", flexWrap: "wrap", width: width, height: '100%' }}>
           <View style={{ backgroundColor: "grey", width: LeftWidth, height: '100%' }}>
-            <ImageBackground resizeMode="stretch"
+          <TouchableOpacity style={{}} onPress={() =>  this._ShowFullImage(item,true)}>
+            <ImageBackground resizeMode="contain"
               source={item.PrdImageUrl ? {  uri:this.state.endpoint + "/Resources/Images/Product/" +  item.PrdImageUrl 
                 } : require("../../assets/icons/ReliposEmenu_4x.png")
               }
@@ -623,6 +638,7 @@ export default class SetMenuView extends Component {
                 <Icon  name="caretleft"  type="antdesign"  iconStyle={{ justifyContent: "space-between", color: "#FFFFFF", fontSize: 36 }} />
               </View>
             </ImageBackground>
+            </TouchableOpacity>
           </View>
           <View style={{ flexDirection: "column", flexWrap: "wrap", width:RightWidth, height: '100%', backgroundColor: "#EEEEEE" }}>
             <View style={{ flexDirection: "column",marginLeft:2,marginRight:2, flexWrap: "wrap", width: "100%"}}>
@@ -813,6 +829,20 @@ export default class SetMenuView extends Component {
 
           </View>
         </View>
+        {(this.state.isShowFullImage==true&& this.state.ImageUrl!='')?
+            <View style={{ backgroundColor: "rgba(98,98,98,0.6)", position: "absolute", top: 0, left: 0, width: SCREEN_WIDTH, justifyContent: 'center', alignItems: 'center', height: SCREEN_HEIGHT }}>
+             <TouchableOpacity style={{}} onPress={() =>  this._ShowFullImage(null,false)}>
+            <ImageBackground resizeMode="contain"
+              source={{ uri:this.state.endpoint + "/Resources/Images/Product/" + this.state.ImageUrl}
+              }
+              style={[{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, backgroundColor: colors.grey1 }]} >
+
+              </ImageBackground>
+              </TouchableOpacity>
+          </View>
+          :null
+        
+        }
         {this.state.isShowMash ?
           <View style={styles.item_view_text}>
             <ActivityIndicator color={colors.primary} size="large"></ActivityIndicator>
