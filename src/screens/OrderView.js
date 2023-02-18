@@ -11,7 +11,7 @@ import { setCustomText } from "react-native-global-props";
 import { ProductDetails, CardDetailView, _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor } from '../components';
 import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize,H2FontSize,H3FontSize,H4FontSize,H5FontSize,FontSize } from "../config/constants";
 import translate from "../services/translate";
-import {GetViewGroup,GetPrdChildGroups,getProductByGroup,getTicketInfor, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getByChoiceId,CancelOrder,CallServices} from "../services";
+import {getMasterData,GetViewGroup,GetPrdChildGroups,getProductByGroup,getTicketInfor, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getByChoiceId,CancelOrder,CallServices} from "../services";
 import { formatCurrency } from "../services/util";
 import colors from "../config/colors";
 import BookingsStyle from "../styles/bookings";
@@ -45,6 +45,7 @@ export default class OrderView extends Component {
       isPostBack: false,
       selectedId: -1,
       language: 1,
+      a:'',
       call: 1,
       data: [],
       ProductGroupList: [],
@@ -488,6 +489,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
       this._getProductByGroup(item);
     });
   };
+  
   _sendOrder = async () => {
     let { table, CartInfor, OrdPlatform,Config } = this.state;
     if (CartInfor.TotalQuantity<=0) 
@@ -628,7 +630,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
           CartFilter.FirstItem = product;
           CartFilter.FirstIndex=index;
         }
-        TotalQuantity=TotalQuantity+product.OrddQuantity;
+        TotalQuantity=TotalQuantity+product.OrddQuantity; 
         CartFilter.TotalQuantity=TotalQuantity;
         CartFilter.items.push(product);
      if (item.PrdIsSetMenu!=true) 
@@ -661,6 +663,13 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
       easing: Easing.linear,
       useNativeDriver: true
     }).start(() => this.setState({ ShowFullCart: isShow }));
+  }
+  onPressNext = async () => {
+    let {table , a} = this.state;
+     a = table,
+        _storeData('APP@BACKEND_Payment', JSON.stringify(a), () => {
+          this.props.navigation.navigate('Payment');
+        });
   }
   CartToggleHandle = async (isShow) =>{
     const endWidth = !this.state.isShowFormCard ? SCREEN_WIDTH * 0.75 : 0;
@@ -1342,8 +1351,8 @@ if (ProductChoise==null) {
             {this.state.ShowFullCart ? 
               <View style={{ width: "100%", flexDirection: "row" }}>
                   <View style={{ flexDirection: "row",justifyContent: "center",alignItems: "center", width: (Center.width/2),}}>                    
-                 <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-                    <Image resizeMode="contain" style={{width: '99%', height: '99%'}}
+                 <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center',  }}>
+                    <Image resizeMode="contain" style={{width: '100%', height: '100%'}}
                     source={{uri:endpoint+'/Resources/Images/View/MenuBaner.png'}} ></Image> 
                    </View>
                 </View> 
@@ -1391,6 +1400,7 @@ if (ProductChoise==null) {
             settings={Config}
             BookingsStyle={BookingsStyle}
             ProductsOrdered={ProductsOrdered}
+            onPressNext={this.onPressNext}
             onSendOrder={() => this._sendOrder()}
             onCallServices={() => { this.onCallServices(); }}
             _addExtraRequestToItem={(item, RowIndex) => { this._addExtraRequestToItem(item, RowIndex); }}

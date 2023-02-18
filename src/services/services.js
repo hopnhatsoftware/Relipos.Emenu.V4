@@ -73,7 +73,6 @@ export const fetchFile = async (Path, Data) => {
   });
 }
 
-
 export const execFetch = async (Path, Method, Data) => {
   let endpoint = await _retrieveData('APP@BACKEND_ENDPOINT', JSON.stringify(ENDPOINT_URL));
   endpoint = JSON.parse(endpoint);

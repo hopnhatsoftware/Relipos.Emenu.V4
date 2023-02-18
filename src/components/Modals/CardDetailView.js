@@ -9,6 +9,7 @@ import colors from "../../config/colors";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Button, Icon } from "react-native-elements";
 import Constants from "expo-constants";
+import { _retrieveData, _storeData, _remove } from "../../services/storages";
 import { H1FontSize,H2FontSize,H3FontSize,H4FontSize } from "../../config/constants";
 import { formatCurrency, formatNumber } from "../../services/util";
 import Question from '../Question';
@@ -135,6 +136,10 @@ export class CardDetailView extends React.Component {
       return null;
     } 
   };
+  onPressNext = async () => {
+    this.props.onPressNext();
+  }
+  
   _AcceptCode= async () => {
     let { setState, onSendOrder, translate, settings} = this.props;
     Keyboard.dismiss();
@@ -155,7 +160,7 @@ export class CardDetailView extends React.Component {
     return;
     }
       if (settings.S_CodeHandleData != this.state.KeyCode) 
-      { 
+      {
         Question.alert( translate.Get("Thông báo"),
         translate.Get("Bạn đã nhập code sai, vui lòng liên hệ với nhân viên!"),
         [
@@ -172,11 +177,11 @@ export class CardDetailView extends React.Component {
       onSendOrder();
     }
   // Đã Order
+  
   renderOrdered= ({ item, RowIndex }) => {
     const { BookingsStyle } = this.props;
     if (item.TkdQuantity <= 0&&item.TksdQuantity<=0)
     return null;
-   
       return (
         <View style={{ width: Contentcf.width, justifyContent:'flex-start', borderBottomColor: colors.grey5, borderBottomWidth: 1,paddingTop:1,paddingBottom:1, marginLeft: 2 }}>
        
@@ -193,7 +198,6 @@ export class CardDetailView extends React.Component {
                   justifyContent: "center",
                   alignItems: "center",
                   fontSize: H3FontSize,
-                 
                 }
               ]}
             >
@@ -215,7 +219,7 @@ export class CardDetailView extends React.Component {
                 fontSize: H3FontSize,
                 textAlign: "right"
               }}>
-              {formatCurrency(item.TkdTotalAmount, "")}
+              {formatCurrency(item.TkdItemAmount, "")}
             </Text>
           </View>
           :
@@ -306,7 +310,7 @@ export class CardDetailView extends React.Component {
           }
            </TouchableOpacity>
            <TouchableOpacity style={{ width: H2FontSize,justifyContent: "center", alignItems: "flex-start" }}  onPress={() => { 
-            // _addExtraRequestToItem(item, RowIndex);
+            _addExtraRequestToItem(item, RowIndex);
               }}>
             <Icon name='edit'  type="antdesign" size={H2FontSize}  iconStyle={{ color: colors.red,  fontFamily: "RobotoBold",height:H2FontSize}} />
           </TouchableOpacity> 
@@ -383,8 +387,7 @@ export class CardDetailView extends React.Component {
           </View>
       )};
   render() {
-    let { state,setState, onSendOrder, BookingsStyle, CartToggleHandle, translate, settings, ProductsOrdered} = this.props;
-   
+    let { state,setState, onSendOrder, BookingsStyle, CartToggleHandle,onPressNext, translate, settings, ProductsOrdered} = this.props;
     if (!this.state.IsLoaded) {
       return (
         <View style={[styles.pnbody, styles.horizontal]}>
@@ -421,7 +424,7 @@ export class CardDetailView extends React.Component {
               </Text>
             </View>
             <View style={{ width: Bordy.width * 0.75, height: TabTitle.height, flexDirection: "row" }}>
-            <TouchableOpacity style={{ borderRadius: 0, backgroundColor: state.isHavingOrder?  '#dc7d46': colors.grey3,width: "50%"
+            <TouchableOpacity style={{justifyContent:'center', borderRadius: 0, backgroundColor: state.isHavingOrder?  '#dc7d46': colors.grey3,width: "50%"
             }}
             onPress={() => {
                 setState({ isHavingOrder: true,iLoadNumber:state.iLoadNumber+1 });
@@ -430,7 +433,7 @@ export class CardDetailView extends React.Component {
                 {translate.Get("Đang Order")}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{ borderRadius: 0, backgroundColor: !state.isHavingOrder ? '#dc7d46': colors.grey3,width: "50%"
+            <TouchableOpacity style={{justifyContent:'center', borderRadius: 0, backgroundColor: !state.isHavingOrder ? '#dc7d46': colors.grey3,width: "50%"
             }}
             onPress={() => {
               setState({isHavingOrder:false, iLoadNumber:state.iLoadNumber+1 });
@@ -456,7 +459,7 @@ export class CardDetailView extends React.Component {
              
                   <View style={[styles.button_end_left_order, { width: "50%",textAlign:'left',paddingTop:(TabTitle.height-H2FontSize)/2  }]}> 
                     <Text style={{ fontSize: H3FontSize, color: "#af3037",paddingLeft:10 }}>
-                      {translate.Get("Số lượng")}: 
+                      {translate.Get("Số lượng")}: CartInfor
                       <Text style={{ fontSize: H3FontSize, color: "black" }}>
                       {state.CartInfor.TotalQuantity}
                     </Text>
@@ -472,7 +475,7 @@ export class CardDetailView extends React.Component {
                   </View>
               </View>
               <View style={[BookingsStyle.bottombar, { width: "100%", flexDirection: "row" ,height:TabTitle.height}]}>
-              <TouchableOpacity style={{ borderRadius: 0, backgroundColor:'#dc7d46',width: "50%"
+              <TouchableOpacity style={{justifyContent:'center', borderRadius: 0, backgroundColor:'#dc7d46',width: "50%"
             }}
             onPress={() => {
               CartToggleHandle(false);
@@ -481,7 +484,7 @@ export class CardDetailView extends React.Component {
                 {translate.Get("Đặt thêm")}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{ borderRadius: 0, backgroundColor:!state.CartInfor.TotalQuantity||state.CartInfor.TotalQuantity <= 0 ?colors.grey0: '#af3037',width: "50%"
+            <TouchableOpacity style={{justifyContent:'center', borderRadius: 0, backgroundColor:!state.CartInfor.TotalQuantity||state.CartInfor.TotalQuantity <= 0 ?colors.grey0: '#af3037',width: "50%"
             }}
             onPress={() => {
              if(!state.CartInfor.TotalQuantity||state.CartInfor.TotalQuantity <= 0 )
@@ -513,18 +516,25 @@ export class CardDetailView extends React.Component {
               </View>
             </View>
           ) : (
-            <View  style={{height:H2FontSize*1.5,width: "100%",
+            <View  style={{height:H2FontSize*2,width: "100%",
                 position: "absolute", flexDirection: "row",
                 bottom: 0,right: 0,borderTopColor: colors.grey5,
                 borderTopWidth: 1,backgroundColor: colors.grey5,
-                alignContent:'center',justifyContent:'flex-start'
+                alignContent:'center',justifyContent:'space-between'
               }}>
-               <Text style={{ fontSize: H2FontSize,marginLeft:10 }}>
+                <View style={{width:'50%',flexDirection: "row",alignItems: "center"}}>
+                <Text style={{ fontSize: H2FontSize,marginLeft:10 }}>
                       {translate.Get("Tạm tính")}:
                       </Text>
                     <Text style={{ fontSize: H2FontSize, color: colors.red,marginLeft:10 }}>
-                    {state.table.Ticket ? formatCurrency(state.table.Ticket.TkTotalAmount, "") : ""}
+                    {state.table.Ticket ? formatCurrency(state.table.Ticket.TkItemAmout, "") : ""}
                   </Text>
+                </View>
+                <TouchableOpacity 
+                onPress={()=>{this.onPressNext()}} 
+             style={{  height: "100%", width: "50%",shadowColor: "#000",shadowOffset: {width: 0,height: 3},shadowOpacity: 0.27,shadowRadius: 4.65,elevation: 6,justifyContent: "center", alignItems: "center", backgroundColor: '#00adee'}}>
+              <Text style={{ textAlign: "center",color:'#FFFFFF',fontFamily: "RobotoBold", width: "100%", fontSize: H2FontSize}}>Thanh toán</Text>
+            </TouchableOpacity>
             </View>
           )}
           </View>

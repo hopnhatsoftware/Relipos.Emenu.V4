@@ -5,7 +5,7 @@ export {ListArea,ListTables, CheckAndGetOrder,
     UploadFile, getTicketInfor, sendOrder,CancelOrder
     ,LoadChoiceByProduct,SetMenu_gettemDefault,getByChoiceId,
     SetMenu_getChoiceCategory,SetMenu_getExtraRequestFromProductId,
-    CallServices,
-    SetMenu_getAllInfor, CheckCasherIn,  
-    Object_Search, Ticket_getById, Ticket_Flush,
+    CallServices,getMasterData,getPaymentAmount,getLinkQrBank,ApplyVoucher,ApplyVipCard,
+    SetMenu_getAllInfor, CheckCasherIn, HandleTip,getQrCode,FlushInvoiceInfor,SearchTaxInfor,
+    Object_Search, Ticket_getById, Ticket_Flush,getVipCardInfor,
     } from './emenu';

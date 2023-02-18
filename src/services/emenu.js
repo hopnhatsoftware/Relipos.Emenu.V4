@@ -52,6 +52,74 @@ export const GetViewGroup = async (Config, item) => {
     PrgLevel: Config.I_ItemGroupLevel
   });
 }
+
+export const getMasterData = async ( TicketId,Config, I_Currency) => {
+  const culture = await _retrieveData('culture', 1);
+  const URL = '/PaymentView/getMasterData';
+  return await execFetch(URL, 'GET', {
+    TicketId: TicketId, I_Currency: I_Currency,
+    Culture: culture, BranchId: Config.I_BranchId,
+  });
+}
+export const getPaymentAmount = async ( TicketId, I_Currency) => {
+  const URL = '/PaymentView/getPaymentAmount';
+  return await execFetch(URL, 'GET', {
+    TicketId: TicketId, I_Currency: I_Currency,
+  });
+}
+export const getLinkQrBank = async ( TicketId, BillContent) => {
+  const URL = '/Ticket/getLinkQrBank';
+  return await execFetch(URL, 'GET', {
+    TicketId: TicketId, BillContent: BillContent,
+  });
+}
+export const getQrCode = async ( TicketId, QRType) => {
+  const URL = '/Ticket/getQrCode';
+  return await execFetch(URL, 'GET', {
+    TicketId: TicketId,QRType:QRType
+  });
+}
+export const SearchTaxInfor = async ( TaxCode) => {
+  const URL = '/PaymentView/SearchTaxInfor';
+  return await execFetch(URL, 'GET', {
+    TaxCode: TaxCode
+  });
+}
+export const FlushInvoiceInfor = async ( TicketId, TaxCode, CustomerName, Company, Address, Email, Phone ) => {
+  const URL = '/Ticket/FlushInvoiceInfor';
+  return await execFetch(URL, 'GET', {
+    TicketId: TicketId, TaxCode: TaxCode==null? '':TaxCode, CustomerName: CustomerName==null? '':CustomerName, Company: Company==null? '':Company, Address: Address==null? '':Address, Email: Email==null? '':Email, Phone: Phone==null? '':Phone
+  });
+}
+export const HandleTip = async ( TicketId, TkTipAmount,IsInvoiceTip) => {
+  const URL = '/Ticket/HandleTip';
+  return await execFetch(URL, 'GET', {
+    TicketId: TicketId, TkTipAmount: TkTipAmount, IsInvoiceTip: IsInvoiceTip
+  });
+}
+export const ApplyVoucher = async ( TicketId, settings,VoucherCode) => {
+  const URL = '/Crm/ApplyVoucher';
+  return await execFetch(URL, 'GET', {
+    TicketId: TicketId, BustId: settings.I_BusinessType ? settings.I_BusinessType : 1,VoucherCode:VoucherCode
+  });
+}
+export const ApplyVipCard = async ( TicketId, Vipcode) => {
+  const URL = '/Crm/ApplyVipCard';
+  return await execFetch(URL, 'GET', {
+    TicketId: TicketId,Vipcode:Vipcode
+  });
+}
+export const getVipCardInfor = async ( Vipcode) => {
+  const URL = '/Crm/getVipCardInfor';
+  return await execFetch(URL, 'GET', {
+    Vipcode:Vipcode
+  });
+}
+export const SearchTaxCode = async (TaxCode) => {
+  const endpoint = _retrieveData('APP@BACKEND_ENDPOINT2', JSON.stringify(endpoint));
+  JSON.parse(endpoint)
+  return await execSearchTaxCode(endpoint, 'GET', { TaxCode: TaxCode });
+}
 export const GetPrdChildGroups = async (settings, item, group) => {
   const culture = await _retrieveData('culture', 1);
   const URL = '/Emenu/LoadGroupChild';
@@ -145,6 +213,7 @@ export const getTicketInfor = async (settings, item) => {
     PosId: settings.PosId ? settings.PosId : 1, Culture: culture, IsGroupView: 1
   });
 }
+
 
 
 //SetMenu

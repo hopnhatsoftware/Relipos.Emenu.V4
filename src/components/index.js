@@ -12,3 +12,5 @@ export { ComboBox } from './comboBox';
 export { _ChoiceCategory } from './Modals/_ChoiceCategory';
 export { FormInputText } from './FormInputText';
 export { Button } from './Button';
+export { ScannerQR } from './ScannerQR';
+export { ScannerQRVip } from './ScannerQRVip';

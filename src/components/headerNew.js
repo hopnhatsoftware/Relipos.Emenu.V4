@@ -72,7 +72,6 @@ export class _HeaderNew extends React.Component  {
   _HandleSound= async () => {
     let { sound } = this.state;
     try{
-    
       if (sound==null) 
          sound=  await this._LoadSound();
       const { onCallServices } = this.props; 
