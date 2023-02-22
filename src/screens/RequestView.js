@@ -65,12 +65,13 @@ export default class RequestView extends Component {
       Products2:[],
       settings:{},
       PrdId:0,
+      a:{},
       Product:{
-        PrdId:0,
-        itemDescription:[],
-        Product:{},
-        SelectedItem: 0,
-        MrqDescription : '',
+        // PrdId:0,
+        // itemDescription:[],
+        // Product:{},
+        // SelectedItem: 0,
+        // MrqDescription : '',
       },
       state:{},
       user:{},
@@ -96,9 +97,11 @@ export default class RequestView extends Component {
     else{
       settings = JSON.parse(settings);
     }
+    let a = await _retrieveData('OrderView@STATE', JSON.stringify({}));
+    a = JSON.parse(a);
     let user = await _retrieveData('APP@USER', JSON.stringify({}));
     user = JSON.parse(user);
-    this.setState({settings, user, fontLoaded:true, isLoading:false,});
+    this.setState({settings, user,a,  fontLoaded:true, isLoading:false,});
     StatusBar.setHidden(true);
  
     this.defaultFonts();

@@ -10,7 +10,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Button, Icon } from "react-native-elements";
 import Constants from "expo-constants";
 import { _retrieveData, _storeData, _remove } from "../../services/storages";
-import { H1FontSize,H2FontSize,H3FontSize,H4FontSize } from "../../config/constants";
+import { H1FontSize,H2FontSize,H3FontSize,H4FontSize,H3_FONT_SIZE } from "../../config/constants";
 import { formatCurrency, formatNumber } from "../../services/util";
 import Question from '../Question';
 
@@ -179,7 +179,8 @@ export class CardDetailView extends React.Component {
   // Đã Order
   
   renderOrdered= ({ item, RowIndex }) => {
-    const { BookingsStyle } = this.props;
+    const { BookingsStyle, ProductsOrdered} = this.props;
+    console.log(ProductsOrdered)
     if (item.TkdQuantity <= 0&&item.TksdQuantity<=0)
     return null;
       return (
@@ -187,7 +188,7 @@ export class CardDetailView extends React.Component {
        
        {item.TkdType==0||item.TkdType==1?
         <View style={{ width: Contentcf.width, flexDirection: "row"}}> 
-            <Text  style={{  color: "#000000", width: Contentcf.width * 0.05, fontSize: H3FontSize,textAlign:'right',paddingRight:5  }} >
+            <Text  style={{  color: "#000000", width: Contentcf.width * 0.05, fontSize: H3_FONT_SIZE,textAlign:'right',paddingRight:5  }} >
               {formatNumber(item.TkdQuantity)}
             </Text>
             <Text  style={[ BookingsStyle.left_menu_Item,
@@ -197,7 +198,7 @@ export class CardDetailView extends React.Component {
                   width: Contentcf.width-(Contentcf.width * 0.05+Contentcf.width*0.1*2+20),
                   justifyContent: "center",
                   alignItems: "center",
-                  fontSize: H3FontSize,
+                  fontSize: H3_FONT_SIZE,
                 }
               ]}
             >
@@ -207,7 +208,7 @@ export class CardDetailView extends React.Component {
                 color: "#000000",
                 width:Contentcf.width*0.1,
                 justifyContent: 'center',
-                fontSize: H3FontSize,
+                fontSize: H3_FONT_SIZE,
                 textAlign: "right"
               }}>
               {formatCurrency(item.TkdBasePrice, "")}
@@ -216,7 +217,7 @@ export class CardDetailView extends React.Component {
                 color: "#000000",
                 width:Contentcf.width*0.1,
                 justifyContent: 'center',
-                fontSize: H3FontSize,
+                fontSize: H3_FONT_SIZE,
                 textAlign: "right"
               }}>
               {formatCurrency(item.TkdItemAmount, "")}
@@ -282,8 +283,7 @@ export class CardDetailView extends React.Component {
           </TouchableOpacity> 
           }
             <View style={{ width: QuantityWidth,marginLeft:2,  height: 'auto',  justifyContent: 'center', alignItems: 'center'}}>
-          
-              <TextInput ref={input => this.textInput = input}  style={{  color: "#af3037", width: '100%',  fontSize: H3FontSize, textAlign:'left',fontFamily: "RobotoBold",}}
+              <TextInput ref={input => this.textInput = input}  style={{  color: "#af3037", width: '100%',  fontSize: H3FontSize, textAlign:'center',fontFamily: "RobotoBold",}}
                 autoFocus={false}  autoCapitalize="none" autoCorrect={false} keyboardAppearance="dark"
                 keyboardType='numeric' autoCompleteType='off' returnKeyType='done' blurOnSubmit={true}
                 defaultValue={item.OrddQuantity ? item.OrddQuantity.toString() : ''}
@@ -317,11 +317,11 @@ export class CardDetailView extends React.Component {
             </View>
 
           <View style={{ width: Contentcf.width* 0.555, justifyContent:'center', }}>
-            <Text style={{  width: Contentcf.width* 0.555, fontSize: H3FontSize,  flexWrap: "wrap",textAlign:'left', }} numberOfLines={5}>
+            <Text style={{  width: Contentcf.width* 0.555, fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left', }} numberOfLines={5}>
               {item.PrdName}
             </Text> 
             {item.OrddDescription?
-            <Text style={{  width: Contentcf.width* 0.555, fontSize: H3FontSize,  flexWrap: "wrap",textAlign:'left', }} numberOfLines={5}>
+            <Text style={{  width: Contentcf.width* 0.555, fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left', }} numberOfLines={5}>
                {item.OrddDescription}
             </Text> 
             :null
@@ -329,7 +329,7 @@ export class CardDetailView extends React.Component {
            
           </View>
           <View style={{  justifyContent:'center',width: Contentcf.width* 0.1 ,}}>
-            <Text style={{ fontSize: H3FontSize ,textAlign:'right' }}>
+            <Text style={{ fontSize: H3_FONT_SIZE ,textAlign:'right' }}>
              {(item.OrddTotalChoiseAmount&&item.OrddTotalChoiseAmount>0)?
               formatCurrency(item.OrddTotalChoiseAmount, ""):
               formatCurrency(item.UnitPrice, "")
@@ -337,8 +337,8 @@ export class CardDetailView extends React.Component {
             </Text>
           </View>
           <View style={{  justifyContent: "center",width: Contentcf.width* 0.15 ,}}>
-            <Text style={{  fontSize: H3FontSize,fontWeight:'bold',textAlign:'right' }}>
-            {formatCurrency(item.TkdTotalAmount, "")}
+            <Text style={{  fontSize: H3_FONT_SIZE,fontWeight:'bold',textAlign:'right' }}>
+            {formatCurrency(item.TkdItemAmount, "")}
             </Text>
           </View>
           </View>
@@ -388,6 +388,7 @@ export class CardDetailView extends React.Component {
       )};
   render() {
     let { state,setState, onSendOrder, BookingsStyle, CartToggleHandle,onPressNext, translate, settings, ProductsOrdered} = this.props;
+    console.log(ProductsOrdered)
     if (!this.state.IsLoaded) {
       return (
         <View style={[styles.pnbody, styles.horizontal]}>
@@ -444,7 +445,9 @@ export class CardDetailView extends React.Component {
             </TouchableOpacity>
              
             </View>
-            <View style={{ width: "100%",marginTop:1, height:Bordy.height-(Titlecf.height+TabTitle.height+(state.isHavingOrder ?TabTitle.height*2:0))}}>
+            <View style={{ width: "100%",marginTop:1, 
+            height:Bordy.height-(Titlecf.height+TabTitle.height+(state.isHavingOrder ?TabTitle.height*2:0))
+            }}>
             <FlatList
               keyExtractor={(item, RowIndex) => RowIndex.toString()}
               data={state.isHavingOrder ? state.CartInfor.items : ProductsOrdered }
@@ -459,7 +462,7 @@ export class CardDetailView extends React.Component {
              
                   <View style={[styles.button_end_left_order, { width: "50%",textAlign:'left',paddingTop:(TabTitle.height-H2FontSize)/2  }]}> 
                     <Text style={{ fontSize: H3FontSize, color: "#af3037",paddingLeft:10 }}>
-                      {translate.Get("Số lượng")}: CartInfor
+                      {translate.Get("Số lượng")}: 
                       <Text style={{ fontSize: H3FontSize, color: "black" }}>
                       {state.CartInfor.TotalQuantity}
                     </Text>
@@ -532,7 +535,7 @@ export class CardDetailView extends React.Component {
                 </View>
                 <TouchableOpacity 
                 onPress={()=>{this.onPressNext()}} 
-             style={{  height: "100%", width: "50%",shadowColor: "#000",shadowOffset: {width: 0,height: 3},shadowOpacity: 0.27,shadowRadius: 4.65,elevation: 6,justifyContent: "center", alignItems: "center", backgroundColor: '#00adee'}}>
+             style={{  height: "100%", width: "50%",shadowColor: "#000",shadowOffset: {width: 0,height: 3},shadowOpacity: 0.27,shadowRadius: 4.65,elevation: 6,justifyContent: "center", alignItems: "center", backgroundColor: '#00adee' }}>
               <Text style={{ textAlign: "center",color:'#FFFFFF',fontFamily: "RobotoBold", width: "100%", fontSize: H2FontSize}}>Thanh toán</Text>
             </TouchableOpacity>
             </View>

@@ -78,7 +78,7 @@ export class ScannerQRVip extends Component {
             }
     return (
       <View style={{
-        backgroundColor: "rgba(98,98,98,0.6)", height: SCREEN_HEIGHT,
+        backgroundColor: "black", height: SCREEN_HEIGHT,
         width: SCREEN_WIDTH, position: 'absolute', bottom: 0, right: 0,
       }}>
        {isViewCamera ? 

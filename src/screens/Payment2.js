@@ -11,9 +11,9 @@ import { AntDesign } from "@expo/vector-icons";
 import StepIndicator from 'react-native-step-indicator';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ProductDetails, CardDetailView, _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor,} from "../components";
-import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, H1FontSize, H2FontSize, H3FontSize, H4FontSize, H5FontSize, FontSize,} from "../config/constants";
+import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, H1_FONT_SIZE,H2_FONT_SIZE,H3_FONT_SIZE,H4_FONT_SIZE,} from "../config/constants";
 import translate from "../services/translate";
-import {SearchTaxInfor,FlushInvoiceInfor, CallServices } from "../services";
+import {SearchTaxInfor,FlushInvoiceInfor, CallServices, getinvoiceInfor } from "../services";
 import { formatCurrency } from "../services/util";
 import colors from "../config/colors";
 import BookingsStyle from "../styles/bookings";
@@ -39,8 +39,8 @@ const ProductList = {
 
 const labels = ["Thông tin đơn hàng","Xuất hóa đơn","Thanh toán"];
 const customStyles = {
-  stepIndicatorSize: 40,
-  currentStepIndicatorSize:50,
+  stepIndicatorSize: H1_FONT_SIZE,
+  currentStepIndicatorSize:H1_FONT_SIZE*1.3,
   separatorStrokeWidth: 2,
   currentStepStrokeWidth: 3,
   stepStrokeCurrentColor: '#333d4c',
@@ -52,14 +52,14 @@ const customStyles = {
   stepIndicatorFinishedColor: '#333d4c',
   stepIndicatorUnFinishedColor: '#ffffff',
   stepIndicatorCurrentColor: '#ffffff',
-  stepIndicatorLabelFontSize: 16,
-  stepIndicatorSize:35,
-  currentStepIndicatorLabelFontSize: 16,
+  stepIndicatorLabelFontSize: H4_FONT_SIZE,
+  stepIndicatorSize:H1_FONT_SIZE,
+  currentStepIndicatorLabelFontSize: H4_FONT_SIZE,
   stepIndicatorLabelCurrentColor: '#333d4c',
   stepIndicatorLabelFinishedColor: '#ffffff',
   stepIndicatorLabelUnFinishedColor: '#aaaaaa',
   labelColor: '#999999',
-  labelSize: 16,
+  labelSize: H3_FONT_SIZE,
   currentStepLabelColor: '#333d4c'
 }
 export default class Payment2 extends Component {
@@ -78,7 +78,6 @@ export default class Payment2 extends Component {
       isRenderProduct: true,
       selectedType: null,
       isPostBack: false,
-      selectedId: -1,
       language: 1,
       call: 1,
       data: [],
@@ -90,50 +89,12 @@ export default class Payment2 extends Component {
         Email:null,
         Phone:null,
       },
-      ProductGroupList: [],
-      ChoiceCategory: [],
-      SelectedGroupIndex: -1,
-      PrdChildGroups: [],
-      SelectedChildGroupIndex: -1,
-      Products: [],
-      ProductsOrdered: [],
-      isShowMash: false,
       Ticket: {},
       table: {},
       settings: {},
       buttontext: props.defaultValue,
-      keysearch: "",
-      ShowFullCart: true,
-      isShowFormCard: false,
-      FullCartWidth: new Animated.Value(0),
-      CartWidth: new Animated.Value(SCREEN_WIDTH * 0.82),
-      /*Dòng mặt hàng đang chọn trong giỏ hàng */
-      CartItemSelected: null,
-      CartProductIndex: -1,
-      /*Dòng giỏ hàng đang xử lý*/
-      CartItemHandle: null,
-      /*Mặt hàng đang chọn để xử lý */
-      ProductChoise: null,
-      /*Vị trí mặt hàng đang chọn để xử lý */
-      ProductChoiseIndex: -1,
-      ChoisetDetails: [],
-      TimeToNextBooking: 0,
-      CartInfor: {
-        TotalQuantity: 0,
-        TotalAmount: 0,
-        items: [],
-      },
-      /*Danh Sách Set được tìm thấy */
-      SetItemsFilter: [],
-      lockTable: false,
-      OrdPlatform: 1,
       endpoint: "",
-      showSetInCart: false,
-      ShowTotalInfo: false,
-      ProductImagePrefix: "",
       Config: {},
-      isShowFullImage: false,
-      ImageUrl: "",
     };
     this.translate = new translate();
   }
@@ -141,14 +102,9 @@ export default class Payment2 extends Component {
     clearInterval(this.interval);
   };
   componentDidMount = async () => {
-      await this.fetchData();
-      // await this._getById();
-      this.setState({ isPostBack: true });
-  };
-  fetchData = async () => {
-   
     await this._setConfig();
-   
+    await this._getinvoiceInfor();
+    this.setState({ isPostBack: true });
   };
   _setConfig = async () => {
     try{
@@ -172,6 +128,19 @@ export default class Payment2 extends Component {
   }
     return true;
   };
+  _getinvoiceInfor = async () => {
+    let{Tax,Ticket} =  this.state;
+    getinvoiceInfor(null, Ticket.TicketID, true).then(res => {
+      console.log(res);
+        Tax.TaxCode = res.Data.ReiTaxId;
+        Tax.Name = res.Data.CustomerName;
+        Tax.TkeCompany = res.Data.CompanyName;
+        Tax.Address = res.Data.ReiAddress;
+        Tax.Email = res.Data.ReiEmail;
+        Tax.Phone = res.Data.ReiPhone;
+        this.setState({Tax});
+      })  
+  }
   _SearchTaxInfor = async () => {
     let{Tax} =  this.state;
     SearchTaxInfor( Tax.TaxCode).then(res => {
@@ -179,11 +148,11 @@ export default class Payment2 extends Component {
         Tax.Name = res.Data.CustomerName;
         Tax.TkeCompany = res.Data.CompanyName;
         Tax.Address = res.Data.ReiAddress;
-        Tax.Email = res.Data.ReiEmail;
-        Tax.Phone = res.Data.ReiPhone;
       }
       else {
         Tax.TaxCode = ''
+        Tax.TkeCompany = '';
+        Tax.Address = '';
       }
         this.setState({Tax});
       })  
@@ -317,50 +286,45 @@ export default class Payment2 extends Component {
         </View>
       );
     }
-    const { ProductGroupList, endpoint, PrdChildGroups, Config, lockTable, ProductsOrdered,} = this.state;
-
+    const { } = this.state;
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.Container}>
           <ScrollView>
           <View style={{ flexDirection: "row", height: SCREEN_HEIGHT * 0.1, width: SCREEN_WIDTH, backgroundColor:'#333d4c',alignItems:'center'}}>
-            <TouchableOpacity
-              onPress={this.onPressBack}
-              style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
+            <TouchableOpacity onPress={this.onPressBack} style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
                <Image style={{height: "55%", width: "55%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
             </TouchableOpacity>
             <View style={{width:'64%'}}>
-              <Text style={{fontSize:H1FontSize,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>Thông tin hóa đơn của bạn</Text>
+              <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>Thông tin hóa đơn của bạn</Text>
             </View>
             <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "22%", borderRadius: 25, }}>
             {this.state.showCall ?
-              <View style={{backgroundColor:'#FF7E27',borderRadius: 25,height:'100%',justifyContent: "center", flexDirection: "row", alignItems: "center", }}>
+              <View style={{backgroundColor:'#FF7E27',borderRadius: 50,height:'100%',justifyContent: "center", flexDirection: "row", alignItems: "center", }}>
                 <View style={{ width: "25%", alignItems:'center'}}>
                 <Image style={{height: "70%", width: "70%"}} resizeMode='contain' source={require("../../assets/icons/IconCall-11.png")}/>
               </View>
-              <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: BUTTON_FONT_SIZE * 0.7 }}>Đang gọi ...</Text>
+              <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: H2_FONT_SIZE }}>Đang gọi ...</Text>
               </View>
               :
               <View style={{height:'100%',justifyContent: "center",borderRadius: 25, flexDirection: "row", alignItems: "center", }}>
                 <View style={{ width: "25%", alignItems:'center'}}>
                 <Image style={{height: "70%", width: "70%"}} resizeMode='contain' source={require("../../assets/icons/IconCall-11.png")}/>
               </View>
-              <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: BUTTON_FONT_SIZE * 0.7 }}>Gọi nhân viên</Text>
+              <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: H2_FONT_SIZE }}>Gọi nhân viên</Text>
               </View>
             }
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={this.onPressHome}
-              style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
+            <TouchableOpacity onPress={this.onPressHome} style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
               <Image style={{height: "55%", width: "55%",}} resizeMode='contain' source={require("../../assets/icons/IconHome-11.png")}/>
             </TouchableOpacity>
           </View>
-          <View style={{ height: SCREEN_HEIGHT * 0.65, width: SCREEN_WIDTH * 0.95, marginHorizontal: "2.5%"}}>
-            <View style={{ height: "74%", marginLeft: "2%",paddingVertical:'1%'}}>
+          <View style={{ height: SCREEN_HEIGHT * 0.67, width: SCREEN_WIDTH * 0.95, marginHorizontal: "2.5%"}}>
+            <View style={{ height: "74%", marginLeft: "2%",}}>
               <View style={{ height: "7%", flexDirection: "row", alignItems: "center"}}>
-                <Text style={{ fontSize: H3FontSize, width: "50%" }}>Mã số thuế:</Text>
-                <Text style={{ fontSize: H3FontSize, width: "50%" }}>Người nhận:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE, width: "50%" }}>Mã số thuế:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE, width: "50%" }}>Người nhận:</Text>
               </View>
               <View style={{ height: "11%", flexDirection: "row"}}>
                 <TextInput 
@@ -368,14 +332,16 @@ export default class Payment2 extends Component {
                   onBlur={this._SearchTaxInfor}
                   onChangeText={(item) => this.setState({Tax :{ ...this.state.Tax , TaxCode : item}, }) } 
                   keyboardType="number-pad" 
-                  style={{paddingHorizontal:8,fontSize:H3FontSize, width: "48%", marginRight: "2%", backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1}}></TextInput>
+                  style={{paddingHorizontal:8,fontSize:H3_FONT_SIZE, width: "48%", marginRight: "2%", backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1}}>
+                </TextInput>
                 <TextInput 
                   value={this.state.Tax.Name}
                   onChangeText={(item) => this.setState({Tax :{ ...this.state.Tax , Name : item}, }) } 
-                  style={{paddingHorizontal:8,fontSize:H3FontSize, width: "48%", backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1 }}></TextInput>
+                  style={{paddingHorizontal:8,fontSize:H3_FONT_SIZE, width: "48%", backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1 }}>
+                </TextInput>
               </View>
               <View style={{ height: "7%", flexDirection: "row", alignItems: "center",marginTop:'0.7%' }}>
-                <Text style={{ fontSize: H3FontSize }}>Tên công ty:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE }}>Tên công ty:</Text>
               </View>
               <View style={{ height: "21%", flexDirection: "row"}}>
                 <TextInput 
@@ -383,10 +349,11 @@ export default class Payment2 extends Component {
                   onChangeText={(item) => this.setState({Tax :{ ...this.state.Tax , TkeCompany : item}, }) }  
                   multiline={true} 
                   numberOfLines={10} 
-                  style={{paddingHorizontal:8,fontSize:H3FontSize, width: "98%", backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1}}></TextInput>
+                  style={{paddingHorizontal:8,fontSize:H3_FONT_SIZE, width: "98%", backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1}}>
+                </TextInput>
               </View>
               <View style={{ height: "7%", flexDirection: "row", alignItems: "center",marginTop:'0.7%'}}>
-                <Text style={{ fontSize: H3FontSize }}>Địa chỉ:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE }}>Địa chỉ:</Text>
               </View>
               <View style={{ height: "21%", flexDirection: "row"}}>
                 <TextInput 
@@ -394,42 +361,45 @@ export default class Payment2 extends Component {
                 onChangeText={(item) => this.setState({Tax :{ ...this.state.Tax , Address : item}, }) }
                 multiline={true} 
                 numberOfLines={10} 
-                style={{paddingHorizontal:8,fontSize:H3FontSize, width: "98%", backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1}}></TextInput>
+                style={{paddingHorizontal:8,fontSize:H3_FONT_SIZE, width: "98%", backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1}}>
+              </TextInput>
               </View>
               <View style={{ height: "7%", flexDirection: "row", alignItems: "center",marginTop:'0.7%'}}>
-                <Text style={{ fontSize: H3FontSize, width: "50%", height: "100%",}}>Email:</Text>
-                <Text style={{ fontSize: H3FontSize, width: "50%" }}>SĐT:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE, width: "50%", height: "100%",}}>Email:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE, width: "50%" }}>SĐT:</Text>
               </View>
               <View style={{ height: "11%", flexDirection: "row"}}>
                 <TextInput
                 value={this.state.Tax.Email}
                 onChangeText={(item) => this.setState({Tax :{ ...this.state.Tax , Email : item}, }) } 
                 keyboardType="email-address" 
-                style={{paddingHorizontal:8,fontSize:H3FontSize, width: "48%", marginRight: "2%", backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1}}></TextInput>
+                style={{paddingHorizontal:8,fontSize:H3_FONT_SIZE, width: "48%", marginRight: "2%", backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1}}>
+                </TextInput>
                 <TextInput 
                 value={this.state.Tax.Phone}
                 onChangeText={(item) => this.setState({Tax :{ ...this.state.Tax , Phone : item}, }) } 
                 keyboardType="phone-pad" 
-                style={{ paddingHorizontal:8,fontSize:H3FontSize,width: "48%", backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1}}></TextInput>
+                style={{ paddingHorizontal:8,fontSize:H3_FONT_SIZE,width: "48%", backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1}}>
+                </TextInput>
               </View>
             </View>
-            <View style={{ height: "26%", backgroundColor: "#FFCCCC", opacity: 0.8, borderWidth: 1, borderColor: "#FF3333", width: "96%", marginHorizontal: "2%", paddingLeft: 5, paddingTop: 5,}} >
-              <Text style={{ fontSize: H3FontSize }}>• Quý Khách vui lòng cung cấp thông tin xuất hóa đơn tài chính ngay tại thời điểm thanh toán.</Text>
-              <Text style={{ fontSize: H3FontSize }}>• Trường hợp Quý khách không cung cấp thông tin xuất hóa đơn tài chính tại thời điểm thanh toán:</Text>
-              <Text style={{ fontSize: H4FontSize, paddingLeft: 8, paddingTop: 5 }}>• Công ty sẽ xuất hóa đơn KHÁCH LẺ</Text>
-              <Text style={{ fontSize: H4FontSize, paddingLeft: 8 }}>• Công ty KHÔNG xuất lại hóa đơn trong mọi trường hợp sau khi xuất hóa đơn KHÁCH LẺ trên đây</Text>
-              <Text style={{ fontSize: H2FontSize, paddingTop: 5 }}>Xin cảm ơn Quý khách!</Text>
+            <View style={{  backgroundColor: "#FFCCCC", opacity: 0.8, borderWidth: 1, borderColor: "#FF3333", width: "96%", marginHorizontal: "2%", paddingLeft: 5, paddingTop: 5,}} >
+              <Text style={{fontSize: H3_FONT_SIZE }}>• Quý Khách vui lòng cung cấp thông tin xuất hóa đơn tài chính ngay tại thời điểm thanh toán.</Text>
+              <Text style={{fontSize: H3_FONT_SIZE }}>• Trường hợp Quý khách không cung cấp thông tin xuất hóa đơn tài chính tại thời điểm thanh toán:</Text>
+              <Text style={{ fontSize: H4_FONT_SIZE, paddingLeft: 8,}}>• Công ty sẽ xuất hóa đơn KHÁCH LẺ</Text>
+              <Text style={{ fontSize: H4_FONT_SIZE, paddingLeft: 8 }}>• Công ty KHÔNG xuất lại hóa đơn trong mọi trường hợp sau khi xuất hóa đơn KHÁCH LẺ trên đây</Text>
+              <Text style={{ fontSize: H2_FONT_SIZE}}>Xin cảm ơn quý khách</Text>
             </View>
           </View>
-          <View style={{ height: SCREEN_HEIGHT * 0.25, width: SCREEN_WIDTH, justifyContent: "center", alignItems: "center"}}>
+          <View style={{ height: SCREEN_HEIGHT * 0.23, width: SCREEN_WIDTH, justifyContent: "center", alignItems: "center"}}>
             <View style={{ height: "30%", justifyContent: "center", alignItems: "center"}}>
-              <Text style={{ fontSize: H2FontSize }}>Chọn bỏ qua nếu bạn không xuất hóa đơn VAT</Text>
+              <Text style={{ fontSize: H2_FONT_SIZE }}>Chọn bỏ qua nếu bạn không xuất hóa đơn VAT</Text>
             </View>
             <View style={{ height: "30%", flexDirection: "row" }}>
               <TouchableOpacity
                 onPress={()=>this.onPressNext()}
                 style={{ backgroundColor: "#DDDDDD", height: "75%", width: "22%",borderRadius:35,marginRight:'2%', justifyContent: "center", alignItems: "center"}}>
-                <Text style={{ textAlign: "center", width: "100%", fontSize: 25,}}>Bỏ qua</Text>
+                <Text style={{ textAlign: "center", width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2,}}>Bỏ qua</Text>
               </TouchableOpacity>
               <LinearGradient
               colors={[ '#333d4c', '#333d4c']}

@@ -79,6 +79,12 @@ export const getQrCode = async ( TicketId, QRType) => {
     TicketId: TicketId,QRType:QRType
   });
 }
+export const getinvoiceInfor = async (ReiId, TicketId, ReiIsEInvoice) => {
+  const URL = '/Ticket/getInvoiceInfor';
+  return await execFetch(URL, 'GET', {
+    ReiId:ReiId, TicketId: TicketId,ReiIsEInvoice:ReiIsEInvoice
+  });
+}
 export const SearchTaxInfor = async ( TaxCode) => {
   const URL = '/PaymentView/SearchTaxInfor';
   return await execFetch(URL, 'GET', {
