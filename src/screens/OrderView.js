@@ -46,6 +46,7 @@ export default class OrderView extends Component {
       selectedId: -1,
       language: 1,
       a:'',
+      b:'',
       call: 1,
       data: [],
       ProductGroupList: [],
@@ -665,11 +666,17 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
     }).start(() => this.setState({ ShowFullCart: isShow }));
   }
   onPressNext = async () => {
-    let {table , a} = this.state;
-     a = table,
-        _storeData('APP@BACKEND_Payment', JSON.stringify(a), () => {
-          this.props.navigation.navigate('Payment');
-        });
+    let {table, lockTable, a,} = this.state;
+    a = table;
+    if (lockTable == true) {
+      _storeData('APP@BACKEND_Payment', JSON.stringify(a), () => {
+        this.props.navigation.navigate('Payment', { lockTable });
+    });
+    }else{
+      _storeData('APP@BACKEND_Payment', JSON.stringify(a), () => {
+        this.props.navigation.navigate('Payment');
+      });
+    }
   }
   CartToggleHandle = async (isShow) =>{
     const endWidth = !this.state.isShowFormCard ? SCREEN_WIDTH * 0.75 : 0;
@@ -1350,13 +1357,13 @@ if (ProductChoise==null) {
           <Animated.View style={[styles.BottonMenu, { width:Center.width,height:Booton.height }]}>
             {this.state.ShowFullCart ? 
               <View style={{ width: "100%", flexDirection: "row" }}>
-                  <View style={{ flexDirection: "row",justifyContent: "center",alignItems: "center", width: (Center.width/2),}}>                    
-                 <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center',  }}>
+                <View style={{ flexDirection: "row",justifyContent: "center",alignItems: "center", width: (Center.width * 0.4)}}>                    
+                <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor:'#FFFFFF' }}>
                     <Image resizeMode="contain" style={{width: '100%', height: '100%'}}
                     source={{uri:endpoint+'/Resources/Images/View/MenuBaner.png'}} ></Image> 
                    </View>
                 </View> 
-                <View style={[BookingsStyle.bottombar, styles.item_menu_order, { width: (Center.width/4), flexDirection: "row" }]}>
+                <View style={[BookingsStyle.bottombar, styles.item_menu_order, { width: (Center.width*0.2), flexDirection: "row" }]}>
                   <View style={{ position: 'absolute', left: 10, paddingTop: 5, justifyContent: 'center', alignItems: 'center' }}>
                     {<Image resizeMode="stretch" source={require('../../assets/icons/iconCash.png')}
                       style={{ width: H3FontSize * 1.3, height: H3FontSize * 1.3, }} /> }
@@ -1366,7 +1373,7 @@ if (ProductChoise==null) {
                   </Text>
                 </View>
                 <TouchableOpacity onPress={() =>{this.CartToggleHandle(true)}}>
-                  <View style={[BookingsStyle.bottombar, { width: (Center.width/4), flexDirection: "row", color: "white", alignItems: "center", justifyContent: "center", 
+                  <View style={[BookingsStyle.bottombar, { width: (Center.width*0.2), flexDirection: "row", color: "white", alignItems: "center", justifyContent: "center", 
                   backgroundColor: "#0D66CE"
                   }]}> 
                     <View style={{ justifyContent: 'center', alignItems: 'center' }}>
@@ -1375,6 +1382,14 @@ if (ProductChoise==null) {
                     </View>
                     <Text style={[{ color: "white", fontSize: H3FontSize, paddingLeft: 10 }]}>
                       {this.translate.Get("Giỏ hàng")}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() =>this.state.table.TkPaymentAmount > 0 || ProductsOrdered.length > 0 ? this.onPressNext(): null}>
+                  <View style={[BookingsStyle.bottombar, { width: (Center.width*0.2), flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor:this.state.table.TkPaymentAmount > 0 || ProductsOrdered.length > 0 ? "#009900":"#dddddd"
+                  }]}>
+                    <Text style={[{ color: "white",fontSize: H3FontSize,}]}>
+                      {this.translate.Get("Thanh toán")}
                     </Text>
                   </View>
                 </TouchableOpacity>

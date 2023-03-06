@@ -7,7 +7,7 @@ import { BarCodeScanner } from 'expo-barcode-scanner';
 import { _retrieveData, _storeData } from '../services/storages';
 import Question from '../components/Question';
 import translate from '../services/translate';
-
+import { H3_FONT_SIZE,H1_FONT_SIZE } from '../config/constants';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 
@@ -92,6 +92,10 @@ export class ScannerQRVip extends Component {
                 <AntDesign name='close' size={SCREEN_WIDTH * 0.08} color='#FFFFFF' ></AntDesign>
               </TouchableOpacity>
           </View>
+          <View style={{width:"100%",position: 'absolute', bottom:25, backgroundColor: "transpanent", zIndex: 10,
+             justifyContent:'center', alignItems: 'center', }}>
+                <Text style={{backgroundColor:'black',textAlign:'center',fontSize: H1_FONT_SIZE,color:'#FFFFFF',paddingHorizontal:10}}>D i chuyển camera đến vùng có mã QR để quét</Text>
+            </View>
       <BarCodeScanner
         onBarCodeScanned={ IsScanedVip ? undefined : this.handleBarCodeScannedVip}
         style={StyleSheet.absoluteFillObject}

@@ -2,7 +2,7 @@ import React from "react";
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet, Image,
   Animated, Platform, FlatList, ActivityIndicator, KeyboardAvoidingView, Keyboard,
-  Dimensions
+  Dimensions,
 } from "react-native";
 import { Audio } from 'expo-av';
 import colors from "../../config/colors";
@@ -13,6 +13,7 @@ import { _retrieveData, _storeData, _remove } from "../../services/storages";
 import { H1FontSize,H2FontSize,H3FontSize,H4FontSize,H3_FONT_SIZE } from "../../config/constants";
 import { formatCurrency, formatNumber } from "../../services/util";
 import Question from '../Question';
+import { ScrollView } from "react-navigation";
 
 const Bordy={
   width:Dimensions.get("window").width,
@@ -180,7 +181,6 @@ export class CardDetailView extends React.Component {
   
   renderOrdered= ({ item, RowIndex }) => {
     const { BookingsStyle, ProductsOrdered} = this.props;
-    console.log(ProductsOrdered)
     if (item.TkdQuantity <= 0&&item.TksdQuantity<=0)
     return null;
       return (
@@ -388,7 +388,6 @@ export class CardDetailView extends React.Component {
       )};
   render() {
     let { state,setState, onSendOrder, BookingsStyle, CartToggleHandle,onPressNext, translate, settings, ProductsOrdered} = this.props;
-    console.log(ProductsOrdered)
     if (!this.state.IsLoaded) {
       return (
         <View style={[styles.pnbody, styles.horizontal]}>
@@ -525,7 +524,7 @@ export class CardDetailView extends React.Component {
                 borderTopWidth: 1,backgroundColor: colors.grey5,
                 alignContent:'center',justifyContent:'space-between'
               }}>
-                <View style={{width:'50%',flexDirection: "row",alignItems: "center"}}>
+                <View style={{width:'100%',flexDirection: "row",alignItems: "center"}}>
                 <Text style={{ fontSize: H2FontSize,marginLeft:10 }}>
                       {translate.Get("Tạm tính")}:
                       </Text>
@@ -533,11 +532,11 @@ export class CardDetailView extends React.Component {
                     {state.table.Ticket ? formatCurrency(state.table.Ticket.TkItemAmout, "") : ""}
                   </Text>
                 </View>
-                <TouchableOpacity 
+                {/* <TouchableOpacity 
                 onPress={()=>{this.onPressNext()}} 
              style={{  height: "100%", width: "50%",shadowColor: "#000",shadowOffset: {width: 0,height: 3},shadowOpacity: 0.27,shadowRadius: 4.65,elevation: 6,justifyContent: "center", alignItems: "center", backgroundColor: '#00adee' }}>
               <Text style={{ textAlign: "center",color:'#FFFFFF',fontFamily: "RobotoBold", width: "100%", fontSize: H2FontSize}}>Thanh toán</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             </View>
           )}
           </View>

@@ -8,6 +8,7 @@ import { _retrieveData, _storeData } from '../services/storages';
 import Question from '../components/Question';
 import translate from '../services/translate';
 import {Icon, Button} from 'react-native-elements';
+import { H3_FONT_SIZE,H1_FONT_SIZE } from '../config/constants';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -74,22 +75,18 @@ export class ScannerQR extends Component {
             if (hasCameraPermission === false) {
               return <Text style={{ paddingTop: Constants.statusBarHeight, textAlign: 'center' }}>No access to camera</Text>;
             }
-    return (
-      <View style={{
-        backgroundColor: "black", height: SCREEN_HEIGHT*1,
-        width: SCREEN_WIDTH, position: 'absolute', bottom: 0, right: 0,
-      }}>
-        {isViewCamera ? 
-        <View style={{flex : 1, }}>
-          <View style={{
-              position: 'absolute', right: 12, top: 5, backgroundColor: "transpanent", zIndex: 10,
-              flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-end',
-            }}>
-                <TouchableOpacity style={{ justifyContent: 'flex-end', alignItems: 'flex-end', paddingTop: 5 }}
-                  onPress={() => this.props.onCancel()} >
-                  <AntDesign name='close' size={SCREEN_WIDTH * 0.08} color='#FFFFFF' ></AntDesign>
-                </TouchableOpacity>
-            </View>
+    return ( 
+      <View style={{backgroundColor: "black", height: SCREEN_HEIGHT*1,width: SCREEN_WIDTH, position: 'absolute', bottom: 0, right: 0}}>
+        {isViewCamera ?  
+        <View style={{flex : 1}}>
+          <View style={{position: 'absolute', right: 12, top: 5, backgroundColor: "transpanent", zIndex: 10,flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-end', }}>
+            <TouchableOpacity style={{ justifyContent: 'flex-end', alignItems: 'flex-end', paddingTop: 5 }}onPress={() => this.props.onCancel()}>
+              <AntDesign name='close' size={SCREEN_WIDTH * 0.08} color='#FFFFFF'></AntDesign>
+            </TouchableOpacity>
+          </View>
+          <View style={{width:"100%",position: 'absolute', bottom:25, backgroundColor: "transpanent", zIndex: 10,justifyContent:'center', alignItems: 'center', }}>
+            <Text style={{backgroundColor:'black',textAlign:'center',fontSize: H1_FONT_SIZE,color:'#FFFFFF',paddingHorizontal:10}}>Di chuyển camera đến vùng có mã QR để quét</Text>
+          </View>
         <BarCodeScanner
           onBarCodeScanned={ IsScaned ? undefined : this.handleBarCodeScanned}
           style={StyleSheet.absoluteFillObject}

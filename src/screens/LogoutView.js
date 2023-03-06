@@ -12,7 +12,6 @@ import Question from '../components/Question';
 
 
 export default class LogoutView extends LoginView {
-  login_button_text = 'Logout';
   has_back_button = true;
   constructor(props) {
     super(props);
@@ -30,6 +29,7 @@ export default class LogoutView extends LoginView {
       passwordValid: true,
       secureTextEntry: true,
       usernameValid: true,
+      notification :false,
       language: 1,
       settings: {},
       firstTouch: '',
@@ -68,6 +68,7 @@ export default class LogoutView extends LoginView {
       return {
         settings: props.navigation.getParam('settings', state.settings),
         lockTable: props.navigation.getParam('lockTable', state.lockTable),
+        notification: props.navigation.getParam('notification', state.notification),
         secretPassword: ''
       };
     }

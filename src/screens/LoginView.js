@@ -8,7 +8,7 @@ import { login, CheckCasherIn } from '../services';
 import { _retrieveData, _storeData, _remove } from '../services/storages';
 import { cacheFonts } from "../helpers/AssetsCaching";
 import { Input, Button } from 'react-native-elements';
-import {ENDPOINT_URL, LOGIN_INPUT_FONT_SIZE, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, BACKGROUND_COLOR,H1FontSize,H2FontSize,H3FontSize } from '../config/constants';
+import {ENDPOINT_URL, LOGIN_INPUT_FONT_SIZE, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, BACKGROUND_COLOR,H1FontSize,H2FontSize,H3FontSize, H1_FONT_SIZE } from '../config/constants';
 import translate from '../services/translate';
 import colors from "../config/colors";
 import { setCustomText } from 'react-native-global-props';
@@ -109,6 +109,7 @@ export default class LoginView extends Component {
     if (props.navigation.getParam('lockTable', state.lockTable) != state.lockTable) {
       return {
         lockTable: props.navigation.getParam('lockTable', state.lockTable),
+        notification: props.navigation.getParam('notification', state.notification),
       };
     }
     // Return null if the state hasn't changed
@@ -135,7 +136,7 @@ BingdingConfig = async (user,Config,JwtToken) => {
             if (res.Status == 1) 
             {
               this.setState({ isLoading: false, isWorking: false, }, () => {
-                this.props.navigation.navigate("TableView", { settings, user });
+                  this.props.navigation.navigate("TableView", { settings, user });
               });
             }
             else {
@@ -298,7 +299,11 @@ let ImageWidth=SCREEN_WIDTH*0.12
       <View style={styles.container}>
           <StatusBar hidden={true} />
         <KeyboardAvoidingView  keyboardType='light' behavior="position" contentContainerStyle={styles.formContainer}  >
-         
+            {this.state.notification ?
+            <View style={{ marginBottom:'5%'}} >
+              <Text style={{fontSize:H1_FONT_SIZE*1.2, color:'#fff'}}>Quý khách vui lòng đợi nhân viên xác nhận thanh toán</Text>
+            </View>
+            :null}
           <View style={styles.BorderLogin}>
             <View style={styles.BorderFormLogin}>
             <View><Text style={{ color: BACKGROUND_COLOR, textAlign: 'center', fontSize: H1FontSize, }}>{this.translate.Get('Đăng nhập hệ thống')}</Text></View> 
