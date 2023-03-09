@@ -2,7 +2,7 @@ import React from "react";
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet, Image,
   Animated, Platform, FlatList, ActivityIndicator, KeyboardAvoidingView, Keyboard,
-  Dimensions,
+  Dimensions,Alert
 } from "react-native";
 import { Audio } from 'expo-av';
 import colors from "../../config/colors";
@@ -387,7 +387,7 @@ export class CardDetailView extends React.Component {
           </View>
       )};
   render() {
-    let { state,setState, onSendOrder, BookingsStyle, CartToggleHandle,onPressNext, translate, settings, ProductsOrdered} = this.props;
+    let { state,setState, onSendOrder,lockTable, BookingsStyle, CartToggleHandle,onPressNext, translate, settings, ProductsOrdered} = this.props;
     if (!this.state.IsLoaded) {
       return (
         <View style={[styles.pnbody, styles.horizontal]}>
@@ -491,22 +491,18 @@ export class CardDetailView extends React.Component {
             onPress={() => {
              if(!state.CartInfor.TotalQuantity||state.CartInfor.TotalQuantity <= 0 )
              return;
-             if (settings.B_CustomerSendOrder != true) 
+             if (lockTable == true) 
              {
                this.setState({ showS_CodeHandleData: true });
               } else {
-               Question.alert(translate.Get("Notice"),
-                 translate.Get("Bạn có muốn gọi order không?"),
-                 [
-                   { text: translate.Get('BỎ QUA'), onPress: () => { } },
-                   {
-                     text: translate.Get('OK'),
-                     onPress: () => {
-                       onSendOrder();
-                     }
-                   }
-                 ]
-               );
+                Alert.alert(translate.Get("Notice"), translate.Get("Bạn có muốn gọi order không?"), [
+                  {
+                    text: translate.Get("BỎ QUA"),
+                    onPress: () => console.log('Cancel Pressed'),
+                  },
+                  {text: translate.Get("AlertOK"), onPress: () => onSendOrder(),}
+                ]);
+               
 
              }
             }} >

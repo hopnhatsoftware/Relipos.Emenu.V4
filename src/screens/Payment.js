@@ -311,10 +311,10 @@ static getDerivedStateFromProps = (props, state) => {
             <TouchableOpacity onPress={this.onPressBack} style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
                <Image style={{height: "55%", width: "55%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
             </TouchableOpacity>
-            <View style={{width:'64%'}}>
+            <View style={{width:'68%'}}>
               <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>Thông tin đơn hàng</Text>
             </View>
-            <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "22%", borderRadius: 25, }}>
+            <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "18%", borderRadius: 25, }}>
             {showCall ?
               <View style={{backgroundColor:'#FF7E27',borderRadius: 50,height:'100%',justifyContent: "center", flexDirection: "row", alignItems: "center", }}>
                 <View style={{ width: "25%", alignItems:'center'}}>
@@ -454,20 +454,20 @@ static getDerivedStateFromProps = (props, state) => {
                   keyboardType="number-pad"
                   value={this.state.value}
                   onChangeText={(number) => this.setState({value : number}) }
-                  style={[{paddingHorizontal:8,fontSize: H3_FONT_SIZE, borderRadius: 8, borderWidth: 1,backgroundColor:'#FFFFFF', borderColor: colors.grey3, height: 40, width: "95%"}]}>
+                  style={[{paddingHorizontal:8,fontSize: H3_FONT_SIZE, borderRadius: 8, borderWidth: 1,backgroundColor:'#FFFFFF', borderColor: colors.grey3, height: H1_FONT_SIZE*2, width: "95%"}]}>
                 </TextInput>
-                <View style={{position: 'absolute', right: '5%', top: '22%', backgroundColor: "transpanent", zIndex: 10,flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-end',}}>
+                <View style={{position: 'absolute', right: '5%', top: '7%', backgroundColor: "transpanent", zIndex: 10,flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-end',}}>
                   <TouchableOpacity onPress={()=> this.setState({PaymentAmount: this.state.PaymentAmount - Money.TkTipAmount ,Money: {...Money, TkTipAmount : 0},value : 0})} style={{ justifyContent: 'flex-end', alignItems: 'flex-end', paddingTop: 5 }}>
                     <AntDesign name='closecircle' size={ITEM_FONT_SIZE*1.2} color={colors.red2} ></AntDesign>
                   </TouchableOpacity>
                 </View>
               </View>
               <View style={{height: "7%", width: "100%",justifyContent:'center' }}>
-                <Text style={{marginLeft:'2%', color: "#CC0000", fontSize: H4_FONT_SIZE}}>Tip có xuất hóa đơn hay không</Text>
+                <Text style={{marginLeft:'2%', color: "#CC0000", fontSize: H3_FONT_SIZE}}>Tip có xuất hóa đơn hay không</Text>
               </View>
-              <View style={{ width: "100%", flexDirection: "row",justifyContent:'center'}}>
-                <CheckBox checked={Money.TkeIsInvoiceTip ? true : false} onPress={()=> {this.setState({Money: {...Money, TkeIsInvoiceTip : Money.TkeIsInvoiceTip ? false : true}})}} containerStyle={{width:'45%', backgroundColor:'#fff'}} title="Có"/>
-                <CheckBox checked={Money.TkeIsInvoiceTip ? false : true} onPress={()=> {this.setState({Money: {...Money, TkeIsInvoiceTip : Money.TkeIsInvoiceTip ? false : true}})}} containerStyle={{width:'45%', backgroundColor:'#fff'}}  title="Không"/>
+              <View style={{ width: "100%", height:'13%', flexDirection: "row",justifyContent:'center'}}>
+                <CheckBox checked={Money.TkeIsInvoiceTip ? true : false} onPress={()=> {this.setState({Money: {...Money, TkeIsInvoiceTip : Money.TkeIsInvoiceTip ? false : true}})}} textStyle={{fontSize:H3_FONT_SIZE}} size={H2_FONT_SIZE} containerStyle={{width:'45%', backgroundColor:'#fff'}} title="Có"/>
+                <CheckBox checked={Money.TkeIsInvoiceTip ? false : true} onPress={()=> {this.setState({Money: {...Money, TkeIsInvoiceTip : Money.TkeIsInvoiceTip ? false : true}})}} textStyle={{fontSize:H3_FONT_SIZE}} size={H2_FONT_SIZE} containerStyle={{width:'45%', backgroundColor:'#fff',}}  title="Không"/>
               </View>
             </View>
           </View>

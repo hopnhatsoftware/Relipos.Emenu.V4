@@ -14,7 +14,8 @@ export const MARGIN_TOP = Platform.OS =='ios'?  Constants.statusBarHeight    :10
 export const TITLE_FONT_SIZE= SCREEN_HEIGHT*0.06>32?32: SCREEN_HEIGHT*0.06;
 
 export const HEADER_HEIGHT = Constants.statusBarHeight + TITLE_FONT_SIZE + 8;
- export const ENDPOINT_URL="http://demo.relipos.com";
+//  export const ENDPOINT_URL="http://demo.relipos.com";
+ export const ENDPOINT_URL="http://192.168.1.25:2202/";
 //export const ENDPOINT_URL="http://192.168.1.102:8081/api/";
 export const IMAGE_MAP_LOCATION ="../../resources/";
 export const ICON_SIZE = 10;
@@ -39,9 +40,8 @@ export const H2FontSize=SCREEN_HEIGHT*0.045>24?24:SCREEN_HEIGHT*0.045;
 export const H3FontSize=SCREEN_HEIGHT*0.0351>18.72?18.72:SCREEN_HEIGHT*0.0351;
 export const H4FontSize=SCREEN_HEIGHT*0.03>16?16:SCREEN_HEIGHT*0.03; 
 
-
-export const H1_FONT_SIZE = SCREEN_HEIGHT > 640?(SCREEN_HEIGHT >= 1024?40:32) : 22 ;
-export const H2_FONT_SIZE = SCREEN_HEIGHT > 640?(SCREEN_HEIGHT >= 1024?36:24) : 18 ;
-export const H3_FONT_SIZE = SCREEN_HEIGHT > 640?(SCREEN_HEIGHT >= 1024?32:18) : 15 ;
-export const H4_FONT_SIZE = SCREEN_HEIGHT > 640?(SCREEN_HEIGHT >= 1024?28:16) : 12 ;
-export const H5_FONT_SIZE = SCREEN_HEIGHT > 640?(SCREEN_HEIGHT >= 1024?24:14) : 10 ;
+export const H1_FONT_SIZE = SCREEN_HEIGHT > 640?(SCREEN_HEIGHT >= 1024?40:32) : SCREEN_HEIGHT < 450? 17 : 22 ;
+export const H2_FONT_SIZE = SCREEN_HEIGHT > 640?(SCREEN_HEIGHT >= 1024?34:24) : SCREEN_HEIGHT < 450? 15 : 18 ;
+export const H3_FONT_SIZE = SCREEN_HEIGHT > 640?(SCREEN_HEIGHT >= 1024?28:18) : SCREEN_HEIGHT < 450? 13 : 15 ;
+export const H4_FONT_SIZE = SCREEN_HEIGHT > 640?(SCREEN_HEIGHT >= 1024?24:16) : SCREEN_HEIGHT < 450? 10 : 12 ;
+export const H5_FONT_SIZE = SCREEN_HEIGHT > 640?(SCREEN_HEIGHT >= 1024?20:14) : SCREEN_HEIGHT < 450? 7 : 10 ;

@@ -298,10 +298,10 @@ let ImageWidth=SCREEN_WIDTH*0.12
     return (
       <View style={styles.container}>
           <StatusBar hidden={true} />
-        <KeyboardAvoidingView  keyboardType='light' behavior="position" contentContainerStyle={styles.formContainer}  >
+        <KeyboardAvoidingView  keyboardType='light' behavior= 'padding' contentContainerStyle={styles.formContainer}  >
             {this.state.notification ?
-            <View style={{ marginBottom:'5%'}} >
-              <Text style={{fontSize:H1_FONT_SIZE*1.2, color:'#fff'}}>Quý khách vui lòng đợi nhân viên xác nhận thanh toán</Text>
+            <View style={{ marginBottom:'5%', width: SCREEN_WIDTH * 0.5, justifyContent:'center',alignItems:'center'}} >
+              <Text style={{fontSize:H1_FONT_SIZE*1.2, color:'#fff',textAlign:'center'}}>Quý khách vui lòng đợi nhân viên xác nhận thanh toán</Text>
             </View>
             :null}
           <View style={styles.BorderLogin}>

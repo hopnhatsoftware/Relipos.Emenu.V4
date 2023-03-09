@@ -153,7 +153,6 @@ export default class Payment3 extends Component {
   }
   _getQrCode = async () => {
     let{QRData,Ticket,NameE_wallet} =  this.state;
-    console.log(NameE_wallet)
     getQrCode( Ticket.TicketID , NameE_wallet).then(res => {
       QRData = res.Data;
       if (QRData === '' || QRData === null){
@@ -179,7 +178,6 @@ export default class Payment3 extends Component {
   _ApplyVoucher = async (QrCode) => {
     let{settings,Ticket} = this.state;
     ApplyVoucher (Ticket.TicketID, settings, QrCode ).then(res => {
-      console.log(res);
       if (res.status == 1){
         this.setState({isShowBarCode:false});
         this._getMasterData();
@@ -195,7 +193,6 @@ export default class Payment3 extends Component {
   _ApplyVipCard = async (QRCodeString) => {
     let{Ticket,Vip} = this.state;
     ApplyVipCard (Ticket.TicketID,  QRCodeString ).then(res => {
-      console.log(res);
       if (res.Status == 1){
         Vip.Name = res.Data.Table[0].ObjName;
         Vip.SDT = res.Data.Table[0].ObjPhone;
@@ -376,7 +373,6 @@ export default class Payment3 extends Component {
     if (lockTable === true) {
       notification = true
       this.props.navigation.navigate("LogoutView", { lockTable , notification});
-      console.log(notification)
     }else{
       this.onPressHome();
     }
@@ -412,10 +408,10 @@ export default class Payment3 extends Component {
               style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
                <Image style={{height: "55%", width: "55%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
             </TouchableOpacity>
-            <View style={{width:'64%'}}>
+            <View style={{width:'68%'}}>
               <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>Phiếu thanh toán</Text>
             </View>
-            <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "22%", borderRadius: 25, }}>
+            <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "18%", borderRadius: 25, }}>
             {showCall ?
               <View style={{backgroundColor:'#FF7E27',borderRadius: 50,height:'100%',justifyContent: "center", flexDirection: "row", alignItems: "center", }}>
                 <View style={{ width: "25%", alignItems:'center'}}>

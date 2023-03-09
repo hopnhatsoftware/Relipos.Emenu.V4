@@ -124,7 +124,6 @@ export default class Payment2 extends Component {
   _getinvoiceInfor = async () => {
     let{Tax,Ticket} =  this.state;
     getinvoiceInfor(null, Ticket.TicketID, true).then(res => {
-      console.log(res);
         Tax.TaxCode = res.Data.ReiTaxId;
         Tax.Name = res.Data.CustomerName;
         Tax.TkeCompany = res.Data.CompanyName;
@@ -246,7 +245,6 @@ export default class Payment2 extends Component {
       Alert.alert(this.translate.Get("Thông báo"),'Email không được để trống')
     }else{
       FlushInvoiceInfor( Ticket.TicketID,Tax.TaxCode,Tax.Name, Tax.TkeCompany, Tax.Address, Tax.Email, Tax.Phone).then(res => {
-        console.log(res);
       if(res.Status === 1){
         _storeData('APP@BACKEND_Payment', JSON.stringify(a), () => {
             this.props.navigation.navigate('Payment3',{lockTable});
@@ -299,10 +297,10 @@ export default class Payment2 extends Component {
             <TouchableOpacity onPress={this.onPressBack} style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
                <Image style={{height: "55%", width: "55%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
             </TouchableOpacity>
-            <View style={{width:'64%'}}>
+            <View style={{width:'68%'}}>
               <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>Thông tin hóa đơn của bạn</Text>
             </View>
-            <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "22%", borderRadius: 25, }}>
+            <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "18%", borderRadius: 25, }}>
             {this.state.showCall ?
               <View style={{backgroundColor:'#FF7E27',borderRadius: 50,height:'100%',justifyContent: "center", flexDirection: "row", alignItems: "center", }}>
                 <View style={{ width: "25%", alignItems:'center'}}>

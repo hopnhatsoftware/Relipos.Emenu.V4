@@ -1413,6 +1413,7 @@ if (ProductChoise==null) {
             HandleQuantity={(item,OrddQuantity,isReplace,Json) => { this.HandleQuantity(item,OrddQuantity,isReplace) }}
             setState={(state) => this.setState(state)}
             settings={Config}
+            lockTable={this.state.lockTable}
             BookingsStyle={BookingsStyle}
             ProductsOrdered={ProductsOrdered}
             onPressNext={this.onPressNext}
