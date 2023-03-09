@@ -1,24 +1,26 @@
-{
-  "expo": {
-    "name": "SOS OfflineMenu",
-    "slug": "SOS-OfflineMenu",
-    "privacy": "public",
-    "platforms": [
+const commonConfig = {
+    name: "SOS OfflineMenu",
+    slug: "SOS-OfflineMenu",
+    privacy: "public",
+    platforms: [
       "ios",
       "android",
       "web"
     ],
-    "version": "1.0.0",
-    "orientation": "landscape",
-    "icon": "./assets/Customer/splash.png",
-    "splash": {
-      "image": "./assets/Customer/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+    version: "1.0.0",
+    orientation: "landscape",
+    icon: "./assets/Customer/splash.png",
+    splash: {
+      image: "./assets/Customer/splash.png",
+      resizeMode: "contain",
+      backgroundColor: "#ffffff"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "buildNumber": "1",
       "infoPlist": {
@@ -85,9 +87,22 @@
         "com.sonyericsson.home.permission.BROADCAST_BADGE"
       ]
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
     "description": "New Version"
+  
+};
+
+module.exports = () => {
+  if (process.env.APP_ENV === "production") {
+    return {
+      ...commonConfig
+    };
+  } else if (process.env.APP_ENV === "staging") {
+    return {
+      ...commonConfig
+    };
+  } else {
+    return {
+      ...commonConfig
+    };
   }
-}
+};

@@ -24,7 +24,7 @@ import {SetMenu_getExtraRequestFromProductId} from '../services';
 import translate from '../services/translate';
 import {Icon, Button} from 'react-native-elements';
 import {getTableColor} from '../services/util';
-import { setCustomText } from 'react-native-global-props'
+//import { setCustomText } from 'react-native-global-props'
 import colors from '../config/colors';
 
 import { formatCurrency } from "../services/util";
@@ -137,7 +137,7 @@ export default class RequestView extends Component {
         fontFamily: 'RobotoRegular',
       }
     }
-    setCustomText(customTextProps)
+   // setCustomText(customTextProps)
   }
   static getDerivedStateFromProps =  (props, state) =>{
     if (props.navigation.getParam('ReturnScreen', state.ReturnScreen) != state.ReturnScreen||
