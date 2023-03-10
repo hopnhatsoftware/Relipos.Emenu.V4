@@ -70,6 +70,7 @@ export default class Payment2 extends Component {
       isRenderProduct: true,
       selectedType: null,
       isPostBack: false,
+      isPostBack2: true,
       language: 1,
       call: 1,
       data: [],
@@ -133,13 +134,22 @@ export default class Payment2 extends Component {
         this.setState({Tax});
       })  
   }
-  _SearchTaxInfor = async () => {
+  _SearchTaxInfor = async (item) => {
     let{Tax} =  this.state;
-    SearchTaxInfor( Tax.TaxCode).then(res => {
-      if(res.Status === 1){
-        Tax.Name = res.Data.CustomerName;
-        Tax.TkeCompany = res.Data.CompanyName; 
-        Tax.Address = res.Data.ReiAddress;
+    this.setState({ isPostBack: false });
+    SearchTaxInfor( item).then(res => {
+    console.log(res)
+    if(res.Status === 1){
+        if(res.Data === ""){
+          this.setState({ isPostBack: true });
+          Alert.alert(this.translate.Get("Thông báo"),'Mã số thuế không tồn tại')
+        }
+        else{
+          this.setState({ isPostBack: true });
+          Tax.Name = res.Data.CustomerName;
+          Tax.TkeCompany = res.Data.CompanyName; 
+          Tax.Address = res.Data.ReiAddress;
+        }
       }
       else {
         return;
@@ -293,11 +303,12 @@ export default class Payment2 extends Component {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.Container}>
           <ScrollView>
-          <View style={{ flexDirection: "row", height: SCREEN_HEIGHT * 0.1, width: SCREEN_WIDTH, backgroundColor:'#333d4c',alignItems:'center'}}>
-            <TouchableOpacity onPress={this.onPressBack} style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
-               <Image style={{height: "55%", width: "55%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
+          <View style={{ flexDirection: "row", height: SCREEN_HEIGHT * 0.08, width: SCREEN_WIDTH, backgroundColor:'#333d4c',alignItems:'center'}}>
+          <TouchableOpacity onPress={this.onPressBack} style={{justifyContent: 'center', width:'12%',height:'100%',alignItems:'center',flexDirection:'row'}}>
+               <Image style={{height: "55%", width: "30%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
+               <Text style={{color:'white', fontSize:H2_FONT_SIZE,fontFamily: "RobotoBold"}}>{this.translate.Get("Trở lại")}</Text>
             </TouchableOpacity>
-            <View style={{width:'68%'}}>
+            <View style={{width:'63%'}}>
               <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>Thông tin hóa đơn của bạn</Text>
             </View>
             <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "18%", borderRadius: 25, }}>
@@ -325,7 +336,7 @@ export default class Payment2 extends Component {
             </TouchableOpacity>
             :null}
           </View>
-          <View style={{ height: SCREEN_HEIGHT * 0.67, width: SCREEN_WIDTH * 0.75, marginHorizontal: "12.5%",paddingTop:5}}>
+          <View style={{ height: SCREEN_HEIGHT * 0.69, width: SCREEN_WIDTH * 0.75, marginHorizontal: "12.5%",paddingTop:5}}>
             <View style={{ height: "74%",}}>
               <View style={{ height: "7%", flexDirection: "row", alignItems: "center"}}>
                 <Text style={{ fontSize: H3_FONT_SIZE, width: "51%" }}>Mã số thuế:</Text>
@@ -334,11 +345,13 @@ export default class Payment2 extends Component {
               <View style={{ height: "11%", flexDirection: "row"}}>
                 <TextInput 
                   value={this.state.Tax.TaxCode}
-                  onBlur={this._SearchTaxInfor}
                   onChangeText={(item) => this.setState({Tax :{ ...this.state.Tax , TaxCode : item}, }) } 
                   keyboardType="number-pad" 
-                  style={{paddingHorizontal:8,fontSize:H3_FONT_SIZE, width: "49%", marginRight: "2%", backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1}}>
+                  style={{paddingHorizontal:8,fontSize:H3_FONT_SIZE, width: "44%",  backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1}}>
                 </TextInput>
+                <TouchableOpacity onPress={()=>this._SearchTaxInfor(this.state.Tax.TaxCode) } style={{height: "100%", width: "5%",marginRight: "2%",backgroundColor:'#333d4c', justifyContent:'center',alignItems:'center'}}>
+                  <Image style={{height: "80%", width: "80%"}} resizeMode='contain' source={require("../../assets/icons/iconNew/IconFind-06.png")}/>
+                </TouchableOpacity>
                 <TextInput 
                   value={this.state.Tax.Name}
                   onChangeText={(item) => this.setState({Tax :{ ...this.state.Tax , Name : item}, }) } 

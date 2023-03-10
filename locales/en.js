@@ -49,7 +49,7 @@ export default en = {
     'Mã phiếu': 'Ticket number',
     'Thông tin không chính xác!': 'Incorrect information!',
     'Tổng': 'Total',
-    'Quay lại': 'Back',
+    'Trở lại': 'Back',
     'Giá cơ bản': 'Base Price',
     'Vui lòng kiểm tra lại thông tin!':'Please check the information!',
     'ServerError': 'No connection to the server, please check again!',

@@ -353,7 +353,7 @@ export default class TableView extends Component {
             <FlatList horizontal={true}  extraData={this.state.selectedAreaIndex}  data={AreasList}
               renderItem={({ item, index }) => <TouchableOpacity key={index}
                 style={{
-                  width: SCREEN_WIDTH/4, height:pnAreaheight, borderRadius: 2, borderWidth: 0.5, borderColor: 'white', justifyContent: 'center', alignItems: 'center', backgroundColor:
+                  width: SCREEN_WIDTH/5, height:pnAreaheight, borderRadius: 2, borderWidth: 0.5, borderColor: 'white', justifyContent: 'center', alignItems: 'center', backgroundColor:
                     index == this.state.selectedAreaIndex ? '#ea6721' : '#2e7cc6',
                 }}
                 onPress={() => { this.loadTables(index) }}>

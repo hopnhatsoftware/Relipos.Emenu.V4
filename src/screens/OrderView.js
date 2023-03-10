@@ -9,7 +9,7 @@ import { FlatList } from "react-native";
 import { Input, Button, Icon } from "react-native-elements";
 import { setCustomText } from "react-native-global-props";
 import { ProductDetails, CardDetailView, _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor } from '../components';
-import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize,H2FontSize,H3FontSize,H4FontSize,H5FontSize,FontSize } from "../config/constants";
+import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize,H2FontSize,H3FontSize,H4FontSize,H5FontSize,FontSize,H4_FONT_SIZE } from "../config/constants";
 import translate from "../services/translate";
 import {getMasterData,GetViewGroup,GetPrdChildGroups,getProductByGroup,getTicketInfor, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getByChoiceId,CancelOrder,CallServices} from "../services";
 import { formatCurrency } from "../services/util";
@@ -346,7 +346,6 @@ onCallServices= async() => {
   }
   _getTicketInfor = async () => {
     let { table, Ticket, ProductsOrdered ,Config} = this.state;
-   
     if ("TicketID" in table && table.TicketID > 0) {
       getTicketInfor(Config, table).then(res => {
         if (!("Table" in res.Data) || res.Data.Table.length == 0) {
@@ -1376,17 +1375,20 @@ if (ProductChoise==null) {
                   <View style={[BookingsStyle.bottombar, { width: (Center.width*0.2), flexDirection: "row", color: "white", alignItems: "center", justifyContent: "center", 
                   backgroundColor: "#0D66CE"
                   }]}> 
-                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                    <View style={{ justifyContent: 'center', alignItems: 'center' ,flexDirection: "column"}}>
+                      <View style={{backgroundColor:'#CC0000', borderRadius:35,width:H4_FONT_SIZE*0.9,height:H4_FONT_SIZE*0.9,justifyContent:'center',alignItems:'center',marginBottom:-3, marginLeft:2}}>
+                        <Text style={{color: "white", fontSize: H4_FONT_SIZE*0.6, textAlign:'center' }}>{CartInfor.TotalQuantity}</Text>
+                      </View>
                       <Image resizeMode="stretch" source={require('../../assets/icons/v2/icon_GioHang.png')}
-                        style={{ width: H3FontSize * 1.3, height: H3FontSize * 1.3, }} />
+                        style={{ width: H3FontSize * 1.3, height: H3FontSize * 1.3, marginBottom:7 }} />
                     </View>
                     <Text style={[{ color: "white", fontSize: H3FontSize, paddingLeft: 10 }]}>
                       {this.translate.Get("Giỏ hàng")}
                     </Text>
                   </View>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() =>this.state.table.TkPaymentAmount > 0 || ProductsOrdered.length > 0 ? this.onPressNext(): null}>
-                  <View style={[BookingsStyle.bottombar, { width: (Center.width*0.2), flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor:this.state.table.TkPaymentAmount > 0 || ProductsOrdered.length > 0 ? "#009900":"#dddddd"
+                <TouchableOpacity onPress={() =>this.state.table.TkPaymentAmount > 0 && CartInfor.TotalAmount == 0 ? this.onPressNext(): null}>
+                  <View style={[BookingsStyle.bottombar, { width: (Center.width*0.2), flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor:this.state.table.TkPaymentAmount  > 0 && CartInfor.TotalAmount == 0 ? "#009900":"#dddddd"
                   }]}>
                     <Text style={[{ color: "white",fontSize: H3FontSize,}]}>
                       {this.translate.Get("Thanh toán")}

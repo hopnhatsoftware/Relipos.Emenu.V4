@@ -307,11 +307,12 @@ static getDerivedStateFromProps = (props, state) => {
     const { showCall,Money,lockTable} = this.state;
     return (
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.Container}>
-          <View style={{ flexDirection: "row", height: SCREEN_HEIGHT * 0.1, width: SCREEN_WIDTH, backgroundColor:'#333d4c',alignItems:'center'}}>
-            <TouchableOpacity onPress={this.onPressBack} style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
-               <Image style={{height: "55%", width: "55%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
+          <View style={{ flexDirection: "row", height: SCREEN_HEIGHT * 0.08, width: SCREEN_WIDTH, backgroundColor:'#333d4c',alignItems:'center'}}>
+            <TouchableOpacity onPress={this.onPressBack} style={{justifyContent: 'center', width:'12%',height:'100%',alignItems:'center',flexDirection:'row'}}>
+               <Image style={{height: "55%", width: "30%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
+               <Text style={{color:'white', fontSize:H2_FONT_SIZE,fontFamily: "RobotoBold"}}>{this.translate.Get("Trở lại")}</Text>
             </TouchableOpacity>
-            <View style={{width:'68%'}}>
+            <View style={{width:'63%'}}>
               <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>Thông tin đơn hàng</Text>
             </View>
             <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "18%", borderRadius: 25, }}>
@@ -332,14 +333,12 @@ static getDerivedStateFromProps = (props, state) => {
             }
             </TouchableOpacity>
             {lockTable == false ?
-            <TouchableOpacity
-              onPress={this.onPressHome}
-              style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
+            <TouchableOpacity onPress={this.onPressHome} style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
               <Image style={{height: "55%", width: "55%",}} resizeMode='contain' source={require("../../assets/icons/IconHome-11.png")}/>
             </TouchableOpacity>
             :null}
           </View>
-          <View style={{height: SCREEN_HEIGHT * 0.72, width: SCREEN_WIDTH ,  flexDirection: "row",shadowOffset: {width: 0,height: 5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6}}>
+          <View style={{height: SCREEN_HEIGHT * 0.68, width: SCREEN_WIDTH ,  flexDirection: "row",shadowOffset: {width: 0,height: 5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6}}>
           <View style={{ width: "70%", height: "100%",}}>
             <View style={{ height: "78%", width: "100%", backgroundColor:"#fff",paddingHorizontal:'1.5%' }}>
             <FlatList
@@ -383,13 +382,12 @@ static getDerivedStateFromProps = (props, state) => {
             <View style={{ height: "100%", width: "100%",}}>
               <View style={{ height: "10%", width: "100%", flexDirection: "row",justifyContent:'center',alignItems:'center'}}>
                 <Image style={{height: "60%", width: "12%",marginRight:'2%'}} resizeMode='contain' source={require("../../assets/icons/IconTIP-11.png")}/>
-                <Text style={{ fontSize: H2_FONT_SIZE, color:'#333d4c'}}>Tip thêm cho nhà hàng</Text>
+                <Text style={{ fontSize: H2_FONT_SIZE, color:'#333d4c'}}>Tip cho nhân viên</Text>
               </View>
               <View style={{ height: "20%", width: "100%", flexDirection: "row",justifyContent:'center',}}>
                 <TouchableOpacity 
                 // onPress={()=> this.setState({value: parseFloat(this.state.value) + (parseFloat(this.state.mod))})} style={styles.tip}
-                onPress={()=> this.setState({value: parseFloat(this.state.value) + 50000})} style={styles.tip}
-                >
+                onPress={()=> this.setState({value: parseFloat(this.state.value) + 50000})} style={styles.tip}>
                   <View style={styles.tipView}>
                     <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>Tổng: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 50000 + (parseFloat(this.state.value)),"")}</Text>
                   </View>
@@ -454,7 +452,7 @@ static getDerivedStateFromProps = (props, state) => {
                   keyboardType="number-pad"
                   value={this.state.value}
                   onChangeText={(number) => this.setState({value : number}) }
-                  style={[{paddingHorizontal:8,fontSize: H3_FONT_SIZE, borderRadius: 8, borderWidth: 1,backgroundColor:'#FFFFFF', borderColor: colors.grey3, height: H1_FONT_SIZE*2, width: "95%"}]}>
+                  style={[{paddingHorizontal:8,fontSize: H3_FONT_SIZE, borderRadius: 8, borderWidth: 1,backgroundColor:'#FFFFFF', borderColor: colors.grey3, height: H1_FONT_SIZE*2, width: "95%",height:'80%'}]}>
                 </TextInput>
                 <View style={{position: 'absolute', right: '5%', top: '7%', backgroundColor: "transpanent", zIndex: 10,flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-end',}}>
                   <TouchableOpacity onPress={()=> this.setState({PaymentAmount: this.state.PaymentAmount - Money.TkTipAmount ,Money: {...Money, TkTipAmount : 0},value : 0})} style={{ justifyContent: 'flex-end', alignItems: 'flex-end', paddingTop: 5 }}>
@@ -472,16 +470,12 @@ static getDerivedStateFromProps = (props, state) => {
             </View>
           </View>
         </View>
-          <View style={{ height: SCREEN_HEIGHT * 0.18, width: SCREEN_WIDTH, alignItems: "center"}}>
-          <LinearGradient
-              colors={[ '#333d4c', '#333d4c']}
-              start={{ x: 0, y: 0 }}
-              end={{ x:0, y: 1 }}
-              style={{marginTop: 15, borderWidth: 1, height: '30%',borderRadius:35,width:'20%'}}>
-            <TouchableOpacity onPress={()=> this._HandleTip ()} style={{  height: "100%", width: "100%", justifyContent: "center", alignItems: "center"}}>
+          <View style={{ height: SCREEN_HEIGHT * 0.24, width: SCREEN_WIDTH, alignItems: "center", }}>
+          <View style={{marginTop: SCREEN_HEIGHT * 0.04, height: '30%',width:'20%',justifyContent:'center'}}>
+            <TouchableOpacity onPress={()=> this._HandleTip ()} style={{ backgroundColor:'#333d4c',borderRadius:35,  borderWidth: 1,height: "80%", width: "100%", justifyContent: "center", alignItems: "center"}}>
               <Text style={{ textAlign: "center",color:'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>Xác nhận</Text>
             </TouchableOpacity>
-            </LinearGradient>
+            </View>
             <View style={{height:'70%', width: SCREEN_WIDTH, justifyContent:'center'}}>
             <StepIndicator
               customStyles={customStyles}

@@ -374,7 +374,9 @@ export default class Payment3 extends Component {
       notification = true
       this.props.navigation.navigate("LogoutView", { lockTable , notification});
     }else{
-      this.onPressHome();
+      // this.onPressHome();
+      notification = true
+      this.props.navigation.navigate("LogoutView", { lockTable , notification});
     }
   }
 
@@ -402,13 +404,12 @@ export default class Payment3 extends Component {
     const {Money,isShowBarCode,isShowBarCodeVip,showCall,Vip,isShowE_wallet,isShowCash,isShowCard,isShowBanking,isShowVip,lockTable} = this.state;
     return (
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.Container}>
-        <View style={{ flexDirection: "row", height: SCREEN_HEIGHT * 0.1, width: SCREEN_WIDTH, backgroundColor:'#333d4c',alignItems:'center'}}>
-            <TouchableOpacity
-              onPress={this.onPressBack}
-              style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
-               <Image style={{height: "55%", width: "55%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
+        <View style={{ flexDirection: "row", height: SCREEN_HEIGHT * 0.08, width: SCREEN_WIDTH, backgroundColor:'#333d4c',alignItems:'center'}}>
+        <TouchableOpacity onPress={this.onPressBack} style={{justifyContent: 'center', width:'12%',height:'100%',alignItems:'center',flexDirection:'row'}}>
+               <Image style={{height: "55%", width: "30%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
+               <Text style={{color:'white', fontSize:H2_FONT_SIZE,fontFamily: "RobotoBold"}}>{this.translate.Get("Trở lại")}</Text>
             </TouchableOpacity>
-            <View style={{width:'68%'}}>
+            <View style={{width:'63%'}}>
               <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>Phiếu thanh toán</Text>
             </View>
             <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "18%", borderRadius: 25, }}>
@@ -436,7 +437,7 @@ export default class Payment3 extends Component {
             </TouchableOpacity>
             :null}
           </View>
-          <View style={{height: SCREEN_HEIGHT * 0.52, width: SCREEN_WIDTH ,  flexDirection: "row",shadowOffset: {width: 0,height: 5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6}}>
+          <View style={{height: SCREEN_HEIGHT * 0.54, width: SCREEN_WIDTH ,  flexDirection: "row",shadowOffset: {width: 0,height: 5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6}}>
           <View style={{ width: "65%", height: "100%",}}>
             <View style={{ height: "72%", width: "100%", backgroundColor:"#fff",paddingHorizontal:'1.5%'}}>
             <FlatList
