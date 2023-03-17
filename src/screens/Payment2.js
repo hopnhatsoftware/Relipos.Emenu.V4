@@ -16,7 +16,7 @@ UIManager.setLayoutAnimationEnabledExperimental(true);
 
 const SCREEN_WIDTH = Dimensions.get("screen").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height; //- Constants.statusBarHeight;
-const Bordy = { width: SCREEN_WIDTH, height: SCREEN_HEIGHT };
+const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
 const pnLeft = { width: Bordy.width * 0.17, height: SCREEN_HEIGHT };
 const Center = { width: Bordy.width - pnLeft.width, height: Bordy.height };
 const Header = { width: Center.width, height: Bordy.height * 0.085 };
@@ -264,15 +264,8 @@ export default class Payment2 extends Component {
     }
   }
   onPressHome = async () => {
-    _remove("APP@TABLE", () => {
-      _remove("APP@CART", () => {
-        _remove("APP@BACKEND_Payment", () => {
-          this.props.navigation.navigate("TableView");
-        });
-      });
-    });
+    this.props.navigation.navigate("OrderView");
 };
-
   /**
    *
    * @param {*} ite
@@ -303,7 +296,7 @@ export default class Payment2 extends Component {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.Container}>
           <ScrollView>
-          <View style={{ flexDirection: "row", height: SCREEN_HEIGHT * 0.08, width: SCREEN_WIDTH, backgroundColor:'#333d4c',alignItems:'center'}}>
+          <View style={{ flexDirection: "row", height: Bordy.height * 0.08, width: Bordy.width, backgroundColor:'#333d4c',alignItems:'center'}}>
           <TouchableOpacity onPress={this.onPressBack} style={{justifyContent: 'center', width:'12%',height:'100%',alignItems:'center',flexDirection:'row'}}>
                <Image style={{height: "55%", width: "30%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
                <Text style={{color:'white', fontSize:H2_FONT_SIZE,fontFamily: "RobotoBold"}}>{this.translate.Get("Trở lại")}</Text>
@@ -336,7 +329,7 @@ export default class Payment2 extends Component {
             </TouchableOpacity>
             :null}
           </View>
-          <View style={{ height: SCREEN_HEIGHT * 0.69, width: SCREEN_WIDTH * 0.75, marginHorizontal: "12.5%",paddingTop:5}}>
+          <View style={{ height: Bordy.height * 0.69, width: Bordy.width * 0.75, marginHorizontal: "12.5%",paddingTop:5}}>
             <View style={{ height: "74%",}}>
               <View style={{ height: "7%", flexDirection: "row", alignItems: "center"}}>
                 <Text style={{ fontSize: H3_FONT_SIZE, width: "51%" }}>Mã số thuế:</Text>
@@ -409,7 +402,7 @@ export default class Payment2 extends Component {
               <Text style={{ fontSize: H2_FONT_SIZE}}>Xin cảm ơn quý khách</Text>
             </View>
           </View>
-          <View style={{ height: SCREEN_HEIGHT * 0.23, width: SCREEN_WIDTH, justifyContent: "center", alignItems: "center"}}>
+          <View style={{ height: Bordy.height * 0.23, width: Bordy.width, justifyContent: "center", alignItems: "center"}}>
             <View style={{ height: "30%", justifyContent: "center", alignItems: "center"}}>
               <Text style={{ fontSize: H2_FONT_SIZE }}>Chọn bỏ qua nếu bạn không xuất hóa đơn VAT</Text>
             </View>
@@ -429,7 +422,7 @@ export default class Payment2 extends Component {
             </TouchableOpacity>
             </LinearGradient>
             </View>
-            <View style={{height:'40%', width: SCREEN_WIDTH, justifyContent:'center'}}>
+            <View style={{height:'40%', width: Bordy.width, justifyContent:'center'}}>
             <StepIndicator
               customStyles={customStyles}
               stepCount={3}
@@ -448,13 +441,13 @@ const styles = StyleSheet.create({
     // backgroundColor: "#E3E3E3",
     // alignItems: 'center',
     justifyContent: "space-around",
-    height: SCREEN_HEIGHT,
-    width: SCREEN_WIDTH,
+    height: Bordy.height,
+    width: Bordy.width,
     flex: 1,
   },
   Container: {
-    flex: 1,
-    width: SCREEN_WIDTH,
+    height:Bordy.height,
+    width:Bordy.width,
     justifyContent: "center",
   },
 
@@ -511,7 +504,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   item_menu_order: {
-    paddingTop: SCREEN_HEIGHT * 0.045 - ITEM_FONT_SIZE - 5,
+    paddingTop: Bordy.height * 0.045 - ITEM_FONT_SIZE - 5,
     fontSize: ITEM_FONT_SIZE * 1.3,
     fontFamily: "RobotoBold",
     textAlign: "center",
@@ -544,8 +537,8 @@ const styles = StyleSheet.create({
     fontFamily: "RobotoBold",
   },
   BackgroundMash: {
-    height: SCREEN_HEIGHT + Constants.statusBarHeight,
-    width: SCREEN_WIDTH,
+    height: Bordy.height + Constants.statusBarHeight,
+    width: Bordy.width,
     position: "absolute",
     flexDirection: "column",
     alignItems: "center",

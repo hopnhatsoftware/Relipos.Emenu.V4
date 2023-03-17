@@ -19,7 +19,7 @@ UIManager.setLayoutAnimationEnabledExperimental &&
 
 const SCREEN_WIDTH = Dimensions.get("screen").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height; //- Constants.statusBarHeight;
-const Bordy = { width: SCREEN_WIDTH, height: SCREEN_HEIGHT };
+const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
 const pnLeft = { width: Bordy.width * 0.17, height: SCREEN_HEIGHT };
 const Center = { width: Bordy.width - pnLeft.width, height: Bordy.height };
 const Header = { width: Center.width, height: Bordy.height * 0.085 };
@@ -351,14 +351,8 @@ export default class Payment3 extends Component {
     this.setState({ isShowCard: false ,isShowE_wallet: false ,isShowCash:true, isShowVip:false,isShowBanking:false });
   }
   onPressHome = async () => {
-    _remove("APP@TABLE", () => {
-      _remove("APP@CART", () => {
-        _remove("APP@BACKEND_Payment", () => {
-          this.props.navigation.navigate("TableView");
-        });
-      });
-    });
-  };
+    this.props.navigation.navigate("OrderView");
+};
   static getDerivedStateFromProps = (props, state) => {
     if (props.navigation.getParam('lockTable', state.lockTable) != state.lockTable) {
       return {
@@ -379,7 +373,6 @@ export default class Payment3 extends Component {
       this.props.navigation.navigate("LogoutView", { lockTable , notification});
     }
   }
-
   /**
    *
    * @param {*} ite
@@ -404,7 +397,7 @@ export default class Payment3 extends Component {
     const {Money,isShowBarCode,isShowBarCodeVip,showCall,Vip,isShowE_wallet,isShowCash,isShowCard,isShowBanking,isShowVip,lockTable} = this.state;
     return (
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.Container}>
-        <View style={{ flexDirection: "row", height: SCREEN_HEIGHT * 0.08, width: SCREEN_WIDTH, backgroundColor:'#333d4c',alignItems:'center'}}>
+        <View style={{ flexDirection: "row", height: Bordy.height * 0.08, width: Bordy.width, backgroundColor:'#333d4c',alignItems:'center'}}>
         <TouchableOpacity onPress={this.onPressBack} style={{justifyContent: 'center', width:'12%',height:'100%',alignItems:'center',flexDirection:'row'}}>
                <Image style={{height: "55%", width: "30%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
                <Text style={{color:'white', fontSize:H2_FONT_SIZE,fontFamily: "RobotoBold"}}>{this.translate.Get("Trở lại")}</Text>
@@ -431,13 +424,13 @@ export default class Payment3 extends Component {
             </TouchableOpacity>
             {lockTable == false?
             <TouchableOpacity
-              onPress={this.onPressHome}
+            onPress={this.onPressNext}
               style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
               <Image style={{height: "55%", width: "55%",}} resizeMode='contain' source={require("../../assets/icons/IconHome-11.png")}/>
             </TouchableOpacity>
             :null}
           </View>
-          <View style={{height: SCREEN_HEIGHT * 0.54, width: SCREEN_WIDTH ,  flexDirection: "row",shadowOffset: {width: 0,height: 5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6}}>
+          <View style={{height: Bordy.height * 0.54, width: Bordy.width ,  flexDirection: "row",shadowOffset: {width: 0,height: 5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6}}>
           <View style={{ width: "65%", height: "100%",}}>
             <View style={{ height: "72%", width: "100%", backgroundColor:"#fff",paddingHorizontal:'1.5%'}}>
             <FlatList
@@ -574,7 +567,7 @@ export default class Payment3 extends Component {
             : null}
           </View>
         </View>
-        <View style={{ height: SCREEN_HEIGHT * 0.18, width: SCREEN_WIDTH, alignItems: "center",paddingHorizontal:'20%'}}>
+        <View style={{ height: Bordy.height * 0.18, width: Bordy.width, alignItems: "center",paddingHorizontal:'20%'}}>
           <View style={{flexDirection:'row',height:'45%',width:'100%', paddingVertical:'1%',alignItems:'center'}}>
             <View style={{width:'5%',height:'100%'}}>
             <Image style={{height: "100%", width: "100%",}} resizeMode='contain' source={require("../../assets/icons/IconThanhToan-11.png")}/>
@@ -620,7 +613,7 @@ export default class Payment3 extends Component {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={{ height: SCREEN_HEIGHT * 0.20, width: SCREEN_WIDTH, alignItems: "center"}}>
+        <View style={{ height: Bordy.height * 0.20, width: Bordy.width, alignItems: "center"}}>
           <LinearGradient
             colors={[ '#333d4c', '#333d4c']}
             start={{ x: 0, y: 0 }}
@@ -630,7 +623,7 @@ export default class Payment3 extends Component {
               <Text style={{ textAlign: "center",color:'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>Xác nhận thanh toán</Text>
             </TouchableOpacity>
           </LinearGradient>
-          <View style={{height:'70%', width: SCREEN_WIDTH, justifyContent:'center'}}>
+          <View style={{height:'70%', width: Bordy.width, justifyContent:'center'}}>
             <StepIndicator
               customStyles={customStyles}
               stepCount={3}
@@ -666,13 +659,13 @@ export default class Payment3 extends Component {
 const styles = StyleSheet.create({
   pnbody: {
     justifyContent: "space-around",
-    height: SCREEN_HEIGHT,
-    width: SCREEN_WIDTH,
+    height: Bordy.height,
+    width: Bordy.width,
     flex: 1,
   },
   Container: {
-    flex: 1,
-    width: SCREEN_WIDTH,
+    height: Bordy.height,
+    width: Bordy.width,
     justifyContent: "center",
   },
   pnLeft: {
@@ -728,7 +721,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   item_menu_order: {
-    paddingTop: SCREEN_HEIGHT * 0.045 - ITEM_FONT_SIZE - 5,
+    paddingTop: Bordy.height * 0.045 - ITEM_FONT_SIZE - 5,
     fontSize: ITEM_FONT_SIZE * 1.3,
     fontFamily: "RobotoBold",
     textAlign: "center",
@@ -761,8 +754,8 @@ const styles = StyleSheet.create({
     fontFamily: "RobotoBold",
   },
   BackgroundMash: {
-    height: SCREEN_HEIGHT + Constants.statusBarHeight,
-    width: SCREEN_WIDTH,
+    height: Bordy.height + Constants.statusBarHeight,
+    width: Bordy.width,
     position: "absolute",
     flexDirection: "column",
     alignItems: "center",

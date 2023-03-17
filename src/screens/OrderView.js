@@ -20,9 +20,9 @@ import Question from '../components/Question';
 UIManager.setLayoutAnimationEnabledExperimental &&
   UIManager.setLayoutAnimationEnabledExperimental(true);
 
-const SCREEN_WIDTH = Dimensions.get("screen").width;
+const SCREEN_WIDTH = Dimensions.get("window").width;
  const SCREEN_HEIGHT = Dimensions.get("window").height //- Constants.statusBarHeight;
- const Bordy={width:SCREEN_WIDTH,height:SCREEN_HEIGHT};
+ const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
 const pnLeft={ width:Bordy.width*0.17,height:SCREEN_HEIGHT };  
 const Center={width:Bordy.width-pnLeft.width, height:Bordy.height};
 const Header={width:Center.width,height:Bordy.height* 0.085};
@@ -65,7 +65,7 @@ export default class OrderView extends Component {
       ShowFullCart: true,
       isShowFormCard: false,
       FullCartWidth: new Animated.Value(0),
-      CartWidth: new Animated.Value(SCREEN_WIDTH * 0.82),
+      CartWidth: new Animated.Value(Bordy.width * 0.82),
       /*Dòng mặt hàng đang chọn trong giỏ hàng */
       CartItemSelected: null,
       CartProductIndex: -1,
@@ -116,7 +116,7 @@ export default class OrderView extends Component {
         state.CartInfor = CartInfor;
         state.Product = that.state.Product;
         state.FullCartWidth = new Animated.Value(0);
-        state.CartWidth = new Animated.Value(SCREEN_WIDTH * 0.82);
+        state.CartWidth = new Animated.Value(Bordy.width * 0.82);
       _storeData("OrderView@STATE", JSON.stringify(state), async () => {
         that.setState({state,CartInfor,SelectedGroupIndex:-1});
         return false;
@@ -137,8 +137,7 @@ export default class OrderView extends Component {
   onPressBack = async() => {
     let { lockTable,table } = this.state;
     if (lockTable == true) {
-       this.props.navigation.navigate("LogoutView", { lockTable });
-      
+        this.props.navigation.navigate("LogoutView", { lockTable });
     }else{
     //console.log('table :'+JSON.stringify(table));
     /*Cancel Order */
@@ -686,7 +685,8 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
     Animated.timing(this.state.FullCartWidth, {
       toValue: endWidth,
       duration: 1000,
-      easing: Easing.linear
+      easing: Easing.linear,
+      useNativeDriver: false
     }).start(() => this.setState({ isShowFormCard: isShow }));
   }
   _buy = item => {
@@ -1149,7 +1149,6 @@ if (ProductChoise==null) {
     let {CartFilter}= this._getCartItems(item,null);
     item.OrddQuantity=CartFilter.TotalQuantity;
     this.state.isRenderProduct=true;
-   // console.log(this.state.endpoint + "/Resources/Images/Product/" + item.PrdImageUrl)
     return (
       <TouchableHighlight   style={ { borderBottomWidth: 1,borderColor: colors.grey2,width:iWith,height: iHeight,marginBottom:2 }}>
         <View style={{ flexDirection: "row", flexWrap: "wrap", width: "100%", height: '100%' }}>
@@ -1158,7 +1157,6 @@ if (ProductChoise==null) {
               onPress={() =>
               { 
                 this._ShowFullImage(item,true);
-                //this.PrerenderProductModal(item,CartFilter,index);
             }}> 
               <ImageBackground  resizeMode="stretch"
                 source={ item.PrdImageUrl ? {uri: this.state.endpoint + "/Resources/Images/Product/" + item.PrdImageUrl
@@ -1300,16 +1298,14 @@ if (ProductChoise==null) {
         </View>
       );
     }
-    const {ProductGroupList,endpoint,PrdChildGroups,Products,CartInfor,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config, lockTable,ProductsOrdered} = this.state; 
+    const {ProductGroupList,endpoint,PrdChildGroups,Products,CartInfor,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config,ProductsOrdered} = this.state; 
    
     return (
       <View style={{height:Bordy.height,width:Bordy.width}}>
         <View style={{flexDirection: "row"}}>
-          <View name='pbLeft' style={[{ backgroundColor: "#333D4C",width:pnLeft.width, flexDirection: "column",
-    height: "94%" }]}>
+          <View name='pbLeft' style={[{ backgroundColor: "#333D4C",width:pnLeft.width, flexDirection: "column",height: "94%" }]}>
             <View style={{ justifyContent: 'center', alignItems: 'center', height: pnLeft.width*4/6, }}>
               <Image resizeMode='contain' 
-              //source={require('../../assets/icons/Logo_Emenu_BG_Red_3.png')}
                source={{uri:endpoint+'/Resources/Images/View/Logo.jpg'}}
                 style={{ width: '99%', height: '99%' }} />
             </View> 

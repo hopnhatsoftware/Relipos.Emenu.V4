@@ -22,7 +22,7 @@ UIManager.setLayoutAnimationEnabledExperimental &&
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-
+const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
 export default class TableView extends Component {
   constructor(props) {
     super(props);
@@ -328,10 +328,10 @@ export default class TableView extends Component {
         </View>
       )
     }
-    let pnHeaderheight=SCREEN_HEIGHT* 0.085;
-    let pnAreaheight=SCREEN_HEIGHT* 0.1; 
+    let pnHeaderheight=Bordy.height* 0.085;
+    let pnAreaheight=Bordy.height* 0.1; 
     let I_TableColumn=5;//(Config&&Config.I_TableColumn&&Config.I_TableColumn>0)?Config.I_TableColumn:5;
-    let I_TableWidth=SCREEN_WIDTH/I_TableColumn;
+    let I_TableWidth=Bordy.width/I_TableColumn;
     return (
       <View style={styles.container}>
         <StatusBar hidden={true} />
@@ -353,7 +353,7 @@ export default class TableView extends Component {
             <FlatList horizontal={true}  extraData={this.state.selectedAreaIndex}  data={AreasList}
               renderItem={({ item, index }) => <TouchableOpacity key={index}
                 style={{
-                  width: SCREEN_WIDTH/5, height:pnAreaheight, borderRadius: 2, borderWidth: 0.5, borderColor: 'white', justifyContent: 'center', alignItems: 'center', backgroundColor:
+                  width: Bordy.width/5, height:pnAreaheight, borderRadius: 2, borderWidth: 0.5, borderColor: 'white', justifyContent: 'center', alignItems: 'center', backgroundColor:
                     index == this.state.selectedAreaIndex ? '#ea6721' : '#2e7cc6',
                 }}
                 onPress={() => { this.loadTables(index) }}>
@@ -371,7 +371,7 @@ export default class TableView extends Component {
               <TouchableOpacity onPress={() => this._onPressTable(item, index)}
                 style={{ width: I_TableWidth, backgroundColor: colors.grey0, borderRadius: 2, borderWidth: 0.5, borderColor: 'white', }}>
                 <View style={{
-                  justifyContent: "center", alignItems: 'center', height: SCREEN_HEIGHT * 0.18, borderRadius: 2, borderColor: 'white',
+                  justifyContent: "center", alignItems: 'center', height: Bordy.height * 0.18, borderRadius: 2, borderColor: 'white',
                   backgroundColor: getTableColor(item.Status)
                 }}>
                   <View style={{ position: 'absolute', justifyContent: 'center', alignItems: 'center', top: 0, paddingTop: 3.6 }}>
@@ -399,10 +399,10 @@ export default class TableView extends Component {
         {showCustomer ?
           <TouchableWithoutFeedback onPress={() => this.setState({ showCustomer: false, isWorking: false })}>
             <View style={{
-              position: "absolute", right: 0, top: 0, width: SCREEN_WIDTH, height: SCREEN_HEIGHT + Constants.statusBarHeight,
+              position: "absolute", right: 0, top: 0, width: Bordy.width, height: Bordy.height + Constants.statusBarHeight,
               alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)',
             }}>
-              <View style={{ backgroundColor: 'white', marginTop: 60, height: SCREEN_HEIGHT + Constants.statusBarHeight, width: SCREEN_WIDTH / 1.46, borderRadius: 10 }}>
+              <View style={{ backgroundColor: 'white', marginTop: 60, height: Bordy.height + Constants.statusBarHeight, width: Bordy.width / 1.46, borderRadius: 10 }}>
                 <View style={{
                   flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: '100%', height: BUTTON_FONT_SIZE * 2.5,
                   borderTopLeftRadius: 10, borderTopRightRadius: 10, backgroundColor: '#0176cd'
@@ -431,7 +431,7 @@ export default class TableView extends Component {
                     placeholderTextColor="#7384B4"
                   />
                 </View>
-                <View style={{ height: SCREEN_HEIGHT - (BUTTON_FONT_SIZE * 5) - 60 }}>
+                <View style={{ height: Bordy.height - (BUTTON_FONT_SIZE * 5) - 60 }}>
                   <FlatList
                     keyExtractor={(item, index) => index.toString()}
                     data={CustomerList}
@@ -447,8 +447,8 @@ export default class TableView extends Component {
 
         {showFilterPanel ?
           <TouchableWithoutFeedback onPress={() => this.setState({ showFilterPanel: false, isWorking: false })}>
-            <View style={{ position: "absolute", right: 0, top: 0, width: SCREEN_WIDTH, height: SCREEN_HEIGHT, backgroundColor: 'rgba(0, 0, 0, 0.4)', }}>
-              <View style={{ position: "absolute", right: 0, top: 60, width: SCREEN_WIDTH / 4, height: SCREEN_HEIGHT / 1.2 }}>
+            <View style={{ position: "absolute", right: 0, top: 0, width: Bordy.width, height: Bordy.height, backgroundColor: 'rgba(0, 0, 0, 0.4)', }}>
+              <View style={{ position: "absolute", right: 0, top: 60, width: Bordy.width / 4, height: Bordy.height / 1.2 }}>
                 <FlatList
                   data={[{ ID: 0, Text: this.translate.Get("Tất cả") },
                   { ID: 6, Text: this.translate.Get("Đặt chỗ") },
@@ -498,9 +498,9 @@ const styles = StyleSheet.create({
     padding: 10
   },
   container: {
-    flex: 1,
     backgroundColor: colors.grey5,
-    width: SCREEN_WIDTH,
+    height:Bordy.height,
+    width:Bordy.width,
     justifyContent: 'space-around',
   },
   toolbar: {
@@ -516,12 +516,12 @@ const styles = StyleSheet.create({
     borderColor: colors.grey5,
   },
   footer: {
-    width: SCREEN_WIDTH,
+    width: Bordy.width,
     paddingLeft: ITEM_FONT_SIZE * 0.2,
   },
   item_view_text: {
-    height: SCREEN_HEIGHT + Constants.statusBarHeight,
-    width: SCREEN_WIDTH,
+    height: Bordy.height + Constants.statusBarHeight,
+    width: Bordy.width,
     position: "absolute",
     flexDirection: "column",
     alignItems: "center",

@@ -16,7 +16,7 @@ import Question from '../components/Question';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-
+const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
 export default class LoginView extends Component {
 
   login_button_text = 'Login';
@@ -36,6 +36,7 @@ export default class LoginView extends Component {
       secureTextEntry: true,
       usernameValid: true,
       passwordValid: true,
+      a:{},
       language: 1,
       settings: {},
       firstTouch: '',
@@ -165,7 +166,7 @@ BingdingConfig = async (user,Config,JwtToken) => {
   });
 }
   login = async () => {  
-    let {  username, password } = this.state;
+    let {  username, password} = this.state;
     let that = this;
     if (username == undefined)
     username=''
@@ -289,18 +290,18 @@ _CombackView = () => {
   render = () => {
     const { manifest } = Constants;
     const {endpoint,  isLoading, fontLoaded,  password,  passwordValid,  username,  lockTable,  secureTextEntry,  usernameValid, } = this.state;
-let ImageWidth=SCREEN_WIDTH*0.12
+let ImageWidth=Bordy.width*0.12
 
     if (!fontLoaded) {
       return (
-        <ActivityIndicator style={{ marginTop: SCREEN_HEIGHT / 2 - 20 }} size="large" color="red"></ActivityIndicator>);
+        <ActivityIndicator style={{ marginTop: Bordy.height / 2 - 20 }} size="large" color="red"></ActivityIndicator>);
     }
     return (
       <View style={styles.container}>
           <StatusBar hidden={true} />
         <KeyboardAvoidingView  keyboardType='light' behavior= 'padding' contentContainerStyle={styles.formContainer}  >
             {this.state.notification ?
-            <View style={{ marginBottom:'5%', width: SCREEN_WIDTH * 0.5, justifyContent:'center',alignItems:'center'}} >
+            <View style={{ marginBottom:'5%', width: Bordy.width * 0.5, justifyContent:'center',alignItems:'center'}} >
               <Text style={{fontSize:H1_FONT_SIZE*1.2, color:'#fff',textAlign:'center'}}>Quý khách vui lòng đợi nhân viên xác nhận thanh toán</Text>
             </View>
             :null}
@@ -441,7 +442,7 @@ let ImageWidth=SCREEN_WIDTH*0.12
             }
           }
           }>
-             <Image resizeMode="contain" style={{ width: SCREEN_WIDTH * 0.8, maxWidth: 442 }} 
+             <Image resizeMode="contain" style={{ width: Bordy.width * 0.8, maxWidth: 442 }} 
             source={require('../../assets/icons/relipos_copyright_white_2x.png')}
              ></Image> 
              
@@ -489,9 +490,8 @@ export const FormInput = props => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    height:Bordy.height,width:Bordy.width,
     backgroundColor: '#333D4C',
-    width: '100%',
     alignItems: 'center',
     justifyContent: 'space-around',
   },
@@ -516,7 +516,7 @@ const styles = StyleSheet.create({
   userTypesContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: SCREEN_WIDTH,
+    width: Bordy.width,
     alignItems: 'center',
   },
   inputContainer: {
@@ -544,7 +544,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: 'flex-end',
     // marginBottom:30,
-    width: SCREEN_WIDTH
+    width: Bordy.width
   },
   buttonText: {
     alignItems: "center",
@@ -590,7 +590,7 @@ const styles = StyleSheet.create({
     borderColor: '#166ead',
     borderBottomColor: '#0C629F',
     backgroundColor: '#EEEEEE',
-    width: SCREEN_WIDTH * 0.5,
+    width: Bordy.width * 0.5,
   },
   BorderFormLogin: {
     paddingBottom: ITEM_FONT_SIZE / 2,
@@ -599,8 +599,8 @@ const styles = StyleSheet.create({
     paddingTop: ITEM_FONT_SIZE,
   },
   item_view_text: {
-    height: SCREEN_HEIGHT + Constants.statusBarHeight,
-    width: SCREEN_WIDTH,
+    height: Bordy.height + Constants.statusBarHeight,
+    width: Bordy.width,
     position: 'absolute',
     flexDirection: 'column',
     alignItems: 'center',

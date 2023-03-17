@@ -15,10 +15,9 @@ import { formatCurrency, formatNumber } from "../../services/util";
 import Question from '../Question';
 import { ScrollView } from "react-navigation";
 
-const Bordy={
-  width:Dimensions.get("window").width,
-  height:Dimensions.get("window").height //- Constants.statusBarHeight
-} 
+const width = Dimensions.get("window").width;
+ const height = Dimensions.get("window").height //- Constants.statusBarHeight;
+ const Bordy={width:width > height ? width : height,height:height < width ? height : width};
 const Titlecf={
   width:0,
   height:Bordy.height*0.06
@@ -444,8 +443,7 @@ export class CardDetailView extends React.Component {
             </TouchableOpacity>
              
             </View>
-            <View style={{ width: "100%",marginTop:1, 
-            height:Bordy.height-(Titlecf.height+TabTitle.height+(state.isHavingOrder ?TabTitle.height*2:0))
+            <View style={{ width: "100%",marginTop:1, height:Bordy.height-(Titlecf.height+TabTitle.height+(state.isHavingOrder ? TabTitle.height*1.5 : 0))
             }}>
             <FlatList
               keyExtractor={(item, RowIndex) => RowIndex.toString()}
@@ -514,7 +512,7 @@ export class CardDetailView extends React.Component {
               </View>
             </View>
           ) : (
-            <View  style={{height:H2FontSize*2,width: "100%",
+            <View  style={{height:TabTitle.height*1.5,width: "100%",
                 position: "absolute", flexDirection: "row",
                 bottom: 0,right: 0,borderTopColor: colors.grey5,
                 borderTopWidth: 1,backgroundColor: colors.grey5,

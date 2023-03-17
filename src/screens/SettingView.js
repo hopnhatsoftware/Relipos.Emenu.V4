@@ -31,7 +31,7 @@ import Question from '../components/Question';
 import * as Permissions from 'expo-permissions';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-
+const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
 export default class Settings extends Component {
   S_DepartmentNameInput = null;
   constructor(props) {
@@ -156,6 +156,7 @@ export default class Settings extends Component {
       let { endpoint, settings } = this.state;
       let that = this;
       endpoint = endpoint.replace("/api/", "").replace("/api", "");
+      console.log("endpoint: " + endpoint);
       _storeData('APP@BACKEND_ENDPOINT', JSON.stringify(endpoint), () => { that._retrievePos(settings) });
     }
   }
@@ -218,12 +219,12 @@ export default class Settings extends Component {
     }
 
     return (
-      <View style={{ flex: 1, backgroundColor: '#EEEEEE' }}>
+      <View style={{ height:Bordy.height,width:Bordy.width, backgroundColor: '#EEEEEE' }}>
         <StatusBar hidden={true} />
         {this.renderHeader()}
         <View style={{ flex: 1 }}>
-          <ScrollView style={{ width: SCREEN_WIDTH, }}>
-            <View style={{ width: SCREEN_WIDTH, flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          <ScrollView style={{ width: Bordy.width, }}>
+            <View style={{width: Bordy.width, flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
               <View style={{ flexDirection: "row", paddingBottom: 5, borderBottomColor: 'white', borderBottomWidth: 1 }}>
                 <View style={{ flexDirection: "row", justifyContent: 'flex-start', alignItems: 'center', paddingLeft: 10, width: '100%' }}>
                   <View style={{ width: '25%', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
@@ -290,13 +291,13 @@ export default class Settings extends Component {
 
         <View style={{ backgroundColor: colors.primary, alignContent: "center", flexDirection: 'row', alignItems: "center", justifyContent: "center", height: 70, maxHeight: 70, }}>
           <Button
-            containerStyle={{ height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.white, width: SCREEN_WIDTH / 3, maxHeight: 40, paddingLeft: 40 }}
+            containerStyle={{ height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.white, width: Bordy.width / 3, maxHeight: 40, paddingLeft: 40 }}
             buttonStyle={{ borderRadius: 0, backgroundColor: colors.white, paddingHorizontal: 50 }}
             title={this.translate.Get("Xoá dữ liệu tạm")}
             onPress={this._clearSettings}
           />
           <Button
-            containerStyle={{ height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.white, width: SCREEN_WIDTH / 3, maxHeight: 40, marginLeft: 40 }}
+            containerStyle={{ height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.white, width: Bordy.width / 3, maxHeight: 40, marginLeft: 40 }}
             buttonStyle={{ borderRadius: 0, backgroundColor: colors.white, paddingHorizontal: 10 }}
             title={this.translate.Get("Apply")}
             onPress={this._saveSettings}
@@ -356,31 +357,31 @@ export default class Settings extends Component {
 const styles = StyleSheet.create({
   dropdownItemViewStyle: {
     justifyContent: "center",
-    width: SCREEN_WIDTH / 3 - 10
+    width: Bordy.width / 3 - 10
   },
   dropdownItemTextStyle: {
     fontWeight: "bold",
     fontSize: 16,
     textAlign: "left",
     margin: 10,
-    width: SCREEN_WIDTH / 3 - 30
+    width: Bordy.width / 3 - 30
   },
   dropdownControlStyle: {
     height: 30,
     borderRadius: 20,
     zIndex: 10,
-    width: SCREEN_WIDTH / 3
+    width: Bordy.width / 3
   },
   dropdownTextStyle: {
-    width: SCREEN_WIDTH / 3 - 20,
+    width: Bordy.width / 3 - 20,
   },
   dropdownStyle: {
     borderColor: "rgba(110, 120, 170, 1)",
-    width: SCREEN_WIDTH / 3 - 20,
+    width: Bordy.width / 3 - 20,
   },
   container: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+    width: Bordy.width,
+    height: Bordy.height,
     alignItems: 'center',
     backgroundColor: 'white',
     marginTop: Constants.statusBarHeight,
@@ -436,7 +437,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     backgroundColor: 'white',
-    width: SCREEN_WIDTH - 30,
+    width: Bordy.width - 30,
     borderRadius: 10,
     paddingTop: 32,
     paddingBottom: 32,
@@ -465,7 +466,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     left: 0,
-    width: SCREEN_WIDTH,
+    width: Bordy.width,
     justifyContent: "flex-end",
     alignItems: 'center',
   },

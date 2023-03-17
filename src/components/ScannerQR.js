@@ -12,7 +12,7 @@ import { H3_FONT_SIZE,H1_FONT_SIZE } from '../config/constants';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-
+const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
 export class ScannerQR extends Component {
   props: any;
   Search = null;
@@ -76,12 +76,12 @@ export class ScannerQR extends Component {
               return <Text style={{ paddingTop: Constants.statusBarHeight, textAlign: 'center' }}>No access to camera</Text>;
             }
     return ( 
-      <View style={{backgroundColor: "black", height: SCREEN_HEIGHT*1,width: SCREEN_WIDTH, position: 'absolute', bottom: 0, right: 0}}>
+      <View style={{backgroundColor: "black",height: Bordy.height, width: Bordy.width, position: 'absolute', bottom: 0, right: 0}}>
         {isViewCamera ?  
         <View style={{flex : 1}}>
           <View style={{position: 'absolute', right: 12, top: 5, backgroundColor: "transpanent", zIndex: 10,flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-end', }}>
             <TouchableOpacity style={{ justifyContent: 'flex-end', alignItems: 'flex-end', paddingTop: 5 }}onPress={() => this.props.onCancel()}>
-              <AntDesign name='close' size={SCREEN_WIDTH * 0.08} color='#FFFFFF'></AntDesign>
+              <AntDesign name='close' size={Bordy.width * 0.08} color='#FFFFFF'></AntDesign>
             </TouchableOpacity>
           </View>
           <View style={{width:"100%",position: 'absolute', bottom:25, backgroundColor: "transpanent", zIndex: 10,justifyContent:'center', alignItems: 'center', }}>

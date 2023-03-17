@@ -6,10 +6,9 @@ import Constants from "expo-constants";
 import {ITEM_FONT_SIZE, BUTTON_FONT_SIZE} from "../config/constants";
 import { Audio } from 'expo-av';
 import { _storeData } from "../services/storages";
-const SCREEN_WIDTH = Dimensions.get("window").width;
-const SCREEN_HEIGHT =
-  Dimensions.get("window").height - Constants.statusBarHeight;
-
+const SCREEN_WIDTH = Dimensions.get("screen").width;
+const SCREEN_HEIGHT = Dimensions.get("window").height; //- Constants.statusBarHeight;
+const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
 export class _HeaderNew extends React.Component  {
   constructor(props) {
     super(props);
@@ -107,13 +106,13 @@ export class _HeaderNew extends React.Component  {
       );
     }
     return (
-      <View style={[BookingsStyle.header,{ backgroundColor: backgroundColor, width: '100%' }]}>
+      <View style={[BookingsStyle.header,{ backgroundColor: backgroundColor, width: '100%', }]}>
         <View style={{ paddingTop: 1, width: "20%", flexDirection: 'row', justifyContent: "space-between" }}>
           <TouchableOpacity
             onPress={() => { onPressBack.apply(null, []); }}
             style={{ width: '14%', justifyContent: 'center', alignItems: 'center' }}>
             <Image   resizeMode="contain"  source={require('../../assets/icons/IconBack.png')}
-              style={[  BookingsStyle.header_logo, { maxWidth: '42%',  height: SCREEN_HEIGHT * 0.085,  justifyContent: "center", alignItems: "center"  }
+              style={[  BookingsStyle.header_logo, { maxWidth: '42%',  height: Bordy.height * 0.085,  justifyContent: "center", alignItems: "center"  }
               ]}
             />
           </TouchableOpacity>
@@ -132,7 +131,7 @@ export class _HeaderNew extends React.Component  {
                 style={[ BookingsStyle.header_logo,
                   {
                     maxWidth: '20%',
-                    height: SCREEN_HEIGHT * 0.025,
+                    height: Bordy.height * 0.025,
                     justifyContent: "center",
                     alignItems: "center"
                   }
@@ -146,7 +145,7 @@ export class _HeaderNew extends React.Component  {
                 style={[ BookingsStyle.header_logo,
                   {
                     maxWidth: '20%',
-                    height: SCREEN_HEIGHT * 0.025,
+                    height: Bordy.height * 0.025,
                     justifyContent: "center",
                     alignItems: "center"
                   }

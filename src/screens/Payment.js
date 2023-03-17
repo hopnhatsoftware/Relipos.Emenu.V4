@@ -21,7 +21,7 @@ UIManager.setLayoutAnimationEnabledExperimental &&
 
 const SCREEN_WIDTH = Dimensions.get("screen").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height; //- Constants.statusBarHeight;
-const Bordy = { width: SCREEN_WIDTH, height: SCREEN_HEIGHT };
+const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
 const pnLeft = { width: Bordy.width * 0.17, height: SCREEN_HEIGHT };
 const Center = { width: Bordy.width - pnLeft.width, height: Bordy.height };
 const Header = { width: Center.width, height: Bordy.height * 0.085 };
@@ -247,13 +247,7 @@ static getDerivedStateFromProps = (props, state) => {
     }
   };
   onPressHome = async () => {
-      _remove("APP@TABLE", () => {
-        _remove("APP@CART", () => {
-          _remove("APP@BACKEND_Payment", () => {
-            this.props.navigation.navigate("TableView");
-          });
-        });
-      });
+            this.props.navigation.navigate("OrderView");
   };
   _HandleTip = async () => {
     let { Ticket,Money,lockTable} = this.state;
@@ -306,8 +300,8 @@ static getDerivedStateFromProps = (props, state) => {
     }
     const { showCall,Money,lockTable} = this.state;
     return (
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.Container}>
-          <View style={{ flexDirection: "row", height: SCREEN_HEIGHT * 0.08, width: SCREEN_WIDTH, backgroundColor:'#333d4c',alignItems:'center'}}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{height:Bordy.height,width:Bordy.width,justifyContent: "center",}}>
+          <View style={{ flexDirection: "row", height: Bordy.height * 0.08, width: Bordy.width, backgroundColor:'#333d4c',alignItems:'center'}}>
             <TouchableOpacity onPress={this.onPressBack} style={{justifyContent: 'center', width:'12%',height:'100%',alignItems:'center',flexDirection:'row'}}>
                <Image style={{height: "55%", width: "30%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
                <Text style={{color:'white', fontSize:H2_FONT_SIZE,fontFamily: "RobotoBold"}}>{this.translate.Get("Trở lại")}</Text>
@@ -333,12 +327,12 @@ static getDerivedStateFromProps = (props, state) => {
             }
             </TouchableOpacity>
             {lockTable == false ?
-            <TouchableOpacity onPress={this.onPressHome} style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
+            <TouchableOpacity onPress={() => {this.onPressHome();}}  style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
               <Image style={{height: "55%", width: "55%",}} resizeMode='contain' source={require("../../assets/icons/IconHome-11.png")}/>
             </TouchableOpacity>
             :null}
           </View>
-          <View style={{height: SCREEN_HEIGHT * 0.68, width: SCREEN_WIDTH ,  flexDirection: "row",shadowOffset: {width: 0,height: 5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6}}>
+          <View style={{height: Bordy.height * 0.68, width: Bordy.width ,  flexDirection: "row",shadowOffset: {width: 0,height: 5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6}}>
           <View style={{ width: "70%", height: "100%",}}>
             <View style={{ height: "78%", width: "100%", backgroundColor:"#fff",paddingHorizontal:'1.5%' }}>
             <FlatList
@@ -470,13 +464,13 @@ static getDerivedStateFromProps = (props, state) => {
             </View>
           </View>
         </View>
-          <View style={{ height: SCREEN_HEIGHT * 0.24, width: SCREEN_WIDTH, alignItems: "center", }}>
-          <View style={{marginTop: SCREEN_HEIGHT * 0.04, height: '30%',width:'20%',justifyContent:'center'}}>
+          <View style={{ height: Bordy.height * 0.24, width: Bordy.width, alignItems: "center", }}>
+          <View style={{marginTop: Bordy.height * 0.04, height: '30%',width:'20%',justifyContent:'center'}}>
             <TouchableOpacity onPress={()=> this._HandleTip ()} style={{ backgroundColor:'#333d4c',borderRadius:35,  borderWidth: 1,height: "80%", width: "100%", justifyContent: "center", alignItems: "center"}}>
               <Text style={{ textAlign: "center",color:'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>Xác nhận</Text>
             </TouchableOpacity>
             </View>
-            <View style={{height:'70%', width: SCREEN_WIDTH, justifyContent:'center'}}>
+            <View style={{height:'70%', width: Bordy.width, justifyContent:'center'}}>
             <StepIndicator
               customStyles={customStyles}
               stepCount={3}
