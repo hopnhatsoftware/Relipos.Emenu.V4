@@ -49,6 +49,7 @@ export default class OrderView extends Component {
       b:'',
       call: 1,
       data: [],
+      TicketDetail: [],
       ProductGroupList: [],
       ChoiceCategory: [],
       SelectedGroupIndex: -1,
@@ -78,6 +79,7 @@ export default class OrderView extends Component {
        ChoisetDetails: [],
       TimeToNextBooking: 0,
       CartInfor: {
+        ItemAmount:0,
         TotalQuantity: 0,
         TotalAmount: 0,
         items: []
@@ -121,19 +123,26 @@ export default class OrderView extends Component {
         that.setState({state,CartInfor,SelectedGroupIndex:-1});
         return false;
       });
+      await this._getMasterData();
       await this._getTicketInfor();
       await this.fetchData();
       await this.CaculatorCardInfor();
-      this.setState({  isPostBack: true, });
+      this.setState({  isPostBack: true });
     //  this.interval = setInterval(() => {
     //    this.setState({ TimeToNextBooking: this.state.TimeToNextBooking - 1 });
     //  }, 1000);
    // console.log(' OrderView componentDidMount CartInfor:' + JSON.stringify(state.CartInfor));
   } catch (ex) {
-    this.setState({ isPostBack: true, });
+    this.setState({ isPostBack: true,});
     console.log('OrderView componentDidMount Error:' + ex);
   }
   };
+  _getMasterData = async () => {
+    let { table } = this.state;
+    table = await _retrieveData('APP@BACKEND_Payment', JSON.stringify({}))
+    table=JSON.parse(table);
+    this.setState({table})
+  }
   onPressBack = async() => {
     let { lockTable,table } = this.state;
     if (lockTable == true) {
@@ -345,6 +354,7 @@ onCallServices= async() => {
   }
   _getTicketInfor = async () => {
     let { table, Ticket, ProductsOrdered ,Config} = this.state;
+    console.log(table)
     if ("TicketID" in table && table.TicketID > 0) {
       getTicketInfor(Config, table).then(res => {
         if (!("Table" in res.Data) || res.Data.Table.length == 0) {
@@ -352,6 +362,7 @@ onCallServices= async() => {
         }
         if ("Table2" in res.Data) {
           ProductsOrdered = res.Data.Table2;
+          console.log(ProductsOrdered)
         }
         if ("Table1" in res.Data) {
           if (res.Data.Table1.length > 0) {
@@ -368,7 +379,7 @@ onCallServices= async() => {
         this.setState({ empty: true, isShowMash: false });
       });
     }
-    this.setState({  isShowMash: false });
+    this.setState({isShowMash: false});
   };
   static getDerivedStateFromProps = (props, state) => {
     if (
@@ -497,7 +508,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
     await sendOrder(Config, table, OrdPlatform, CartInfor.items).then(async res => {
       if (res.Status == 1) {
         await _remove("APP@CART", async () => {
-          await this.setState({ CartInfor: {  TotalQuantity: 0, TotalAmount: 0, items: [], } }, async () => {
+          await this.setState({ CartInfor: {  TotalQuantity: 0, TotalAmount: 0, ItemAmount:0, items: [], } }, async () => {
             await CheckAndGetOrder(table, OrdPlatform).then(async res => {
               table.OrderId = res.Data;
               await _storeData("APP@TABLE", JSON.stringify(table), async () => {
@@ -584,7 +595,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
   CaculatorCardInfor = async (isRender)=>
   { 
     let { CartInfor } = this.state;
-    let TotalAmount=0,TotalQuantity=0,Master=null;
+    let TotalAmount=0,TotalQuantity=0,ItemAmount=0,Master=null;
    //console.log("CaculatorCardInfor CartInfor "+JSON.stringify({CartInfor}));
    // console.log("-----------------------");
    if (CartInfor.items&&CartInfor.items.length>0) 
@@ -592,6 +603,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
      let{Master}=  this._CaculatorMaster(item);
        // console.log("item.TkdTotalAmount:"+item.TkdTotalAmount);
         TotalAmount+=Master.TkdTotalAmount;
+        ItemAmount+=Master.TkdItemAmount;
         //console.log("CaculatorCardInfor TkdTotalAmount itembf"+result.Master.TkdTotalAmount );
         TotalQuantity+=Master.OrddQuantity
         CartInfor.items[index]=Master;
@@ -602,6 +614,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
      isRender=true;
     CartInfor.TotalQuantity=TotalQuantity;
     CartInfor.TotalAmount = parseFloat(TotalAmount);
+    CartInfor.ItemAmount = parseFloat(ItemAmount);
     this.setState({ CartInfor }, () => _storeData("APP@CART", JSON.stringify(CartInfor)));
     this.setState({ isRenderProduct:isRender});
   };
@@ -1158,9 +1171,9 @@ if (ProductChoise==null) {
               { 
                 this._ShowFullImage(item,true);
             }}> 
-              <ImageBackground  resizeMode="stretch"
+              <ImageBackground  resizeMode='contain'
                 source={ item.PrdImageUrl ? {uri: this.state.endpoint + "/Resources/Images/Product/" + item.PrdImageUrl
-                  }: require("../../assets/icons/ReliposEmenu_4x.png")
+                  }: require("../../assets/images/NoImage_trans-04.png")
                 }
                 style={[{ width: '100%', height: '100%', backgroundColor: colors.grey1 }]} >
                 {item.SttId && item.SttId == 3 ? 
@@ -1195,7 +1208,7 @@ if (ProductChoise==null) {
                   {item.PrdName} 
                 </Text>
                 <Text style={{fontStyle:'italic',color: "#af3037",marginLeft:7,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left',marginTop:3}}>
-              {this.translate.Get("Giá")}:{" "}{formatCurrency(item.UnitPrice, "")}
+              {this.translate.Get("Giá")}:{" "}{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPrice : item.UnitPriceAfter, "")}
                 </Text>
               </View>
               </View>
@@ -1206,7 +1219,7 @@ if (ProductChoise==null) {
                 {item.PrdName} 
               </Text>
               <Text style={{fontStyle:'italic',color: "#af3037",marginLeft:7,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left',marginTop:3}}>
-              {this.translate.Get("Giá")}:{" "}{formatCurrency(item.UnitPrice, "")}
+              {this.translate.Get("Giá")}:{" "}{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPrice : item.UnitPriceAfter, "")}
                 </Text>
             </View>
             </View>
@@ -1303,7 +1316,7 @@ if (ProductChoise==null) {
     return (
       <View style={{height:Bordy.height,width:Bordy.width}}>
         <View style={{flexDirection: "row"}}>
-          <View name='pbLeft' style={[{ backgroundColor: "#333D4C",width:pnLeft.width, flexDirection: "column",height: "94%" }]}>
+          <View name='pbLeft' style={[{ backgroundColor: "#333D4C",width:pnLeft.width, flexDirection: "column",height: "95%" }]}>
             <View style={{ justifyContent: 'center', alignItems: 'center', height: pnLeft.width*4/6, }}>
               <Image resizeMode='contain' 
                source={{uri:endpoint+'/Resources/Images/View/Logo.jpg'}}
@@ -1315,12 +1328,15 @@ if (ProductChoise==null) {
               SelectedGroupIndex={SelectedGroupIndex}
               _GroupClick={(index) => this._GroupClick(index)}
               setState={(state) => this.setState(state)}
-              pnheight={Bordy.height-pnLeft.width*4/6}
+              pnheight={Bordy.height-pnLeft.width*4/6-Booton.height}
               BookingsStyle={BookingsStyle}
               PrdChildGroups={PrdChildGroups}
               SelectedChildGroupIndex={SelectedChildGroupIndex}
               _selectChildGroup={(item,index) => this._selectChildGroup(item,index)}
             />
+            <View style={{position:'absolute',height:Booton.height,width:'100%',bottom:0,zIndex:2}}>
+              <Image resizeMode='contain' style={{ width: '99%', height: '99%' }} source={require('../../assets/images/RelisoftLogo_trans-07.png')} />
+            </View>
           </View>
           <View style={{width:Center.width,height:Center.height, flexDirection: "column"}}>
             <_HeaderNew
@@ -1353,9 +1369,9 @@ if (ProductChoise==null) {
             {this.state.ShowFullCart ? 
               <View style={{ width: "100%", flexDirection: "row" }}>
                 <View style={{ flexDirection: "row",justifyContent: "center",alignItems: "center", width: (Center.width * 0.4)}}>                    
-                <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center', backgroundColor:'#FFFFFF' }}>
-                    <Image resizeMode="contain" style={{width: '100%', height: '100%'}}
-                    source={{uri:endpoint+'/Resources/Images/View/MenuBaner.png'}} ></Image> 
+                <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                    <Text style={{fontSize:H3FontSize, fontFamily:'RobotoBold',color:"#000000",textShadowColor:'#FFFFFF',textShadowOffset: {width:1, height:0.5 },textShadowRadius: 1 }}>{Config.B_ViewUnitPriceBefor ? this.translate.Get("Giá chưa bao gồm VAT") : this.translate.Get("Giá đã bao gồm VAT")}</Text>
+                    
                    </View>
                 </View> 
                 <View style={[BookingsStyle.bottombar, styles.item_menu_order, { width: (Center.width*0.2), flexDirection: "row" }]}>
@@ -1364,7 +1380,7 @@ if (ProductChoise==null) {
                       style={{ width: H3FontSize * 1.3, height: H3FontSize * 1.3, }} /> }
                   </View>
                   <Text style={[{ fontSize: H3FontSize, fontFamily: "RobotoBold", color: '#FFFFFF', paddingLeft: 10 }]}>
-                    {formatCurrency(CartInfor.TotalAmount, "")}
+                    {formatCurrency(Config.B_ViewUnitPriceBefor ? CartInfor.ItemAmount : CartInfor.TotalAmount, "")}
                   </Text>
                 </View>
                 <TouchableOpacity onPress={() =>{this.CartToggleHandle(true)}}>
@@ -1383,8 +1399,8 @@ if (ProductChoise==null) {
                     </Text>
                   </View>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() =>this.state.table.TkPaymentAmount > 0 && CartInfor.TotalAmount == 0 ? this.onPressNext(): null}>
-                  <View style={[BookingsStyle.bottombar, { width: (Center.width*0.2), flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor:this.state.table.TkPaymentAmount  > 0 && CartInfor.TotalAmount == 0 ? "#009900":"#dddddd"
+                <TouchableOpacity onPress={() =>(ProductsOrdered.length > 0 &&  CartInfor.TotalAmount == 0 )? this.onPressNext(): null}>
+                  <View style={[BookingsStyle.bottombar, { width: (Center.width*0.2), flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor:(ProductsOrdered.length > 0  && CartInfor.TotalAmount == 0 )? "#009900":"#dddddd"
                   }]}>
                     <Text style={[{ color: "white",fontSize: H3FontSize,}]}>
                       {this.translate.Get("Thanh toán")}

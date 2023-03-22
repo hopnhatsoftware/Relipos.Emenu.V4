@@ -64,6 +64,7 @@ export default class Payment2 extends Component {
     this.flatListRef = null;
     this.textInput = null;
     this.state = {
+      alertt:false,
       value :'',
       currentPosition: 1,
       showCall: false,
@@ -96,6 +97,7 @@ export default class Payment2 extends Component {
     clearInterval(this.interval);
   };
   componentDidMount = async () => {
+    this.translate = await this.translate.loadLang();
     await this._setConfig();
     await this._getinvoiceInfor();
     this.setState({ isPostBack: true });
@@ -136,9 +138,11 @@ export default class Payment2 extends Component {
   }
   _SearchTaxInfor = async (item) => {
     let{Tax} =  this.state;
+    if (Tax.TaxCode == '' || Tax.TaxCode == undefined) {
+      Alert.alert(this.translate.Get("Thông báo"),'Vui lòng nhập mã số thuế')
+    }else{
     this.setState({ isPostBack: false });
-    SearchTaxInfor( item).then(res => {
-    console.log(res)
+    SearchTaxInfor( item ).then(res => {
     if(res.Status === 1){
         if(res.Data === ""){
           this.setState({ isPostBack: true });
@@ -155,9 +159,33 @@ export default class Payment2 extends Component {
         return;
       }
         this.setState({Tax});
-      })  
+      })  }
   }
-  
+  _SearchTaxInfor2 = async () => {
+    let{Tax} =  this.state;
+    if (Tax.TaxCode == '' || Tax.TaxCode == undefined) {
+      return;
+    }else{
+      this.setState({ isPostBack: false });
+    SearchTaxInfor( Tax.TaxCode ).then(res => {
+    if(res.Status === 1){
+        if(res.Data === ""){
+          this.setState({ isPostBack: true });
+          Alert.alert(this.translate.Get("Thông báo"),'Mã số thuế không tồn tại')
+        }
+        else{
+          this.setState({ isPostBack: true });
+          Tax.Name = res.Data.CustomerName;
+          Tax.TkeCompany = res.Data.CompanyName; 
+          Tax.Address = res.Data.ReiAddress;
+        }
+      }
+      else {
+        return;
+      }
+        this.setState({Tax});
+      })  }
+  }
   onCallServices= async() => {
     let { settings,table } = this.state;
     let user = await _retrieveData('APP@USER', JSON.stringify({ObjId:-1}));
@@ -301,10 +329,10 @@ export default class Payment2 extends Component {
                <Image style={{height: "55%", width: "30%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
                <Text style={{color:'white', fontSize:H2_FONT_SIZE,fontFamily: "RobotoBold"}}>{this.translate.Get("Trở lại")}</Text>
             </TouchableOpacity>
-            <View style={{width:'63%'}}>
+            <View style={{width:'62%'}}>
               <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>Thông tin hóa đơn của bạn</Text>
             </View>
-            <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "18%", borderRadius: 25, }}>
+            <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "19%", borderRadius: 25, }}>
             {this.state.showCall ?
               <View style={{backgroundColor:'#FF7E27',borderRadius: 50,height:'100%',justifyContent: "center", flexDirection: "row", alignItems: "center", }}>
                 <View style={{ width: "25%", alignItems:'center'}}>
@@ -338,6 +366,7 @@ export default class Payment2 extends Component {
               <View style={{ height: "11%", flexDirection: "row"}}>
                 <TextInput 
                   value={this.state.Tax.TaxCode}
+                  onBlur={this._SearchTaxInfor2}
                   onChangeText={(item) => this.setState({Tax :{ ...this.state.Tax , TaxCode : item}, }) } 
                   keyboardType="number-pad" 
                   style={{paddingHorizontal:8,fontSize:H3_FONT_SIZE, width: "44%",  backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1}}>
@@ -348,6 +377,7 @@ export default class Payment2 extends Component {
                 <TextInput 
                   value={this.state.Tax.Name}
                   onChangeText={(item) => this.setState({Tax :{ ...this.state.Tax , Name : item}, }) } 
+
                   style={{paddingHorizontal:8,fontSize:H3_FONT_SIZE, width: "49%", backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1 }}>
                 </TextInput>
               </View>

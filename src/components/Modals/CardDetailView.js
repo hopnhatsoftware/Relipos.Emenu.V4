@@ -210,16 +210,16 @@ export class CardDetailView extends React.Component {
                 fontSize: H3_FONT_SIZE,
                 textAlign: "right"
               }}>
-              {formatCurrency(item.TkdBasePrice, "")}
+              {formatCurrency(item.TkdTotalAmount/item.TkdQuantity, "")}
             </Text>
             <Text style={{
-                color: "#000000",
+                color: "#ddddd",
                 width:Contentcf.width*0.1,
                 justifyContent: 'center',
                 fontSize: H3_FONT_SIZE,
                 textAlign: "right"
               }}>
-              {formatCurrency(item.TkdItemAmount, "")}
+              {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.TkdItemAmount : item.TkdTotalAmount, "")}
             </Text>
           </View>
           :
@@ -329,15 +329,12 @@ export class CardDetailView extends React.Component {
           </View>
           <View style={{  justifyContent:'center',width: Contentcf.width* 0.1 ,}}>
             <Text style={{ fontSize: H3_FONT_SIZE ,textAlign:'right' }}>
-             {(item.OrddTotalChoiseAmount&&item.OrddTotalChoiseAmount>0)?
-              formatCurrency(item.OrddTotalChoiseAmount, ""):
-              formatCurrency(item.UnitPrice, "")
-               }
+            {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.UnitPrice : item.UnitPriceAfter, "")}
             </Text>
           </View>
           <View style={{  justifyContent: "center",width: Contentcf.width* 0.15 ,}}>
             <Text style={{  fontSize: H3_FONT_SIZE,fontWeight:'bold',textAlign:'right' }}>
-            {formatCurrency(item.TkdItemAmount, "")}
+            {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.TkdItemAmount : item.TkdTotalAmount, "")}
             </Text>
           </View>
           </View>
@@ -414,10 +411,7 @@ export class CardDetailView extends React.Component {
           }}
         > 
           <View  name='pnContent' style={{ width: Bordy.width * 0.75, flexDirection: "column", height: Bordy.height }}>
-            <View style={{  height: Titlecf.height,  borderBottomColor: colors.grey3,  borderBottomWidth: 1,
-                backgroundColor: colors.Header,  width: "100%", justifyContent: "center",   alignItems: "center",  flexDirection: "row"
-              }}
-            >
+            <View style={{  height: Titlecf.height,  borderBottomColor: colors.grey3,  borderBottomWidth: 1,backgroundColor: colors.Header,  width: "100%", justifyContent: "center",   alignItems: "center",  flexDirection: "row" }}>
               <Text style={{ fontSize: H2FontSize, fontFamily: "RobotoBold", color: "white",  textAlign: "center" }}>
                 {translate.Get("Giỏ Hàng")}
               </Text>
@@ -443,7 +437,7 @@ export class CardDetailView extends React.Component {
             </TouchableOpacity>
              
             </View>
-            <View style={{ width: "100%",marginTop:1, height:Bordy.height-(Titlecf.height+TabTitle.height+(state.isHavingOrder ? TabTitle.height*1.5 : 0))
+            <View style={{ width: "100%",marginTop:1, height:Bordy.height-(Titlecf.height+TabTitle.height+(state.isHavingOrder ? TabTitle.height*2 : TabTitle.height))
             }}>
             <FlatList
               keyExtractor={(item, RowIndex) => RowIndex.toString()}
@@ -454,7 +448,7 @@ export class CardDetailView extends React.Component {
             /> 
             </View>
             {state.isHavingOrder ? (
-            <View style={{ height: TabTitle.height*2, width: "100%",  flexDirection: "column" }}>
+            <View style={{ height: TabTitle.height, width: "100%",  flexDirection: "column" }}>
               <View style={{ width: "100%", height: TabTitle.height, flexDirection: "row", backgroundColor: colors.grey5 }}>
              
                   <View style={[styles.button_end_left_order, { width: "50%",textAlign:'left',paddingTop:(TabTitle.height-H2FontSize)/2  }]}> 
@@ -469,7 +463,7 @@ export class CardDetailView extends React.Component {
                     <Text style={{ fontSize: H3FontSize, color: "#af3037",paddingLeft:H2FontSize*0.2 }}>
                     {translate.Get("Thành tiền")}:
                       <Text style={{ fontSize: H3FontSize, color: "black",paddingLeft:5 }}>
-                      {formatCurrency(state.CartInfor.TotalAmount, "")}
+                      {formatCurrency(state.Config.B_ViewUnitPriceBefor ? state.CartInfor.ItemAmount : state.CartInfor.TotalAmount, "")}
                     </Text>
                       </Text>
                   </View>
@@ -512,7 +506,7 @@ export class CardDetailView extends React.Component {
               </View>
             </View>
           ) : (
-            <View  style={{height:TabTitle.height*1.5,width: "100%",
+            <View  style={{height:TabTitle.height,width: "100%",
                 position: "absolute", flexDirection: "row",
                 bottom: 0,right: 0,borderTopColor: colors.grey5,
                 borderTopWidth: 1,backgroundColor: colors.grey5,
@@ -523,7 +517,7 @@ export class CardDetailView extends React.Component {
                       {translate.Get("Tạm tính")}:
                       </Text>
                     <Text style={{ fontSize: H2FontSize, color: colors.red,marginLeft:10 }}>
-                    {state.table.Ticket ? formatCurrency(state.table.Ticket.TkItemAmout, "") : ""}
+                    {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? state.table.Ticket.TkItemAmout : state.table.Ticket.TkTotalAmount, "")}
                   </Text>
                 </View>
                 {/* <TouchableOpacity 

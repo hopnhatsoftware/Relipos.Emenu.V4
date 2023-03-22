@@ -127,6 +127,7 @@ export default class Payment3 extends Component {
     return true;
   };
   componentDidMount = async () => {
+    this.translate = await this.translate.loadLang();
     await this._setConfig();
     await this._getMasterData();
     await this._getPaymentAmount();
@@ -402,10 +403,10 @@ export default class Payment3 extends Component {
                <Image style={{height: "55%", width: "30%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
                <Text style={{color:'white', fontSize:H2_FONT_SIZE,fontFamily: "RobotoBold"}}>{this.translate.Get("Trở lại")}</Text>
             </TouchableOpacity>
-            <View style={{width:'63%'}}>
+            <View style={{width:'62%'}}>
               <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>Phiếu thanh toán</Text>
             </View>
-            <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "18%", borderRadius: 25, }}>
+            <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "19%", borderRadius: 25, }}>
             {showCall ?
               <View style={{backgroundColor:'#FF7E27',borderRadius: 50,height:'100%',justifyContent: "center", flexDirection: "row", alignItems: "center", }}>
                 <View style={{ width: "25%", alignItems:'center'}}>
@@ -579,25 +580,25 @@ export default class Payment3 extends Component {
             <View style={{width:'100%',height:'70%',justifyContent:'center',alignItems:'center'}}>
             <Image style={{height: "90%", width: "90%",}} resizeMode='contain' source={require("../../assets/icons/iconCash-11.png")}/>
             </View>
-            <Text style={{height:'30%', fontSize:H4_FONT_SIZE}}>Tiền mặt</Text>
+            <Text style={{height:'30%', fontSize:H4_FONT_SIZE}}>{this.translate.Get('Tiền mặt')}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={this._ShowATM} style={{width:'13%',height:'100%',flexDirection:'column',alignItems:'center',backgroundColor:'#fff', borderRadius:10,shadowOpacity: 0.3,shadowRadius: 4,elevation:6}}>
             <View style={{width:'100%',height:'70%',justifyContent:'center',alignItems:'center'}}>
             <Image style={{height: "90%", width: "90%",}} resizeMode='contain' source={require("../../assets/icons/IconQuetThe-11.png")}/>
             </View>
-            <Text style={{height:'30%', fontSize:H4_FONT_SIZE}}>Quẹt thẻ</Text>
+            <Text style={{height:'30%', fontSize:H4_FONT_SIZE}}>{this.translate.Get('Quẹt thẻ')}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={this._ShowBanking} style={{width:'13%',height:'100%',flexDirection:'column',alignItems:'center',backgroundColor:'#fff', borderRadius:10,shadowOpacity: 0.3,shadowRadius: 4,elevation:6}}>
             <View style={{width:'100%',height:'70%',justifyContent:'center',alignItems:'center'}}>
             <Image style={{height: "90%", width: "90%",}} resizeMode='contain' source={require("../../assets/icons/IconBanking-11.png")}/>
             </View>
-            <Text style={{height:'30%', fontSize:H4_FONT_SIZE*0.9}}>Chuyển khoản</Text>
+            <Text style={{height:'30%', fontSize:H4_FONT_SIZE*0.9}}>{this.translate.Get('Chuyển khoản')}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={this._ShowE_wallet} style={{width:'13%',height:'100%',flexDirection:'column',alignItems:'center',backgroundColor:'#fff', borderRadius:10,shadowOpacity: 0.3,shadowRadius: 4,elevation:6}}>
             <View style={{width:'100%',height:'70%',justifyContent:'center',alignItems:'center'}}>
             <Image style={{height: "90%", width: "90%",}} resizeMode='contain' source={require("../../assets/icons/IconViDienTu-11.png")}/>
             </View>
-            <Text style={{height:'30%', fontSize:H4_FONT_SIZE}}>Ví điện tử</Text>
+            <Text style={{height:'30%', fontSize:H4_FONT_SIZE}}>{this.translate.Get('Ví điện tử')}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={this._isShowBarCode} style={{width:'13%',height:'100%',flexDirection:'column',alignItems:'center',backgroundColor:'#fff', borderRadius:10,shadowOpacity: 0.3,shadowRadius: 4,elevation:6}}>
             <View style={{width:'100%',height:'70%',justifyContent:'center',alignItems:'center'}}>

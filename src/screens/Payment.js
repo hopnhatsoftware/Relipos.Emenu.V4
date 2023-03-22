@@ -97,6 +97,7 @@ export default class Payment extends Component {
     }
   }
   componentDidMount = async () => {
+    this.translate = await this.translate.loadLang();
     this.setState({IsLoaded:true ,KeyCode:''});
     await this._LoadSound();
     this.setState({IsLoaded:true });
@@ -240,10 +241,10 @@ static getDerivedStateFromProps = (props, state) => {
   onPressBack = () => {
     let { lockTable } = this.state;
     if (lockTable == true) {
-    this.props.navigation.navigate('OrderView', { lockTable })
+        this.props.navigation.navigate('OrderView', { lockTable });
     }
     else{
-      this.props.navigation.navigate('OrderView')
+        this.props.navigation.navigate('OrderView',);
     }
   };
   onPressHome = async () => {
@@ -263,7 +264,7 @@ static getDerivedStateFromProps = (props, state) => {
         });
       }
       else{
-        Alert.alert(this.translate.Get("Thông báo"),'Lỗi hệ thống !')
+        Alert.alert(this.translate.Get('Thông báo'),this.translate.Get('Lỗi hệ thống !'))
       }
     })
   }
@@ -306,10 +307,10 @@ static getDerivedStateFromProps = (props, state) => {
                <Image style={{height: "55%", width: "30%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
                <Text style={{color:'white', fontSize:H2_FONT_SIZE,fontFamily: "RobotoBold"}}>{this.translate.Get("Trở lại")}</Text>
             </TouchableOpacity>
-            <View style={{width:'63%'}}>
-              <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>Thông tin đơn hàng</Text>
+            <View style={{width:'62%'}}>
+              <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>{this.translate.Get('Thông tin đơn hàng')}</Text>
             </View>
-            <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "18%", borderRadius: 25, }}>
+            <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "19%", borderRadius: 25, }}>
             {showCall ?
               <View style={{backgroundColor:'#FF7E27',borderRadius: 50,height:'100%',justifyContent: "center", flexDirection: "row", alignItems: "center", }}>
                 <View style={{ width: "25%", alignItems:'center'}}>
@@ -376,26 +377,26 @@ static getDerivedStateFromProps = (props, state) => {
             <View style={{ height: "100%", width: "100%",}}>
               <View style={{ height: "10%", width: "100%", flexDirection: "row",justifyContent:'center',alignItems:'center'}}>
                 <Image style={{height: "60%", width: "12%",marginRight:'2%'}} resizeMode='contain' source={require("../../assets/icons/IconTIP-11.png")}/>
-                <Text style={{ fontSize: H2_FONT_SIZE, color:'#333d4c'}}>Tip cho nhân viên</Text>
+                <Text style={{ fontSize: H2_FONT_SIZE, color:'#333d4c'}}>Tip</Text>
               </View>
               <View style={{ height: "20%", width: "100%", flexDirection: "row",justifyContent:'center',}}>
                 <TouchableOpacity 
                 // onPress={()=> this.setState({value: parseFloat(this.state.value) + (parseFloat(this.state.mod))})} style={styles.tip}
                 onPress={()=> this.setState({value: parseFloat(this.state.value) + 50000})} style={styles.tip}>
                   <View style={styles.tipView}>
-                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>Tổng: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 50000 + (parseFloat(this.state.value)),"")}</Text>
+                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>{this.translate.Get('Tổng')}: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 50000 + (parseFloat(this.state.value)),"")}</Text>
                   </View>
                   <View style={{height: "65%", alignItems: "center" ,justifyContent:'center'}}>
-                    <Text style={{ fontSize: H4_FONT_SIZE,}}>Tiền tip</Text>
+                    <Text style={{ fontSize: H4_FONT_SIZE,}}>{this.translate.Get('Tiền tip')}</Text>
                     <Text style={{ fontSize: H3_FONT_SIZE, }}>+ {formatCurrency(50000,"")}</Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=> this.setState({value: parseFloat(this.state.value) + 100000})} style={styles.tip} >
                   <View style={styles.tipView}>
-                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>Tổng: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 100000 + (parseFloat(this.state.value)),"")}</Text>
+                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>{this.translate.Get('Tổng')}: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 100000 + (parseFloat(this.state.value)),"")}</Text>
                   </View>
                   <View style={{height: "65%", alignItems: "center" ,justifyContent:'center'}}>
-                    <Text style={{ fontSize: H4_FONT_SIZE,}}>Tiền tip</Text>
+                    <Text style={{ fontSize: H4_FONT_SIZE,}}>{this.translate.Get('Tiền tip')}</Text>
                     <Text style={{ fontSize: H3_FONT_SIZE, }}>{formatCurrency("+ 100000","")}</Text>
                   </View>
                 </TouchableOpacity>
@@ -403,19 +404,19 @@ static getDerivedStateFromProps = (props, state) => {
               <View style={{ height: "20%", width: "100%", flexDirection: "row",justifyContent:'center'}}>
               <TouchableOpacity onPress={()=> this.setState({value: parseFloat(this.state.value) + 200000})} style={styles.tip} >
                   <View style={styles.tipView}>
-                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>Tổng: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 200000 + (parseFloat(this.state.value)),"")}</Text>
+                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>{this.translate.Get('Tổng')}: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 200000 + (parseFloat(this.state.value)),"")}</Text>
                   </View>
                   <View style={{height: "65%", alignItems: "center",justifyContent:'center' }}>
-                    <Text style={{ fontSize: H4_FONT_SIZE,}}>Tiền tip</Text>
+                    <Text style={{ fontSize: H4_FONT_SIZE,}}>{this.translate.Get('Tiền tip')}</Text>
                     <Text style={{ fontSize: H3_FONT_SIZE, }}>{formatCurrency("+ 200000","")}</Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=> this.setState({value: parseFloat(this.state.value) + 500000})} style={styles.tip} >
                   <View style={styles.tipView}>
-                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>Tổng: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 500000 + (parseFloat(this.state.value)),"")}</Text>
+                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>{this.translate.Get('Tổng')}: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 500000 + (parseFloat(this.state.value)),"")}</Text>
                   </View>
                   <View style={{height: "65%", alignItems: "center" ,justifyContent:'center'}}>
-                    <Text style={{ fontSize: H4_FONT_SIZE,}}>Tiền tip</Text>
+                    <Text style={{ fontSize: H4_FONT_SIZE,}}>{this.translate.Get('Tiền tip')}</Text>
                     <Text style={{ fontSize: H3_FONT_SIZE, }}>{formatCurrency("+ 500000","")}</Text>
                   </View>
                 </TouchableOpacity>
@@ -423,19 +424,19 @@ static getDerivedStateFromProps = (props, state) => {
               <View style={{ height: "20%", width: "100%", flexDirection: "row",justifyContent:'center'}}>
               <TouchableOpacity onPress={()=> this.setState({value: parseFloat(this.state.value) + 1000000})} style={styles.tip} >
                   <View style={styles.tipView}>
-                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>Tổng: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 1000000 + (parseFloat(this.state.value)),"")}</Text>
+                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>{this.translate.Get('Tổng')}: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 1000000 + (parseFloat(this.state.value)),"")}</Text>
                   </View>
                   <View style={{height: "65%", alignItems: "center",justifyContent:'center' }}>
-                    <Text style={{ fontSize: H4_FONT_SIZE,}}>Tiền tip</Text>
+                    <Text style={{ fontSize: H4_FONT_SIZE,}}>{this.translate.Get('Tiền tip')}</Text>
                     <Text style={{ fontSize: H3_FONT_SIZE, }}>{formatCurrency("+ 1000000","")}</Text>
                   </View>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=> this.setState({PaymentAmount: this.state.PaymentAmount - Money.TkTipAmount ,Money: {...Money, TkTipAmount : 0},value : 0})} style={styles.tip} >
                   <View style={styles.tipView}>
-                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>Tổng: {formatCurrency(this.state.PaymentAmount,"")}</Text>
+                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>{this.translate.Get('Tổng')}: {formatCurrency(this.state.PaymentAmount,"")}</Text>
                   </View>
                   <View style={{height: "65%", alignItems: "center" ,justifyContent:'center'}}>
-                    <Text style={{ fontSize: H4_FONT_SIZE,}}>Tiền tip</Text>
+                    <Text style={{ fontSize: H4_FONT_SIZE,}}>{this.translate.Get('Tiền tip')}</Text>
                     <Text style={{ fontSize: H3_FONT_SIZE, }}>Không tip</Text>
                   </View>
                 </TouchableOpacity>
@@ -467,7 +468,7 @@ static getDerivedStateFromProps = (props, state) => {
           <View style={{ height: Bordy.height * 0.24, width: Bordy.width, alignItems: "center", }}>
           <View style={{marginTop: Bordy.height * 0.04, height: '30%',width:'20%',justifyContent:'center'}}>
             <TouchableOpacity onPress={()=> this._HandleTip ()} style={{ backgroundColor:'#333d4c',borderRadius:35,  borderWidth: 1,height: "80%", width: "100%", justifyContent: "center", alignItems: "center"}}>
-              <Text style={{ textAlign: "center",color:'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>Xác nhận</Text>
+              <Text style={{ textAlign: "center",color:'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>{this.translate.Get('Xác nhận')}</Text>
             </TouchableOpacity>
             </View>
             <View style={{height:'70%', width: Bordy.width, justifyContent:'center'}}>
