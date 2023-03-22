@@ -404,7 +404,7 @@ export default class Payment3 extends Component {
                <Text style={{color:'white', fontSize:H2_FONT_SIZE,fontFamily: "RobotoBold"}}>{this.translate.Get("Trở lại")}</Text>
             </TouchableOpacity>
             <View style={{width:'62%'}}>
-              <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>Phiếu thanh toán</Text>
+              <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>{this.translate.Get('Phiếu thanh toán')}</Text>
             </View>
             <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "19%", borderRadius: 25, }}>
             {showCall ?
@@ -412,14 +412,14 @@ export default class Payment3 extends Component {
                 <View style={{ width: "25%", alignItems:'center'}}>
                 <Image style={{height: "70%", width: "70%"}} resizeMode='contain' source={require("../../assets/icons/IconCall-11.png")}/>
               </View>
-              <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: H2_FONT_SIZE }}>Đang gọi ...</Text>
+              <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: H2_FONT_SIZE }}>{this.translate.Get('Đang gọi ..')}</Text>
               </View>
               :
               <View style={{backgroundColor:'#33FF33',height:'100%',justifyContent: "center",borderRadius: 25, flexDirection: "row", alignItems: "center", }}>
                 <View style={{ width: "25%", alignItems:'center'}}>
                 <Image style={{height: "70%", width: "70%"}} resizeMode='contain' source={require("../../assets/icons/IconCall-11.png")}/>
               </View>
-              <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: H2_FONT_SIZE }}>Gọi nhân viên</Text>
+              <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: H2_FONT_SIZE }}>{this.translate.Get('Gọi nhân viên')}</Text>
               </View>
             }
             </TouchableOpacity>
@@ -443,7 +443,7 @@ export default class Payment3 extends Component {
             <View style={{ height: "28%", width: "100%",shadowColor: "#000",backgroundColor:'#fff', shadowOffset: {width: 0,height: -5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6 ,paddingHorizontal:'2%'}}>
               <View style={{height:'30%',flexDirection:'row',justifyContent:'space-between',paddingVertical:'0.5%',alignItems:'center'}}>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                  <Text style={{ fontSize: H3_FONT_SIZE }}>Thành tiền:</Text>
+                  <Text style={{ fontSize: H3_FONT_SIZE }}>{this.translate.Get('Thành tiền')}:</Text>
                   <Text style={{ fontSize: H3_FONT_SIZE, fontFamily:'RobotoBold' }}>{formatCurrency(this.state.Money.TkItemAmout,"")}</Text>
                 </View>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between',}}>
@@ -454,7 +454,7 @@ export default class Payment3 extends Component {
                   </TouchableOpacity> */}
                 </View>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between',}}>
-                  <Text style={{ fontSize: H3_FONT_SIZE ,}}>Giảm giá:</Text>
+                  <Text style={{ fontSize: H3_FONT_SIZE ,}}>{this.translate.Get('Giảm giá')}:</Text>
                   <Text style={{ fontSize: H3_FONT_SIZE ,fontFamily:'RobotoBold'}}>{formatCurrency(Money.TkTotalDiscount,"")}</Text>
                 </View>
               </View>
@@ -469,7 +469,7 @@ export default class Payment3 extends Component {
                 </View>
               </View>
               <View style={{height:'40%', flexDirection: "row", justifyContent: "space-between", alignItems: "center",paddingVertical:'0.5%'}}>
-                <Text style={{ fontSize: H1_FONT_SIZE, textAlign: "center", justifyContent: "flex-start",fontFamily:'RobotoBold',}}>Tổng tiền cần thanh toán</Text>
+                <Text style={{ fontSize: H1_FONT_SIZE, textAlign: "center", justifyContent: "flex-start",fontFamily:'RobotoBold',}}>{this.translate.Get('Tổng tiền cần thanh toán')}</Text>
                 <Text style={{ fontSize: H1_FONT_SIZE, textAlign: "center", justifyContent: "flex-end", color: "#CC0000",fontFamily:'RobotoBold',}}>{formatCurrency(this.state.PaymentAmount,"")}</Text>
               </View>
             </View>
@@ -483,7 +483,7 @@ export default class Payment3 extends Component {
                 </View>
               </View>
               <View style={{height:'20%',justifyContent:'center',paddingHorizontal:'7%'}}>
-                <Text style={{fontSize:H2_FONT_SIZE, color:'#0000EE',textAlign:'center'}}>Bấm nút "Gọi nhân viên" để phục vụ tiếp nhận thanh toán tiền mặt</Text>
+                <Text style={{fontSize:H2_FONT_SIZE, color:'#0000EE',textAlign:'center'}}>{this.translate.Get('Bấm nút "Gọi nhân viên" để phục vụ tiếp nhận thanh toán tiền mặt')}</Text>
               </View>
             </View>
             :isShowCard ? 
@@ -494,7 +494,7 @@ export default class Payment3 extends Component {
                 </View>
               </View>
               <View style={{height:'20%',justifyContent:'center',paddingHorizontal:'7%'}}>
-                <Text style={{fontSize:H2_FONT_SIZE, color:'#0000EE',textAlign:'center'}}>Bấm nút "Gọi nhân viên" để phục vụ tiếp nhận thanh toán quẹt thẻ</Text>
+                <Text style={{fontSize:H2_FONT_SIZE, color:'#0000EE',textAlign:'center'}}>{this.translate.Get('Bấm nút "Gọi nhân viên" để phục vụ tiếp nhận thanh toán quẹt thẻ')}</Text>
               </View>
             </View>
             :isShowBanking ? 
@@ -573,7 +573,7 @@ export default class Payment3 extends Component {
             <View style={{width:'5%',height:'100%'}}>
             <Image style={{height: "100%", width: "100%",}} resizeMode='contain' source={require("../../assets/icons/IconThanhToan-11.png")}/>
             </View>
-            <Text style={{fontSize:H2_FONT_SIZE,}}>Chọn hình thức thanh toán</Text>
+            <Text style={{fontSize:H2_FONT_SIZE,}}>{this.translate.Get('Chọn hình thức thanh toán')}</Text>
           </View>
           <View style={{flexDirection:'row',height:'55%',width:'100%',justifyContent:'space-between'}}>
             <TouchableOpacity onPress={ this._ShowTM} style={{width:'13%',height:'100%',flexDirection:'column',alignItems:'center',backgroundColor:'#fff', borderRadius:10,shadowOpacity: 0.3,shadowRadius: 4,elevation:6}}>
@@ -621,7 +621,7 @@ export default class Payment3 extends Component {
             end={{ x:0, y: 1 }}
             style={{marginTop: 15, borderWidth: 1, height: '30%',borderRadius:35,width:'30%'}}>
             <TouchableOpacity onPress={this.onPressNext} style={{  height: "100%", width: "100%", justifyContent: "center", alignItems: "center"}}>
-              <Text style={{ textAlign: "center",color:'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>Xác nhận thanh toán</Text>
+              <Text style={{ textAlign: "center",color:'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>{this.translate.Get('Xác nhận thanh toán')}</Text>
             </TouchableOpacity>
           </LinearGradient>
           <View style={{height:'70%', width: Bordy.width, justifyContent:'center'}}>

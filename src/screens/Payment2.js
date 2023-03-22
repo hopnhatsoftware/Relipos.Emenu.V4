@@ -330,7 +330,7 @@ export default class Payment2 extends Component {
                <Text style={{color:'white', fontSize:H2_FONT_SIZE,fontFamily: "RobotoBold"}}>{this.translate.Get("Trở lại")}</Text>
             </TouchableOpacity>
             <View style={{width:'62%'}}>
-              <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>Thông tin hóa đơn của bạn</Text>
+              <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>{this.translate.Get('Thông tin hóa đơn của bạn')}</Text>
             </View>
             <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "19%", borderRadius: 25, }}>
             {this.state.showCall ?
@@ -338,14 +338,14 @@ export default class Payment2 extends Component {
                 <View style={{ width: "25%", alignItems:'center'}}>
                 <Image style={{height: "70%", width: "70%"}} resizeMode='contain' source={require("../../assets/icons/IconCall-11.png")}/>
               </View>
-              <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: H2_FONT_SIZE }}>Đang gọi ...</Text>
+              <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: H2_FONT_SIZE }}>{this.translate.Get("Đang gọi ..")}</Text>
               </View>
               :
               <View style={{backgroundColor:'#33FF33',height:'100%',justifyContent: "center",borderRadius: 25, flexDirection: "row", alignItems: "center", }}>
                 <View style={{ width: "25%", alignItems:'center'}}>
                 <Image style={{height: "70%", width: "70%"}} resizeMode='contain' source={require("../../assets/icons/IconCall-11.png")}/>
               </View>
-              <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: H2_FONT_SIZE }}>Gọi nhân viên</Text>
+              <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: H2_FONT_SIZE }}>{this.translate.Get("Gọi nhân viên")}</Text>
               </View>
             }
             </TouchableOpacity>
@@ -360,8 +360,8 @@ export default class Payment2 extends Component {
           <View style={{ height: Bordy.height * 0.69, width: Bordy.width * 0.75, marginHorizontal: "12.5%",paddingTop:5}}>
             <View style={{ height: "74%",}}>
               <View style={{ height: "7%", flexDirection: "row", alignItems: "center"}}>
-                <Text style={{ fontSize: H3_FONT_SIZE, width: "51%" }}>Mã số thuế:</Text>
-                <Text style={{ fontSize: H3_FONT_SIZE, width: "49%" }}>Người nhận:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE, width: "51%" }}>{this.translate.Get('Mã số thuế')}:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE, width: "49%" }}>{this.translate.Get('Người nhận')}:</Text>
               </View>
               <View style={{ height: "11%", flexDirection: "row"}}>
                 <TextInput 
@@ -382,7 +382,7 @@ export default class Payment2 extends Component {
                 </TextInput>
               </View>
               <View style={{ height: "7%", flexDirection: "row", alignItems: "center",marginTop:'0.7%' }}>
-                <Text style={{ fontSize: H3_FONT_SIZE }}>Tên công ty:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE }}>{this.translate.Get('Tên công ty')}:</Text>
               </View>
               <View style={{ height: "21%", flexDirection: "row"}}>
                 <TextInput 
@@ -394,7 +394,7 @@ export default class Payment2 extends Component {
                 </TextInput>
               </View>
               <View style={{ height: "7%", flexDirection: "row", alignItems: "center",marginTop:'0.7%'}}>
-                <Text style={{ fontSize: H3_FONT_SIZE }}>Địa chỉ:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE }}>{this.translate.Get('Địa chỉ')}:</Text>
               </View>
               <View style={{ height: "21%", flexDirection: "row"}}>
                 <TextInput 
@@ -407,7 +407,7 @@ export default class Payment2 extends Component {
               </View>
               <View style={{ height: "7%", flexDirection: "row", alignItems: "center",marginTop:'0.7%'}}>
                 <Text style={{ fontSize: H3_FONT_SIZE, width: "51%", height: "100%",}}>Email:</Text>
-                <Text style={{ fontSize: H3_FONT_SIZE, width: "49%" }}>SĐT:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE, width: "49%" }}>{this.translate.Get('SĐT')}:</Text>
               </View>
               <View style={{ height: "11%", flexDirection: "row"}}>
                 <TextInput
@@ -440,7 +440,7 @@ export default class Payment2 extends Component {
               <TouchableOpacity
                 onPress={()=>this.onPressNext()}
                 style={{ backgroundColor: "#DDDDDD", height: "75%", width: "22%",borderRadius:35,marginRight:'2%', justifyContent: "center", alignItems: "center"}}>
-                <Text style={{ textAlign: "center", width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2,}}>Bỏ qua</Text>
+                <Text style={{ textAlign: "center", width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2,}}>{this.translate.Get('Bỏ qua')}</Text>
               </TouchableOpacity>
               <LinearGradient
               colors={[ '#333d4c', '#333d4c']}
@@ -448,7 +448,7 @@ export default class Payment2 extends Component {
               end={{ x:0, y: 1 }}
               style={{ borderWidth: 1,height: '75%',borderRadius:35,width:'22%',shadowColor: "#000"}}>
             <TouchableOpacity onPress={()=>this._FlushInvoiceInfor()} style={{  height: "100%", width: "100%", justifyContent: "center", alignItems: "center"}}>
-              <Text style={{ textAlign: "center",color:'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>Xác nhận</Text>
+              <Text style={{ textAlign: "center",color:'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>{this.translate.Get('Xác nhận')}</Text>
             </TouchableOpacity>
             </LinearGradient>
             </View>

@@ -345,7 +345,7 @@ static getDerivedStateFromProps = (props, state) => {
             <View style={{ height: "22%", width: "100%",shadowColor: "#000",backgroundColor:'#fff', shadowOffset: {width: 0,height: -5},shadowOpacity: 0.1,shadowRadius: 5,elevation: 6 ,paddingHorizontal:'2%',}}>
               <View style={{flexDirection:'row',justifyContent:'space-between',paddingVertical:'0.5%'}}>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between'}}>
-                  <Text style={{ fontSize: H3_FONT_SIZE, }}>Thành tiền:</Text>
+                  <Text style={{ fontSize: H3_FONT_SIZE, }}>{this.translate.Get('Thành tiền')}:</Text>
                   <Text style={{ fontSize: H3_FONT_SIZE, fontFamily:'RobotoBold'}}>{formatCurrency(Money.TkItemAmout,"")}</Text>
                 </View>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between'}}>
@@ -353,7 +353,7 @@ static getDerivedStateFromProps = (props, state) => {
                   <Text style={{ fontSize: H3_FONT_SIZE ,fontFamily:'RobotoBold'}}>{formatCurrency(this.state.SumVoucher,"")}</Text>
                 </View>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between'}}>
-                  <Text style={{ fontSize: H3_FONT_SIZE,}}>Giảm giá:</Text>
+                  <Text style={{ fontSize: H3_FONT_SIZE,}}>{this.translate.Get('Giảm giá')}:</Text>
                   <Text style={{ fontSize: H3_FONT_SIZE, fontFamily:'RobotoBold'}}>{formatCurrency(Money.TkTotalDiscount,"")}</Text>
                 </View>
               </View>
@@ -368,7 +368,7 @@ static getDerivedStateFromProps = (props, state) => {
                 </View>
               </View>
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center",paddingVertical:'0.5%'}}>
-                <Text style={{ fontSize: H1_FONT_SIZE, textAlign: "center", justifyContent: "flex-start",fontFamily:'RobotoBold',}}>Tổng tiền cần thanh toán</Text>
+                <Text style={{ fontSize: H1_FONT_SIZE, textAlign: "center", justifyContent: "flex-start",fontFamily:'RobotoBold',}}>{this.translate.Get('Tổng tiền cần thanh toán')}</Text>
                 <Text style={{ fontSize: H1_FONT_SIZE, textAlign: "center", justifyContent: "flex-end", color: "#CC0000",fontFamily:'RobotoBold',}}>{formatCurrency(parseFloat(this.state.PaymentAmount)+ parseFloat(this.state.value),"")}</Text>
               </View>
             </View>
@@ -437,7 +437,7 @@ static getDerivedStateFromProps = (props, state) => {
                   </View>
                   <View style={{height: "65%", alignItems: "center" ,justifyContent:'center'}}>
                     <Text style={{ fontSize: H4_FONT_SIZE,}}>{this.translate.Get('Tiền tip')}</Text>
-                    <Text style={{ fontSize: H3_FONT_SIZE, }}>Không tip</Text>
+                    <Text style={{ fontSize: H3_FONT_SIZE, }}>{this.translate.Get('Không Tip')}</Text>
                   </View>
                 </TouchableOpacity>
               </View>
@@ -459,8 +459,8 @@ static getDerivedStateFromProps = (props, state) => {
                 <Text style={{marginLeft:'2%', color: "#CC0000", fontSize: H3_FONT_SIZE}}>Tip có xuất hóa đơn hay không</Text>
               </View>
               <View style={{ width: "100%", height:'13%', flexDirection: "row",justifyContent:'center'}}>
-                <CheckBox checked={Money.TkeIsInvoiceTip ? true : false} onPress={()=> {this.setState({Money: {...Money, TkeIsInvoiceTip : Money.TkeIsInvoiceTip ? false : true}})}} textStyle={{fontSize:H3_FONT_SIZE}} size={H2_FONT_SIZE} containerStyle={{width:'45%', backgroundColor:'#fff'}} title="Có"/>
-                <CheckBox checked={Money.TkeIsInvoiceTip ? false : true} onPress={()=> {this.setState({Money: {...Money, TkeIsInvoiceTip : Money.TkeIsInvoiceTip ? false : true}})}} textStyle={{fontSize:H3_FONT_SIZE}} size={H2_FONT_SIZE} containerStyle={{width:'45%', backgroundColor:'#fff',}}  title="Không"/>
+                <CheckBox checked={Money.TkeIsInvoiceTip ? true : false} onPress={()=> {this.setState({Money: {...Money, TkeIsInvoiceTip : Money.TkeIsInvoiceTip ? false : true}})}} textStyle={{fontSize:H3_FONT_SIZE}} size={H2_FONT_SIZE} containerStyle={{width:'45%', backgroundColor:'#fff'}} title={this.translate.Get('Có')}/>
+                <CheckBox checked={Money.TkeIsInvoiceTip ? false : true} onPress={()=> {this.setState({Money: {...Money, TkeIsInvoiceTip : Money.TkeIsInvoiceTip ? false : true}})}} textStyle={{fontSize:H3_FONT_SIZE}} size={H2_FONT_SIZE} containerStyle={{width:'45%', backgroundColor:'#fff',}}  title={this.translate.Get('Không')}/>
               </View>
             </View>
           </View>
