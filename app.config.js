@@ -87,7 +87,12 @@ const commonConfig = {
         "com.sonyericsson.home.permission.BROADCAST_BADGE"
       ]
     },
-    "description": "New Version"
+    "description": "New Version",
+    "extra": {
+      "eas": {
+        "projectId": "7fa2b6f8-9aa9-4a04-826c-697534534f12"
+      }
+    }
   
 };
 
