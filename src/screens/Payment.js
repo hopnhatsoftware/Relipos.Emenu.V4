@@ -25,9 +25,8 @@ const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,h
 const pnLeft = { width: Bordy.width * 0.17, height: SCREEN_HEIGHT };
 const Center = { width: Bordy.width - pnLeft.width, height: Bordy.height };
 const Header = { width: Center.width, height: Bordy.height * 0.085 };
-
 const Booton = { width: Center.width, height: Center.height * 0.07 };
-const labels = ["Thông tin đơn hàng","Xuất hóa đơn","Thanh toán"];
+
 const customStyles = {
   stepIndicatorSize: H4_FONT_SIZE,
   currentStepIndicatorSize:H1_FONT_SIZE*1.4,
@@ -61,7 +60,9 @@ export default class Payment extends Component {
     this._nextIndex = null;
     this.flatListRef = null;
     this.textInput = null;
+    this.translate = new translate();
     this.state = {
+      
       mod : 0,
       PaymentAmount:0,
       SumVoucher:0,
@@ -86,8 +87,9 @@ export default class Payment extends Component {
       endpoint: "",
       Config: {},
     };
-    this.translate = new translate();
+    
   }
+  
   componentWillUnmount= async () => 
   {
     let { sound} = this.state;
@@ -299,6 +301,7 @@ static getDerivedStateFromProps = (props, state) => {
         </View>
       );
     }
+    const labels = [this.translate.Get("Thông tin đơn hàng"),this.translate.Get("Xuất hóa đơn"),this.translate.Get("Thanh toán")];
     const { showCall,Money,lockTable} = this.state;
     return (
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{height:Bordy.height,width:Bordy.width,justifyContent: "center",}}>
@@ -443,7 +446,7 @@ static getDerivedStateFromProps = (props, state) => {
               </View>
               <View style={{ height: "10%", width: "100%", alignItems:'center',justifyContent:'center'}}>
                 <TextInput
-                  placeholder="Nhập số tiền tip (đ)"
+                  placeholder={this.translate.Get("Nhập số tiền tip (đ)")}
                   keyboardType="number-pad"
                   value={this.state.value}
                   onChangeText={(number) => this.setState({value : number}) }
@@ -456,7 +459,7 @@ static getDerivedStateFromProps = (props, state) => {
                 </View>
               </View>
               <View style={{height: "7%", width: "100%",justifyContent:'center' }}>
-                <Text style={{marginLeft:'2%', color: "#CC0000", fontSize: H3_FONT_SIZE}}>Tip có xuất hóa đơn hay không</Text>
+                <Text style={{marginLeft:'2%', color: "#CC0000", fontSize: H3_FONT_SIZE}}>{this.translate.Get("Tip có xuất hóa đơn hay không?")}</Text>
               </View>
               <View style={{ width: "100%", height:'13%', flexDirection: "row",justifyContent:'center'}}>
                 <CheckBox checked={Money.TkeIsInvoiceTip ? true : false} onPress={()=> {this.setState({Money: {...Money, TkeIsInvoiceTip : Money.TkeIsInvoiceTip ? false : true}})}} textStyle={{fontSize:H3_FONT_SIZE}} size={H2_FONT_SIZE} containerStyle={{width:'45%', backgroundColor:'#fff'}} title={this.translate.Get('Có')}/>

@@ -85,7 +85,7 @@ export class ScannerQR extends Component {
             </TouchableOpacity>
           </View>
           <View style={{width:"100%",position: 'absolute', bottom:25, backgroundColor: "transpanent", zIndex: 10,justifyContent:'center', alignItems: 'center', }}>
-            <Text style={{backgroundColor:'black',textAlign:'center',fontSize: H1_FONT_SIZE,color:'#FFFFFF',paddingHorizontal:10}}>Di chuyển camera đến vùng có mã QR để quét</Text>
+            <Text style={{backgroundColor:'black',textAlign:'center',fontSize: H1_FONT_SIZE,color:'#FFFFFF',paddingHorizontal:10}}>{this.translate.Get("Di chuyển camera đến vùng có mã QR để quét")}</Text>
           </View>
         <BarCodeScanner
           onBarCodeScanned={ IsScaned ? undefined : this.handleBarCodeScanned}

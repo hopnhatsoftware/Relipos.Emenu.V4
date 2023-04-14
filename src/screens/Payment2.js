@@ -28,8 +28,6 @@ const ProductList = {
   ColumnNum: 2,
   RowNum: 3,
 };
-
-const labels = ["Thông tin đơn hàng","Xuất hóa đơn","Thanh toán"];
 const customStyles = {
   stepIndicatorSize: H4_FONT_SIZE,
   currentStepIndicatorSize:H1_FONT_SIZE*1.4,
@@ -72,6 +70,7 @@ export default class Payment2 extends Component {
       selectedType: null,
       isPostBack: false,
       isPostBack2: true,
+      isShowMash: false,
       language: 1,
       call: 1,
       data: [],
@@ -307,7 +306,7 @@ export default class Payment2 extends Component {
     }
     if (!this.state.isPostBack) {
       return (
-        <View style={[styles.pnbody, styles.horizontal]}>
+        <View style={styles.pnbody}>
           <ActivityIndicator
             size="large"
             color="#0000ff"
@@ -318,11 +317,17 @@ export default class Payment2 extends Component {
         </View>
       );
     }
+    const labels = [this.translate.Get("Thông tin đơn hàng"),this.translate.Get("Xuất hóa đơn"),this.translate.Get("Thanh toán")];
     const { lockTable} = this.state;
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.Container}>
+          {this.state.isShowMash?
+      <View style={styles.BackgroundMash}>
+      <ActivityIndicator color={'#29ade3'} size="large"></ActivityIndicator>
+    </View>
+      :null}
           <ScrollView>
           <View style={{ flexDirection: "row", height: Bordy.height * 0.08, width: Bordy.width, backgroundColor:'#333d4c',alignItems:'center'}}>
           <TouchableOpacity onPress={this.onPressBack} style={{justifyContent: 'center', width:'12%',height:'100%',alignItems:'center',flexDirection:'row'}}>
@@ -434,7 +439,7 @@ export default class Payment2 extends Component {
           </View>
           <View style={{ height: Bordy.height * 0.23, width: Bordy.width, justifyContent: "center", alignItems: "center"}}>
             <View style={{ height: "30%", justifyContent: "center", alignItems: "center"}}>
-              <Text style={{ fontSize: H2_FONT_SIZE }}>Chọn bỏ qua nếu bạn không xuất hóa đơn VAT</Text>
+              <Text style={{ fontSize: H2_FONT_SIZE }}>{this.translate.Get("Chọn bỏ qua nếu bạn không xuất hóa đơn VAT")}</Text>
             </View>
             <View style={{ height: "30%", flexDirection: "row" }}>
               <TouchableOpacity
@@ -473,12 +478,19 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     height: Bordy.height,
     width: Bordy.width,
-    flex: 1,
+  },
+  BackgroundMash: {
+    height: Bordy.height,
+    width: Bordy.width,
+    backgroundColor: "#EEEEEE",
+    zIndex: 99,
+    opacity: 0.1,
   },
   Container: {
     height:Bordy.height,
     width:Bordy.width,
     justifyContent: "center",
+    zIndex: 1,
   },
 
   pnLeft: {

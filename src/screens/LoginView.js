@@ -1,25 +1,24 @@
 import React, { Component } from 'react';
-import { Alert,TouchableOpacity,Dimensions,Image,ActivityIndicator,KeyboardAvoidingView,StyleSheet,Text,View,StatusBar, Platform, Keyboard} from 'react-native';
+import { Alert,TouchableOpacity,Dimensions,Image,ActivityIndicator,KeyboardAvoidingView,StyleSheet,Text,View,StatusBar, Platform, Keyboard,Modal,FlatList} from 'react-native';
 import * as Network from 'expo-network';
 import { LinearGradient } from 'expo-linear-gradient'
 import Constants from 'expo-constants';
 import Icon from '@expo/vector-icons/Entypo'
-import { login, CheckCasherIn } from '../services';
+import { login, CheckCasherIn,getLanguage } from '../services';
 import { _retrieveData, _storeData, _remove } from '../services/storages';
 import { cacheFonts } from "../helpers/AssetsCaching";
 import { Input, Button } from 'react-native-elements';
-import {ENDPOINT_URL, LOGIN_INPUT_FONT_SIZE, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, BACKGROUND_COLOR,H1FontSize,H2FontSize,H3FontSize, H1_FONT_SIZE } from '../config/constants';
+import {ENDPOINT_URL, LOGIN_INPUT_FONT_SIZE, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, BACKGROUND_COLOR,H1FontSize,H2FontSize,H3FontSize, H1_FONT_SIZE,H3_FONT_SIZE ,H2_FONT_SIZE,H4_FONT_SIZE} from '../config/constants';
 import translate from '../services/translate';
 import colors from "../config/colors";
 import { setCustomText } from 'react-native-global-props';
 import Question from '../components/Question';
-
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
 export default class LoginView extends Component {
 
-  login_button_text = 'Login';
+  login_button_text = 'login';
   has_back_button=false;
   constructor(props) {
     super(props);
@@ -38,6 +37,12 @@ export default class LoginView extends Component {
       passwordValid: true,
       a:{},
       language: 1,
+      listLanguage:[],
+      listLanguage2:{},
+      languageText: '',
+      languageImg: '',
+      LgIco:'',
+      modalVisible : false,
       settings: {},
       firstTouch: '',
       lockTable: false,
@@ -60,6 +65,7 @@ export default class LoginView extends Component {
     if (settings == undefined) {
       settings = { "PosId": 1, "PosIdName": "Thu ngân" };
     }
+
     else {
       try {
         settings = JSON.parse(settings);
@@ -102,6 +108,7 @@ export default class LoginView extends Component {
     StatusBar.setHidden(true);
     this.defaultFonts();
     this.setState({ fontLoaded: true,endpoint, username, language: language, settings });
+    await this._getLanguage(true);
   } catch (ex) {
     console.log('LoginView componentDidMount Error:' + ex);
   }
@@ -116,7 +123,19 @@ export default class LoginView extends Component {
     // Return null if the state hasn't changed
     return null;
   }
-
+  _getLanguage(IsActive){
+    let {listLanguage,language,listLanguage2,} = this.state;
+    getLanguage(IsActive).then(res => {
+      listLanguage = res.Data
+      this.setState({listLanguage: listLanguage})
+     
+      listLanguage2 = listLanguage.find((item) => {
+        return item.LgId == language;
+      })  
+      this.setState({languageText: listLanguage2.LgName,languageImg: listLanguage2.LgClsIco})
+      
+      })  
+  }
   defaultFonts() {
     const customTextProps = {
       style: {
@@ -243,14 +262,17 @@ const passwordValid = this.validatePassword();
         });
         this.setState({ isLoading: false, isWorking: false, })
   }
-  changeLanguage = async (lang) => {
+  changeLanguage = async (lang , item) => {
     if (this.state.language != lang) {
       _storeData("culture", lang.toString(), async () => {
         this.translate = await this.translate.loadLang();
-        this.setState({ language: lang });
+        this.setState({ language: lang, languageText: item.LgName, languageImg: item.LgClsIco });
         this.getBranchesList();
       });
     }
+  }
+  setModalVisible = (visible) => {
+    this.setState({ modalVisible: visible });
   }
   ValidaUsername = async => {
     //try{
@@ -289,7 +311,7 @@ _CombackView = () => {
   }
   render = () => {
     const { manifest } = Constants;
-    const {endpoint,  isLoading, fontLoaded,  password,  passwordValid,  username,  lockTable,  secureTextEntry,  usernameValid, } = this.state;
+    const {endpoint,  isLoading, fontLoaded,  password,  passwordValid,  username,  lockTable,  secureTextEntry,  usernameValid,listLanguage,modalVisible,languageImg } = this.state;
 let ImageWidth=Bordy.width*0.12
 
     if (!fontLoaded) {
@@ -298,11 +320,41 @@ let ImageWidth=Bordy.width*0.12
     }
     return (
       <View style={styles.container}>
+        {modalVisible ?
+          <Modal
+          animationType='fade'
+          transparent={true}
+          visible={modalVisible}>
+          <TouchableOpacity style={{height: Bordy.height,width: Bordy.width,backgroundColor: 'black',opacity: 0.5,zIndex: 1}} onPress={() => this.setModalVisible(!modalVisible)}>
+          </TouchableOpacity>
+          <View style={{top: Bordy.height*0.3, left: Bordy.width*0.32, width: Bordy.width *0.36, height: Bordy.height*0.4, zIndex: 2, position: 'absolute',backgroundColor:'white',borderWidth:0.5}}>
+            <View style={{height:'15%',width:'100%',backgroundColor:'#257DBC',justifyContent:'center',borderBottomWidth:0.5}}>
+            <Text style={{fontSize:H2_FONT_SIZE, textAlign:'center', color:'white',fontFamily: "RobotoBold"}}>{this.translate.Get('language')}</Text>
+            </View>
+            <FlatList
+            data={listLanguage}
+            renderItem={({ item, index }) =>
+              <TouchableOpacity onPress={() => { this.changeLanguage(item.LgId, item) &&  this.setModalVisible(!modalVisible )}}
+                style={{ width: '100%',justifyContent:'center',borderBottomWidth:0.5,paddingVertical:20}}>
+                <View style={{width:'100%',flexDirection: "row",alignItems:'center'}}>
+                  <Image resizeMode="contain" source={item.LgClsIco == 'icon-flagvn' ? require('../../assets/icons/icon-flagvn.png'): item.LgClsIco == 'icon-flagus' ? require('../../assets/icons/icon-flagus.png'):item.LgClsIco == 'icon-flagcn' ? require('../../assets/icons/icon-flagcn.png'): null} style={{ width: '20%',height:"100%", }}></Image>
+                  <Text style={{width:this.state.language == item.LgId ? '70%' : "80%",justifyContent:'center',textAlign:'left',fontSize:H3FontSize}} >{item.LgName}</Text>
+                  {this.state.language == item.LgId ?
+                    <Icon  name="check" type="entypo" style={{left: 2, color: '#009900',fontSize: H2_FONT_SIZE,}}/>
+                    :null
+                  }
+                  
+                </View>
+              </TouchableOpacity>}
+            />
+          </View>
+        </Modal>
+          : null}
           <StatusBar hidden={true} />
         <KeyboardAvoidingView  keyboardType='light' behavior= 'padding' contentContainerStyle={styles.formContainer}  >
             {this.state.notification ?
-            <View style={{ marginBottom:'5%', width: Bordy.width * 0.5, justifyContent:'center',alignItems:'center'}} >
-              <Text style={{fontSize:H1_FONT_SIZE*1.2, color:'#fff',textAlign:'center'}}>Quý khách vui lòng đợi nhân viên xác nhận thanh toán</Text>
+            <View style={{ marginBottom:'5%', width: Bordy.width * 0.55, justifyContent:'center',alignItems:'center'}} >
+              <Text style={{fontSize:H1_FONT_SIZE*1.2, color:'#fff',textAlign:'center'}}>{this.translate.Get("Quý khách vui lòng đợi nhân viên xác nhận thanh toán")}</Text>
             </View>
             :null}
           <View style={styles.BorderLogin}>
@@ -386,21 +438,18 @@ let ImageWidth=Bordy.width*0.12
               />
             </View>
             <LinearGradient  colors={["#257DBC", "#1D75B3", "#166ead", "#0C629F"]}
-              style={{ marginTop: ITEM_FONT_SIZE }}>
-              <View style={{ flexDirection: 'row', width: '100%', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: ITEM_FONT_SIZE * 1.5 }}>
-                <View style={{ flexDirection: "row", alignContent: "flex-start",textAlignVertical:'center', paddingTop: ITEM_FONT_SIZE / 2, }}>
-               
-
-                  <TouchableOpacity onPress={() => this.changeLanguage(1)}>
-                    <Image resizeMode="contain" source={require('../../assets/icons/vi1.png')} style={{ width: 50, height: 50, opacity: this.state.language == 1 ? 1 : 0.5 }}></Image>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => this.changeLanguage(2)} style={{ left: 5 }}>
-                    <Image resizeMode="contain" source={require('../../assets/icons/en1.png')} style={{ width: 50, height: 50, opacity: this.state.language == 1 ? 0.5 : 1 }}></Image>
+              style={{ marginTop: ITEM_FONT_SIZE, paddingHorizontal:10 }}>
+              <View style={{ flexDirection: 'row', width: '100%', alignItems: 'center', justifyContent: 'space-between' }}>
+                <View style={{flexDirection: "row",height:"100%",alignItems:'center'}}>
+                  <TouchableOpacity onPress={() => this.setModalVisible(!modalVisible )} 
+                  style={{height:'70%', flexDirection: "row", justifyContent:'space-around',borderWidth:1,borderColor: '#000000',backgroundColor: '#0176cd',borderRadius:8, alignItems:'center'}}>
+                    <Image resizeMode="contain" source={languageImg == 'icon-flagvn' ? require('../../assets/icons/icon-flagvn.png'): languageImg == 'icon-flagus' ? require('../../assets/icons/icon-flagus.png'):languageImg == 'icon-flagcn' ? require('../../assets/icons/icon-flagcn.png'): null} style={{ width: '20%',height:"100%", }}></Image>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:'white', textAlign:'center'}}>{this.state.languageText}</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={{ flexDirection: "row", alignContent: "center", paddingTop: ITEM_FONT_SIZE / 2, paddingBottom: ITEM_FONT_SIZE / 2, }}>
                 {this.has_back_button ? 
-                <View style={{ paddingRight: ITEM_FONT_SIZE / 2 }}>
+                <View style={{ paddingRight: ITEM_FONT_SIZE / 3 }}>
                   <Button
                     con={{name:"input", color:"white"}}
                     buttonStyle={styles.button}
@@ -548,8 +597,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     alignItems: "center",
-    fontSize: BUTTON_FONT_SIZE / 1.3,
-    width: BUTTON_FONT_SIZE * 4
+    fontSize: H2_FONT_SIZE,
   },
   bottomPanel: {
     flex: 1
@@ -590,7 +638,7 @@ const styles = StyleSheet.create({
     borderColor: '#166ead',
     borderBottomColor: '#0C629F',
     backgroundColor: '#EEEEEE',
-    width: Bordy.width * 0.5,
+    width: Bordy.width * 0.55,
   },
   BorderFormLogin: {
     paddingBottom: ITEM_FONT_SIZE / 2,

@@ -1,7 +1,8 @@
 /*Màn hình bàn */
 import React, { Component } from 'react';
-import {TouchableOpacity,  Dimensions,  ActivityIndicator, UIManager, TextInput, TouchableWithoutFeedback,StyleSheet, Text, View, StatusBar, FlatList } from 'react-native';
+import {TouchableOpacity,  Dimensions,  ActivityIndicator, UIManager, TextInput, TouchableWithoutFeedback,StyleSheet, Text, View, StatusBar, FlatList,Alert } from 'react-native';
 import Constants from 'expo-constants';
+import NetInfo from "@react-native-community/netinfo";
 import { _retrieveData, _storeData, _remove, _clearData } from '../services/storages';
 import { cacheFonts } from "../helpers/AssetsCaching";
 import { ListArea, ListTables, CheckAndGetOrder, Object_Search, Ticket_getById, Ticket_Flush } from '../services';
@@ -91,8 +92,26 @@ export default class TableView extends Component {
   }
 
   async componentDidMount() {
+  //   NetInfo.fetch().then(state => {
+  //     console.log("Connection type", state.type);
+  //     console.log("Is connected?", state.isConnected);
+  // });
+  
+  // NetInfo.addEventListener(state => {
+  //     console.log("Connection type2", state.type);
+  //     console.log("Is connected2?", state.isConnected);
+  //     if(state.isConnected == true){
+  //       Alert.alert('Thông báo',NetInfo.isConnected)
+  //     }
+  //     else{
+  //       return ;
+  //     }
+  // });
+  
+  // Unsubscribe
+  // unsubscribe();
     try {
-      this.translate = await this.translate.loadLang();
+    this.translate = await this.translate.loadLang();
     await cacheFonts({
       RobotoLight: require("../../assets/fonts/Roboto-Light.ttf"),
       RobotoBold: require("../../assets/fonts/Roboto-Bold.ttf"),

@@ -52,7 +52,13 @@ export const GetViewGroup = async (Config, item) => {
     PrgLevel: Config.I_ItemGroupLevel
   });
 }
-
+export const getLanguage = async ( IsActive) => {
+  const culture = await _retrieveData('culture', 1);
+  const URL = '/Global/getAllCulture';
+  return await execFetch(URL, 'GET', {
+    IsActive:IsActive
+  });
+}
 export const getMasterData = async ( TicketId,Config, I_Currency) => {
   const culture = await _retrieveData('culture', 1);
   const URL = '/PaymentView/getMasterData';

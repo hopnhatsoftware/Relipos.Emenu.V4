@@ -413,7 +413,7 @@ export class CardDetailView extends React.Component {
           <View  name='pnContent' style={{ width: Bordy.width * 0.75, flexDirection: "column", height: Bordy.height }}>
             <View style={{  height: Titlecf.height,  borderBottomColor: colors.grey3,  borderBottomWidth: 1,backgroundColor: colors.Header,  width: "100%", justifyContent: "center",   alignItems: "center",  flexDirection: "row" }}>
               <Text style={{ fontSize: H2FontSize, fontFamily: "RobotoBold", color: "white",  textAlign: "center" }}>
-                {translate.Get("Giỏ Hàng")}
+                {translate.Get("Giỏ hàng")}
               </Text>
             </View>
             <View style={{ width: Bordy.width * 0.75, height: TabTitle.height, flexDirection: "row" }}>
@@ -423,7 +423,7 @@ export class CardDetailView extends React.Component {
                 setState({ isHavingOrder: true,iLoadNumber:state.iLoadNumber+1 });
             }} >
              <Text style={{ fontSize: H2FontSize,  color: "white",  textAlign: "center" }}>
-                {translate.Get("Đang Order")}
+                {translate.Get("Đang order")}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity style={{justifyContent:'center', borderRadius: 0, backgroundColor: !state.isHavingOrder ? '#dc7d46': colors.grey3,width: "50%"
@@ -432,7 +432,7 @@ export class CardDetailView extends React.Component {
               setState({isHavingOrder:false, iLoadNumber:state.iLoadNumber+1 });
             }} >
              <Text style={{ fontSize: H2FontSize,  color: "white",  textAlign: "center" }}>
-                {translate.Get("Đã Order")}
+                {translate.Get("Đã order")}
               </Text>
             </TouchableOpacity>
              
@@ -499,7 +499,7 @@ export class CardDetailView extends React.Component {
              }
             }} >
              <Text style={{ fontSize: H2FontSize,  color: "white",  textAlign: "center" }}>
-                {translate.Get("Gửi Order")}
+                {translate.Get("Gửi order")}
               </Text>
             </TouchableOpacity>
 

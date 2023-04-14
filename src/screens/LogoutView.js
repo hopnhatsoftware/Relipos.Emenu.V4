@@ -4,6 +4,7 @@ import {
   StatusBar, Platform
 } from 'react-native';
 import { ENDPOINT_URL } from '../config/constants';
+import {getLanguage } from '../services';
 import { login } from '../services';
 import { _retrieveData, _storeData, _remove } from '../services/storages';
 import { cacheFonts } from "../helpers/AssetsCaching";
@@ -54,14 +55,28 @@ export default class LogoutView extends LoginView {
       'bold': require('../../assets/fonts/Ubuntu-Bold.ttf'),
       'light': require('../../assets/fonts/Montserrat-Light.ttf'),
     });
+    
     let dictionary = await _retrieveData('dictionary');
     let language = await _retrieveData('culture', 1);
     let endpoint =await _retrieveData( "APP@BACKEND_ENDPOINT",  JSON.stringify(ENDPOINT_URL));
     endpoint=JSON.parse(endpoint);
     this.setState({ fontLoaded: true,endpoint, language: language, dictionary: dictionary, settings });
+    await this._getLanguage(true);
     StatusBar.setHidden(true);
   }
-
+  _getLanguage(IsActive){
+    let {listLanguage,language,listLanguage2,} = this.state;
+    getLanguage(IsActive).then(res => {
+      listLanguage = res.Data
+      this.setState({listLanguage: listLanguage})
+     
+      listLanguage2 = listLanguage.find((item) => {
+        return item.LgId == language;
+      })  
+      this.setState({languageText: listLanguage2.LgName,languageImg: listLanguage2.LgClsIco})
+      
+      })  
+  }
   static getDerivedStateFromProps = (props, state) => {
     if (props.navigation.getParam('settings', state.settings) != state.settings || 
     props.navigation.getParam('lockTable', state.lockTable) != state.lockTable) {

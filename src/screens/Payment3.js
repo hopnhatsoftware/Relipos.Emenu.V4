@@ -24,7 +24,6 @@ const pnLeft = { width: Bordy.width * 0.17, height: SCREEN_HEIGHT };
 const Center = { width: Bordy.width - pnLeft.width, height: Bordy.height };
 const Header = { width: Center.width, height: Bordy.height * 0.085 };
 const Booton = { width: Center.width, height: Center.height * 0.07 };
-const labels = ["Thông tin đơn hàng","Xuất hóa đơn","Thanh toán"];
 const customStyles = {
   stepIndicatorSize: H4_FONT_SIZE,
   currentStepIndicatorSize:H1_FONT_SIZE*1.4,
@@ -395,6 +394,7 @@ export default class Payment3 extends Component {
         </View>
       );
     }
+    const labels = [this.translate.Get("Thông tin đơn hàng"),this.translate.Get("Xuất hóa đơn"),this.translate.Get("Thanh toán")];
     const {Money,isShowBarCode,isShowBarCodeVip,showCall,Vip,isShowE_wallet,isShowCash,isShowCard,isShowBanking,isShowVip,lockTable} = this.state;
     return (
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.Container}>
@@ -531,30 +531,30 @@ export default class Payment3 extends Component {
             :isShowVip ? 
             <View style={{ height: "100%", width: "100%",}}>
               <View style={{height:'75%',alignItems:'center'}}>
-                <Text style={{height:'10%',fontSize:H2_FONT_SIZE}}>Khách hàng VIP</Text>
+                <Text style={{height:'10%',fontSize:H2_FONT_SIZE}}>{this.translate.Get("Khách hàng VIP")}</Text>
                 <View style={{width:'100%',height:'90%',justifyContent:'center',alignItems:'center',paddingHorizontal:'2%'}}>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center'}}>
-                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>Tên khách hàng:</Text>
+                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Tên khách hàng")}:</Text>
                     <Text style={{width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.Name}</Text>
                   </View>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center'}}>
-                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>Số điện thoại:</Text>
+                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Số điện thoại")}:</Text>
                     <Text style={{width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.SDT}</Text>
                   </View>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center',}}>
-                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>Ngày sinh:</Text>
+                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Ngày sinh")}:</Text>
                     <Text style={{width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.date}</Text>
                   </View>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center'}}>
-                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>Mã thẻ:</Text>
+                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Mã thẻ")}:</Text>
                     <Text style={{width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8}}>{Vip.cardNo}</Text>
                   </View>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center'}}>
-                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>Điểm tích lũy:</Text>
+                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Điểm tích lũy")}:</Text>
                     <Text style={{width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.point}</Text>
                   </View>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center'}}>
-                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>Hạng thẻ:</Text>
+                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Hạng thẻ")}:</Text>
                     <Text style={{width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.rank}</Text>
                   </View>
                 </View>

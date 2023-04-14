@@ -11,7 +11,7 @@ import { setCustomText } from "react-native-global-props";
 import { ProductDetails, CardDetailView, _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor } from '../components';
 import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize,H2FontSize,H3FontSize,H4FontSize,H5FontSize,FontSize,H4_FONT_SIZE } from "../config/constants";
 import translate from "../services/translate";
-import {getMasterData,GetViewGroup,GetPrdChildGroups,getProductByGroup,getTicketInfor, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getByChoiceId,CancelOrder,CallServices} from "../services";
+import {getMasterData,GetViewGroup,GetPrdChildGroups,getProductByGroup,getTicketInfor, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getByChoiceId,CancelOrder,CallServices,getLanguage} from "../services";
 import { formatCurrency } from "../services/util";
 import colors from "../config/colors";
 import BookingsStyle from "../styles/bookings";
@@ -44,7 +44,11 @@ export default class OrderView extends Component {
       selectedType: null,
       isPostBack: false,
       selectedId: -1,
+      listLanguage:[],
+      listLanguage2:{},
       language: 1,
+      languageText: '',
+      languageImg: '',
       a:'',
       b:'',
       call: 1,
@@ -125,6 +129,7 @@ export default class OrderView extends Component {
       });
       await this._getMasterData();
       await this._getTicketInfor();
+      await this._getLanguage(true);
       await this.fetchData();
       await this.CaculatorCardInfor();
       this.setState({  isPostBack: true });
@@ -158,6 +163,19 @@ export default class OrderView extends Component {
   
   });
 }
+}
+_getLanguage(IsActive){
+  let {listLanguage,language,listLanguage2,} = this.state;
+  getLanguage(IsActive).then(res => {
+    listLanguage = res.Data
+    this.setState({listLanguage: listLanguage})
+   
+    listLanguage2 = listLanguage.find((item) => {
+      return item.LgId == language;
+    })  
+    this.setState({languageText: listLanguage2.LgName,languageImg: listLanguage2.LgClsIco})
+    
+    })  
 }
 onCallServices= async() => {
   let { settings,table } = this.state;
@@ -354,7 +372,6 @@ onCallServices= async() => {
   }
   _getTicketInfor = async () => {
     let { table, Ticket, ProductsOrdered ,Config} = this.state;
-    console.log(table)
     if ("TicketID" in table && table.TicketID > 0) {
       getTicketInfor(Config, table).then(res => {
         if (!("Table" in res.Data) || res.Data.Table.length == 0) {
@@ -362,7 +379,6 @@ onCallServices= async() => {
         }
         if ("Table2" in res.Data) {
           ProductsOrdered = res.Data.Table2;
-          console.log(ProductsOrdered)
         }
         if ("Table1" in res.Data) {
           if (res.Data.Table1.length > 0) {
@@ -479,16 +495,17 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
     }
   };
  
-  changeLanguage = async lang => {
+  changeLanguage = async (lang , item) => {
     if (this.state.language != lang) {
       let that = this;
       await _storeData("culture", lang.toString(), async () => {
         that.translate = await this.translate.loadLang();
-        that.setState({ language: lang }, () => that.fetchData());
+        that.setState({ language: lang, languageText: item.LgName, languageImg: item.LgClsIco }, () => that.fetchData());
       });
     }
     this.setState({ language: lang });
   };
+
   _GroupClick = index => {
     this.setState({  SelectedGroupIndex: index,  SelectedChildGroupIndex: -1, isShowMash: true },
       () => { this._loadChildGroups(index);  }
@@ -1315,6 +1332,7 @@ if (ProductChoise==null) {
    
     return (
       <View style={{height:Bordy.height,width:Bordy.width}}>
+        
         <View style={{flexDirection: "row"}}>
           <View name='pbLeft' style={[{ backgroundColor: "#333D4C",width:pnLeft.width, flexDirection: "column",height: "95%" }]}>
             <View style={{ justifyContent: 'center', alignItems: 'center', height: pnLeft.width*4/6, }}>
@@ -1345,10 +1363,13 @@ if (ProductChoise==null) {
               table={this.state.table}
               onPressBack={() => { this.onPressBack(); }}
               _searchProduct={(val) => this._searchProduct(val)}
-              changeLanguage={(lang) => this.changeLanguage(lang)}
-              
+              changeLanguage={(lang,item) => this.changeLanguage(lang,item)}
+              data={this.state.listLanguage}
               onCallServices={() => { this.onCallServices(); }}
-
+              listLanguage={this.state.listLanguage}
+              listLanguage2={this.state.listLanguage2}
+              languageText={this.state.languageText}
+              languageImg={this.state.languageImg}
               translate={this.translate}
               name={'OrderView'}
               setState={(state) => this.setState(state)}

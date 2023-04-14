@@ -1,5 +1,6 @@
 import vi from '../../locales/vi';
 import en from '../../locales/en';
+import cn from '../../locales/cn';
 import {_retrieveData,_storeData} from './storages';
 
 export default class t{
@@ -8,7 +9,7 @@ export default class t{
     
     loadLang = async()=>{
         this.lang = await _retrieveData('culture', 1);
-        this.lang = this.lang == 1? 'vi':'en';
+        this.lang = this.lang == 1? 'vi': this.lang == 2 ? 'en' : this.lang == 5 ? 'cn' :null;
         if (__DEV__) {
             this.dictionary =  await _retrieveData('dictionary');
             if(this.dictionary){
@@ -38,5 +39,6 @@ export default class t{
 }
 export const i18n={
     vi: vi,
-    en: en
+    en: en,
+    cn: cn,
 }
