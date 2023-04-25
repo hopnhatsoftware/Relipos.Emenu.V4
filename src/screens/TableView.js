@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import {TouchableOpacity,  Dimensions,  ActivityIndicator, UIManager, TextInput, TouchableWithoutFeedback,StyleSheet, Text, View, StatusBar, FlatList,Alert } from 'react-native';
 import Constants from 'expo-constants';
-import {NetInfo} from "@react-native-community/netinfo";
 import { _retrieveData, _storeData, _remove, _clearData } from '../services/storages';
 import { cacheFonts } from "../helpers/AssetsCaching";
 import { ListArea, ListTables, CheckAndGetOrder, Object_Search, Ticket_getById, Ticket_Flush } from '../services';
@@ -33,7 +32,6 @@ export default class TableView extends Component {
     this._nextIndex = null;
     this.Search = null;
     //const data = Array.apply(null, {length: 20}).map(Number.call, Number);
-
     this.state = {
       selectedType: null,
       fontLoaded: false,
@@ -93,34 +91,6 @@ export default class TableView extends Component {
   }
 
   async componentDidMount() {
-  //   NetInfo.fetch().then(state => {
-  //     console.log("Connection type", state.type);
-  //     console.log("Is connected?", state.isConnected);
-  // });
-  
-  // NetInfo.addEventListener(state => {
-  //     console.log("Connection type2", state.type);
-  //     console.log("Is connected2?", state.isConnected);
-  //     if(state.isConnected == true){
-  //       Alert.alert('Thông báo','Có kết nối internet')
-  //     }
-  //     else{
-  //       Alert.alert('Thông báo','Không kết nối internet')
-  //     }
-  // });
-//   NetInfo.isConnected.fetch().done((isConnected) => {
-//     if ( isConnected )
-//     {
-//         // Run your API call
-//         Alert.alert('Thông báo','Có kết nối internet')
-//     }
-//     else
-//     {
-//         // Ideally load from local storage
-//         Alert.alert('Thông báo','Không kết nối internet')
-//     }
-// });
-  // unsubscribe();
     try {
     this.translate = await this.translate.loadLang();
     await cacheFonts({
@@ -152,6 +122,7 @@ export default class TableView extends Component {
       Alert.alert(this.t._('Notice'), error, [
         {
           text: "OK", onPress: () => {
+            this.setState({ fontLoaded:true, isWorking: false})
           }
         }
       ]
@@ -176,7 +147,6 @@ export default class TableView extends Component {
     catch{(async (err) => {
       this.setState({ CustomerList: [],  isWorking: false });
     })};
-    this.setState({ isWorking: false,  });
   }
   defaultFonts() {
     const customTextProps = {
@@ -248,10 +218,10 @@ export default class TableView extends Component {
       this.setState({ selectedAreaIndex, TablesList: res.Data.Table, isWorking: false });
     })}
     catch{(async (err) => {
-      this.setState({ selectedAreaIndex, isWorking: false});
       Alert.alert(this.t._('Notice'), error, [
         {
           text: "OK", onPress: () => {
+            this.setState({ selectedAreaIndex, isWorking: false});
           }
         }
       ]

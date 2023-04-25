@@ -142,7 +142,7 @@ export default class OrderView extends Component {
    // console.log(' OrderView componentDidMount CartInfor:' + JSON.stringify(state.CartInfor));
   } catch (ex) {
     this.setState({ isPostBack: true,});
-    console.log('OrderView componentDidMount Error:' + ex);
+    console.log('OrderView componentDidMount Error:' + ex);  
   }
   };
   _getMasterData = async () => {
@@ -168,6 +168,7 @@ export default class OrderView extends Component {
 }
 }
 _getLanguage(IsActive){
+  try{
   let {listLanguage,language,listLanguage2,} = this.state;
   getLanguage(IsActive).then(res => {
     listLanguage = res.Data
@@ -177,8 +178,16 @@ _getLanguage(IsActive){
       return item.LgId == language;
     })  
     this.setState({languageText: listLanguage2.LgName,languageImg: listLanguage2.LgClsIco})
-    
     })  
+  }
+  catch{((error) => {
+    Question.alert( 'System Error',error, [
+      {
+        text: "OK", onPress: () => {
+        }
+      }
+    ]);
+  })};
 }
 onCallServices= async() => {
   let { settings,table } = this.state;
@@ -374,6 +383,7 @@ onCallServices= async() => {
     setCustomText(customTextProps);
   }
   _getTicketInfor = async () => {
+    try{
     let { table, Ticket, ProductsOrdered ,Config} = this.state;
     if ("TicketID" in table && table.TicketID > 0) {
       getTicketInfor(Config, table).then(res => {
@@ -399,6 +409,15 @@ onCallServices= async() => {
       });
     }
     this.setState({isShowMash: false});
+  }
+  catch{((error) => {
+    Question.alert( 'System Error',error, [
+      {
+        text: "OK", onPress: () => {
+        }
+      }
+    ]);
+  })};
   };
   static getDerivedStateFromProps = (props, state) => {
     if (
@@ -521,6 +540,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
   };
   
   _sendOrder = async () => {
+    try{
     let { table, CartInfor, OrdPlatform,Config } = this.state;
     if (CartInfor.TotalQuantity<=0) 
       return;
@@ -575,6 +595,15 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
         this._getTicketInfor();
       });
     });
+  }
+  catch{((error) => {
+    Question.alert( 'System Error',error, [
+      {
+        text: "OK", onPress: () => {
+        }
+      }
+    ]);
+  })};
   };
 
   _CaculatorMaster = (Master) => {

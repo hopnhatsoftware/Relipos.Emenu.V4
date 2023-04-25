@@ -129,17 +129,26 @@ export default class LoginView extends Component {
     return null;
   }
   _getLanguage(IsActive){
-    let {listLanguage,language,listLanguage2,} = this.state;
-    getLanguage(IsActive).then(res => {
-      listLanguage = res.Data
-      this.setState({listLanguage: listLanguage})
-     
-      listLanguage2 = listLanguage.find((item) => {
-        return item.LgId == language;
-      })  
-      this.setState({languageText: listLanguage2.LgName,languageImg: listLanguage2.LgClsIco})
-      
-      })  
+    try{
+      let {listLanguage,language,listLanguage2,} = this.state;
+      getLanguage(IsActive).then(res => {
+        listLanguage = res.Data
+        this.setState({listLanguage: listLanguage})
+       
+        listLanguage2 = listLanguage.find((item) => {
+          return item.LgId == language;
+        })  
+        this.setState({languageText: listLanguage2.LgName,languageImg: listLanguage2.LgClsIco})
+        })  
+    }
+    catch{((error) => {
+      Question.alert( 'System Error',error, [
+        {
+          text: "OK", onPress: () => {
+          }
+        }
+      ]);
+    })};
   }
   defaultFonts() {
     const customTextProps = {

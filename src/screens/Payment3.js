@@ -103,6 +103,7 @@ export default class Payment3 extends Component {
     return true;
   };
   componentDidMount = async () => {
+    try{
     this.translate = await this.translate.loadLang();
     let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
     isColor = JSON.parse(isColor);
@@ -110,13 +111,27 @@ export default class Payment3 extends Component {
     await this._getMasterData();
     await this._getPaymentAmount();
     this.setState({ isPostBack: true ,isColor});
+    }
+    catch (ex) {
+      this.setState({ isPostBack: true,});
+      console.log('Payment3 componentDidMount Error:' + ex);
+    }
   };
   _getPaymentAmount= async () => {
     let {PaymentAmount,Ticket} = this.state;
     getPaymentAmount( Ticket.TicketID , '').then(res => {
       PaymentAmount = res.Data;
       this.setState({ PaymentAmount})
-      })  
+      }).catch((error) => {
+        Alert.alert(this.translate.Get('Thông báo'),this.translate.Get('Lỗi hệ thống !'),
+        [
+          {
+            text: "OK", onPress: () => {
+              this.setState({PaymentAmount:0 });
+            }
+          }
+        ])
+  })
   }
   _getLinkQrBank = async () => {
     let{linkQrBank, Ticket} =  this.state;
@@ -128,7 +143,14 @@ export default class Payment3 extends Component {
       else{
         this.setState({ linkQrBank})
       }
-      })  
+      }).catch((error) => {
+        Question.alert( 'System Error',error, [
+          {
+            text: "OK", onPress: () => {
+            }
+          }
+        ]);
+      });
   }
   _getQrCode = async () => {
     let{QRData,Ticket,NameE_wallet} =  this.state;
@@ -140,7 +162,14 @@ export default class Payment3 extends Component {
         ]);
       }
       this.setState({QRData, NameE_wallet});
-      })  
+      }).catch((error) => {
+        Question.alert( 'System Error',error, [
+          {
+            text: "OK", onPress: () => {
+            }
+          }
+        ]);
+      });
   }
   _getQrCodeVNPAY = async () => {
     let{QRData,Ticket,NameE_wallet} =  this.state;
@@ -152,7 +181,14 @@ export default class Payment3 extends Component {
         ]);
       }
       this.setState({QRData, NameE_wallet});
-      })  
+      }).catch((error) => {
+        Question.alert( 'System Error',error, [
+          {
+            text: "OK", onPress: () => {
+            }
+          }
+        ]);
+      });  
   }
   _ApplyVoucher = async (QrCode) => {
     let{settings,Ticket} = this.state;
@@ -167,7 +203,14 @@ export default class Payment3 extends Component {
         this._getMasterData();
         this._getPaymentAmount();
       }
-    })  
+    }).catch((error) => {
+      Question.alert( 'System Error',error, [
+        {
+          text: "OK", onPress: () => {
+          }
+        }
+      ]);
+    });  
   }
   _ApplyVipCard = async (QRCodeString) => {
     let{Ticket,Vip} = this.state;
@@ -186,9 +229,17 @@ export default class Payment3 extends Component {
         this.setState({isShowBarCodeVip:false});
         this.componentDidMount();
       }
-    })  
+    }).catch((error) => {
+      Question.alert( 'System Error',error, [
+        {
+          text: "OK", onPress: () => {
+          }
+        }
+      ]);
+    });  
   }
   _getMasterData = async () => {
+    try{
     let {Config,TicketDetail,Money,TicketPayment,SumVoucher,Ticket} = this.state;
     getMasterData( Ticket.TicketID, Config, '').then(res => {
       if ("TicketDetail" in res.Data)
@@ -200,7 +251,14 @@ export default class Payment3 extends Component {
       SumVoucher = TicketPayment.reduce((a,v) => {if (v.PaymentName === "VOUCHER"){return a + v.TkpAmount ;} return a;},0)
       }
       this.setState({ TicketDetail,Money,TicketPayment,SumVoucher});
-    })
+    })}catch{((error) => {
+      Question.alert( 'System Error',error, [
+        {
+          text: "OK", onPress: () => {
+          }
+        }
+      ]);
+    })};
   }
   _RemoveVoucher = async () => {
     Alert.alert(this.translate.Get("Thông báo"), 'Bạn có chắc muốn xóa Voucher', [
@@ -212,7 +270,6 @@ export default class Payment3 extends Component {
     ]);
   }
   renderOrdered= ({ item, Index }) => {
-    const { BookingsStyle } = this.props;
       return (
         <View style={{ width: '100%', flexDirection: "row"}}>
             <Text style={{color:this.state.isColor == true ? '#ffffff' : '000000',fontSize:H3_FONT_SIZE,width:'5%'}}>{item.TkdQuantity} x </Text>
@@ -313,7 +370,14 @@ export default class Payment3 extends Component {
         Vip.point = res.Data.Table[0].VicPointCurrent - res.Data.Table[0].VctPointNorm;
         Vip.rank = res.Data.Table[0].VctName;
         this.setState({Vip })
-    })
+    }).catch((error) => {
+      Question.alert( 'System Error',error, [
+        {
+          text: "OK", onPress: () => {
+          }
+        }
+      ]);
+    });
     }
     this.setState({ isShowCard: false ,isShowE_wallet: false ,isShowCash:false, isShowVip:true,isShowBanking:false });
 
@@ -490,7 +554,7 @@ export default class Payment3 extends Component {
             <View style={{ height: "100%", width: "100%",}}>
               <View style={{height:'80%',alignItems:'center'}}>
                 <View style={{width:'100%',height:'100%',justifyContent:'center',alignItems:'center'}}>
-                  <Image style={{height: "80%", width: "80%"}} resizeMode='contain' source={require("../../assets/images/hand.gif")}/>
+                  <Image style={{height: "80%", width: "80%"}} resizeMode='contain' source={isColor == true ? require("../../assets/images/hand_gray.gif") : require("../../assets/images/hand.gif")}/>
                 </View>
               </View>
               <View style={{height:'20%',justifyContent:'center',paddingHorizontal:'7%'}}>
@@ -501,7 +565,7 @@ export default class Payment3 extends Component {
             <View style={{ height: "100%", width: "100%",}}>
               <View style={{height:'80%',alignItems:'center'}}>
                 <View style={{width:'100%',height:'100%',justifyContent:'center',alignItems:'center'}}>
-                <Image style={{height: "80%", width: "80%"}} resizeMode='contain' source={require("../../assets/images/hand.gif")}/>
+                <Image style={{height: "80%", width: "80%"}} resizeMode='contain' source={isColor == true ? require("../../assets/images/hand_gray.gif") : require("../../assets/images/hand.gif")}/>
                 </View>
               </View>
               <View style={{height:'20%',justifyContent:'center',paddingHorizontal:'7%'}}>

@@ -73,12 +73,21 @@ export default class Payment2 extends Component {
     clearInterval(this.interval);
   };
   componentDidMount = async () => {
+    try{
     let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
     isColor = JSON.parse(isColor);
     this.translate = await this.translate.loadLang();
     await this._setConfig();
     await this._getinvoiceInfor();
     this.setState({ isPostBack: true ,isColor});
+    }catch{((error) => {
+      Question.alert( 'System Error',error, [
+        {
+          text: "OK", onPress: () => {
+          }
+        }
+      ]);
+    })};
   };
   _setConfig = async () => {
     try{
@@ -137,7 +146,15 @@ export default class Payment2 extends Component {
         return;
       }
         this.setState({Tax});
-      })  }
+      }).catch((error) => {
+        Alert.alert(this.translate.Get('Thông báo'),this.translate.Get('Lỗi hệ thống !'),
+        [
+          {
+            text: "OK", onPress: () => {
+            }
+          }
+        ])
+  })}
   }
   _SearchTaxInfor2 = async () => {
     let{Tax} =  this.state;
@@ -249,6 +266,7 @@ export default class Payment2 extends Component {
     });
   };
   _FlushInvoiceInfor = async () => {
+    try{
     let{Ticket,Tax,lockTable} =  this.state;
     let a = Ticket
     if (Tax.TaxCode === null || Tax.TaxCode === ''){
@@ -266,9 +284,16 @@ export default class Payment2 extends Component {
             this.props.navigation.navigate('Payment3',{lockTable});
         });
       }
-    }) 
+    })}}catch{((error) => {
+      Question.alert( 'System Error',error, [
+        {
+          text: "OK", onPress: () => {
+          }
+        }
+      ]);
+    })};
     }
-  }
+  
   onPressHome = async () => {
     this.props.navigation.navigate("OrderView");
 };
@@ -283,19 +308,19 @@ export default class Payment2 extends Component {
     if (this.state.showCall==undefined||this.state.showCall==null) {
       this.state.showCall=false;
     }
-    if (!this.state.isPostBack) {
-      return (
-        <View style={styles.pnbody}>
-          <ActivityIndicator
-            size="large"
-            color="#0000ff"
-            onLayout={() => {
-              this.setState({ isPostBack: false });
-            }}
-          />
-        </View>
-      );
-    }
+    // if (!this.state.isPostBack) {
+    //   return (
+    //     <View style={styles.pnbody}>
+    //       <ActivityIndicator
+    //         size="large"
+    //         color="#0000ff"
+    //         onLayout={() => {
+    //           this.setState({ isPostBack: false });
+    //         }}
+    //       />
+    //     </View>
+    //   );
+    // }
     const labels = [this.translate.Get("Thông tin đơn hàng"),this.translate.Get("Xuất hóa đơn"),this.translate.Get("Thanh toán")];
     const { lockTable,isColor} = this.state;
     const customStyles = {
@@ -326,11 +351,23 @@ export default class Payment2 extends Component {
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={[styles.Container,{backgroundColor:isColor == true ? '#333333' : '#FFFFFF', }]}>
-          {this.state.isShowMash?
-      <View style={styles.BackgroundMash}>
-      <ActivityIndicator color={'#29ade3'} size="large"></ActivityIndicator>
-    </View>
-      :null}
+         {!this.state.isPostBack ?
+          <View style={{height: Bordy.height,
+            width: Bordy.width,
+            position: "absolute",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: isColor == true ? colors.white : "black",
+            opacity: 0.5,
+            bottom: 0,
+            right: 0,
+            borderTopColor: colors.grey4,
+            borderTopWidth: 1
+            }}>
+            <ActivityIndicator color={isColor == true ? colors.blue : colors.primary} size="large"></ActivityIndicator>
+          </View>
+          : null}
           <ScrollView>
           <View style={{ flexDirection: "row", height: Bordy.height * 0.08, width: Bordy.width, backgroundColor:isColor == true ? '#111111' :'#333d4c',alignItems:'center'}}>
           <TouchableOpacity onPress={this.onPressBack} style={{justifyContent: 'center', width:'12%',height:'100%',alignItems:'center',flexDirection:'row'}}>
@@ -489,7 +526,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     zIndex: 1,
   },
-
   pnLeft: {
     flexDirection: "column",
     height: "94%",

@@ -110,7 +110,7 @@ export default class Payment extends Component {
       this.setState({ TicketDetail,Money,TicketPayment,SumVoucher,});
     })}
     catch{(async (err) => {
-      Question.alert( this.translate.Get('Notice'),err, [
+      Alert.alert( this.translate.Get('Notice'),err, [
         {
           text: "OK", onPress: () => {
           }
@@ -121,21 +121,22 @@ export default class Payment extends Component {
 
   };
   _getPaymentAmount = async () => {
-    let {PaymentAmount,mod, Ticket} = this.state;
-    getPaymentAmount( Ticket.TicketID , '').then(res => {
-      PaymentAmount = res.Data;
-      if (PaymentAmount % 1000 != 0) {
-      mod = 1000 - PaymentAmount % 1000
-      }this.setState({ PaymentAmount, mod})
-      }).catch(async (err) => {
-        Alert.alert( this.translate.Get('Notice'),err, [
+      let {PaymentAmount,mod, Ticket} = this.state;
+      getPaymentAmount( Ticket.TicketID , '').then(res => {
+        PaymentAmount = res.Data;
+        if (PaymentAmount % 1000 != 0) {
+        mod = 1000 - PaymentAmount % 1000
+        }this.setState({ PaymentAmount, mod})
+        }).catch((error) => {
+        Alert.alert(this.translate.Get('Thông báo'),this.translate.Get('Lỗi hệ thống !'),
+        [
           {
             text: "OK", onPress: () => {
+              this.setState({PaymentAmount:0, isPostBack: true });
             }
           }
-        ]);
-       
-      });
+        ])
+  })
       // onPress={()=> this.setState({value: parseFloat(this.state.value) + (parseFloat(this.state.mod))})} style={styles.tip}
     }
   
@@ -262,8 +263,10 @@ static getDerivedStateFromProps = (props, state) => {
     if (totalTip < 0 ){
       totalTip = 0
     }
+    try{
     let a = Ticket;
     HandleTip( Ticket.TicketID, totalTip, Money.TkeIsInvoiceTip).then(res => {
+      console.log(res)
       if (res.Status === 1){
         _storeData('APP@BACKEND_Payment', JSON.stringify(a), () => {
           this.props.navigation.navigate('Payment2', { lockTable });
@@ -272,7 +275,25 @@ static getDerivedStateFromProps = (props, state) => {
       else{
         Alert.alert(this.translate.Get('Thông báo'),this.translate.Get('Lỗi hệ thống !'))
       }
-    })
+    })}catch{((error) => {
+      if(TypeError === 'Network request failed'){
+        Question.alert( 'System Error',error, [
+          {
+            text: "OK", onPress: () => {this.props.navigation.navigate('LoginView', { lockTable });
+            }
+          }
+        ]);
+      }
+      else{
+        Question.alert( 'System Error',error, [
+          {
+            text: "OK", onPress: () => {
+            }
+          }
+        ]);
+      }
+      
+    })};
   }
   /**
    *
