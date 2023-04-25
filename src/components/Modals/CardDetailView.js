@@ -43,6 +43,7 @@ export class CardDetailView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      isColor:false,
       IsLoaded:false,
       KeyCode:'',
       showCall:false,
@@ -121,7 +122,9 @@ export class CardDetailView extends React.Component {
     }
   }
     componentDidMount= async () => {
-      this.setState({IsLoaded:true ,KeyCode:''});
+      let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
+    isColor = JSON.parse(isColor);
+      this.setState({IsLoaded:true ,KeyCode:'',isColor});
       await this._LoadSound();
       
     };
@@ -180,19 +183,20 @@ export class CardDetailView extends React.Component {
   
   renderOrdered= ({ item, RowIndex }) => {
     const { BookingsStyle, ProductsOrdered} = this.props;
+    const {isColor} = this.state;
     if (item.TkdQuantity <= 0&&item.TksdQuantity<=0)
     return null;
       return (
-        <View style={{ width: Contentcf.width, justifyContent:'flex-start', borderBottomColor: colors.grey5, borderBottomWidth: 1,paddingTop:1,paddingBottom:1, marginLeft: 2 }}>
+        <View style={{backgroundColor:isColor ==true ? '#333333':'#000000', width: Contentcf.width, justifyContent:'flex-start', borderBottomColor: colors.grey5, borderBottomWidth: 0.5,paddingBottom:1, }}>
        
        {item.TkdType==0||item.TkdType==1?
         <View style={{ width: Contentcf.width, flexDirection: "row"}}> 
-            <Text  style={{  color: "#000000", width: Contentcf.width * 0.05, fontSize: H3_FONT_SIZE,textAlign:'right',paddingRight:5  }} >
+            <Text  style={{  color:isColor ==true ? '#FFFFFF': "#000000", width: Contentcf.width * 0.05, fontSize: H3_FONT_SIZE,textAlign:'right',paddingRight:5  }} >
               {formatNumber(item.TkdQuantity)}
             </Text>
             <Text  style={[ BookingsStyle.left_menu_Item,
                 {
-                  color: "#000000",
+                  color: isColor ==true ? '#FFFFFF':"#000000",
                   marginRight: 10,
                   width: Contentcf.width-(Contentcf.width * 0.05+Contentcf.width*0.1*2+20),
                   justifyContent: "center",
@@ -204,7 +208,7 @@ export class CardDetailView extends React.Component {
               {item.PrdName}
             </Text>
             <Text style={{
-                color: "#000000",
+                color: isColor ==true ? '#FFFFFF':"#000000",
                 width:Contentcf.width*0.1,
                 justifyContent: 'center',
                 fontSize: H3_FONT_SIZE,
@@ -213,7 +217,7 @@ export class CardDetailView extends React.Component {
               {formatCurrency(item.TkdTotalAmount/item.TkdQuantity, "")}
             </Text>
             <Text style={{
-                color: "#ddddd",
+                color:isColor ==true ? '#FFFFFF': "#ddddd",
                 width:Contentcf.width*0.1,
                 justifyContent: 'center',
                 fontSize: H3_FONT_SIZE,
@@ -227,7 +231,7 @@ export class CardDetailView extends React.Component {
          
           <Text  style={[ BookingsStyle.left_menu_Item,
               {
-                color: "#000000",
+                color: isColor ==true ? '#FFFFFF':"#000000",
                 marginRight: 10,
                width: Contentcf.width-(Contentcf.width*0.1*2+20),
                 justifyContent: "center",
@@ -265,24 +269,25 @@ export class CardDetailView extends React.Component {
   // Đang Order
   renderOrder = ({ item, RowIndex }) => {
     let {_addExtraRequestToItem} = this.props;
+    let{isColor}=this.state
     const Column1=Contentcf.width* 0.17;
     const QuantityWidth=Column1-H2FontSize*3;-2
     return (
-      <View style={{ width: Contentcf.width,height:'auto', justifyContent:'flex-start', borderBottomColor: colors.grey5, borderBottomWidth: 1, marginLeft: 1 }}>
+      <View style={{backgroundColor: isColor == true ? '#333333' :'#FFFFFF',  width: Contentcf.width,height:'auto', justifyContent:'flex-start', borderBottomColor: colors.grey5, borderBottomWidth: 1,}}>
         <View style={{ width: Contentcf.width, paddingTop:1,paddingBottom:1}}> 
         <View style={{ width: Contentcf.width, flexDirection: "row"}}> 
-        <View style={{  flexDirection: "row",  justifyContent: "center", width: Column1 }} >
+        <View style={{ flexDirection: "row",  justifyContent: "center", width: Column1,paddingLeft:2 }} >
          { (!item.PrdIsSetMenu) ?
             <TouchableOpacity  style={{width: H2FontSize, justifyContent: "center", alignItems: 'flex-start'  }} onPress={() => this._HandleQuantity(item, -1, false)}>
               <Image resizeMode="stretch" source={require('../../../assets/icons/IconDelete.png')} 
-              style={{ width: H2FontSize,height: H2FontSize,  }} />
+              style={{ width: H2FontSize*0.9,height: H2FontSize*0.9,  }} />
             </TouchableOpacity>:   
             <TouchableOpacity style={{ width: H2FontSize,justifyContent: "center", alignItems: "flex-start" }}  onPress={() => { this._HandleQuantity(item,-1,false) }}>
             <Icon name="close"  type="antdesign" size={H2FontSize}  iconStyle={{ color: colors.red,  fontFamily: "RobotoBold",height:H2FontSize}} />
           </TouchableOpacity> 
           }
             <View style={{ width: QuantityWidth,marginLeft:2,  height: 'auto',  justifyContent: 'center', alignItems: 'center'}}>
-              <TextInput ref={input => this.textInput = input}  style={{  color: "#af3037", width: '100%',  fontSize: H3FontSize, textAlign:'center',fontFamily: "RobotoBold",}}
+              <TextInput ref={input => this.textInput = input}  style={{  color:isColor == true ? "#FFFFFF" : "#af3037", width: '100%',  fontSize: H3FontSize, textAlign:'center',fontFamily: "RobotoBold",}}
                 autoFocus={false}  autoCapitalize="none" autoCorrect={false} keyboardAppearance="dark"
                 keyboardType='numeric' autoCompleteType='off' returnKeyType='done' blurOnSubmit={true}
                 defaultValue={item.OrddQuantity ? item.OrddQuantity.toString() : ''}
@@ -304,7 +309,7 @@ export class CardDetailView extends React.Component {
                }}>
             {!item.PrdIsSetMenu ? 
             <Image resizeMode="stretch" source={require('../../../assets/icons/IconAdd.png')} 
-            style={{ width: H2FontSize, height: H2FontSize, }} />
+            style={{ width: H2FontSize*0.9, height: H2FontSize*0.9, }} />
            : null
           }
            </TouchableOpacity>
@@ -316,11 +321,11 @@ export class CardDetailView extends React.Component {
             </View>
 
           <View style={{ width: Contentcf.width* 0.555, justifyContent:'center', }}>
-            <Text style={{  width: Contentcf.width* 0.555, fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left', }} numberOfLines={5}>
+            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", width: Contentcf.width* 0.555, fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left', }} numberOfLines={5}>
               {item.PrdName}
             </Text> 
             {item.OrddDescription?
-            <Text style={{  width: Contentcf.width* 0.555, fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left', }} numberOfLines={5}>
+            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", width: Contentcf.width* 0.555, fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left', }} numberOfLines={5}>
                {item.OrddDescription}
             </Text> 
             :null
@@ -328,12 +333,12 @@ export class CardDetailView extends React.Component {
            
           </View>
           <View style={{  justifyContent:'center',width: Contentcf.width* 0.1 ,}}>
-            <Text style={{ fontSize: H3_FONT_SIZE ,textAlign:'right' }}>
+            <Text style={{color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H3_FONT_SIZE ,textAlign:'right' }}>
             {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.UnitPrice : item.UnitPriceAfter, "")}
             </Text>
           </View>
           <View style={{  justifyContent: "center",width: Contentcf.width* 0.15 ,}}>
-            <Text style={{  fontSize: H3_FONT_SIZE,fontWeight:'bold',textAlign:'right' }}>
+            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H3_FONT_SIZE,fontWeight:'bold',textAlign:'right' }}>
             {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.TkdItemAmount : item.TkdTotalAmount, "")}
             </Text>
           </View>
@@ -343,7 +348,7 @@ export class CardDetailView extends React.Component {
             <FlatList keyExtractor={(item, RowIndex) => RowIndex.toString()}
               data={item.subItems && typeof item.subItems != 'undefined' ? item.subItems : []}
               renderItem={this.RenderSubItem}
-              contentContainerStyle={{ backgroundColor: colors.white, borderColor: colors.grey4 }}
+              contentContainerStyle={{color: isColor ==true ? '#FFFFFF':"#000000", backgroundColor: colors.white, borderColor: colors.grey4 }}
             />
           </View>:null
         }
@@ -384,6 +389,7 @@ export class CardDetailView extends React.Component {
       )};
   render() {
     let { state,setState, onSendOrder,lockTable, BookingsStyle, CartToggleHandle,onPressNext, translate, settings, ProductsOrdered} = this.props;
+    let {isColor}= this.state;
     if (!this.state.IsLoaded) {
       return (
         <View style={[styles.pnbody, styles.horizontal]}>
@@ -417,16 +423,16 @@ export class CardDetailView extends React.Component {
               </Text>
             </View>
             <View style={{ width: Bordy.width * 0.75, height: TabTitle.height, flexDirection: "row" }}>
-            <TouchableOpacity style={{justifyContent:'center', borderRadius: 0, backgroundColor: state.isHavingOrder?  '#dc7d46': colors.grey3,width: "50%"
+            <TouchableOpacity style={{justifyContent:'center', borderRadius: 0, backgroundColor: state.isHavingOrder? isColor == true ?'#FFCC33': '#dc7d46': colors.grey3,width: "50%"
             }}
             onPress={() => {
                 setState({ isHavingOrder: true,iLoadNumber:state.iLoadNumber+1 });
             }} >
-             <Text style={{ fontSize: H2FontSize,  color: "white",  textAlign: "center" }}>
+             <Text style={{ fontSize: H2FontSize,  color:"white",  textAlign: "center" }}>
                 {translate.Get("Đang order")}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{justifyContent:'center', borderRadius: 0, backgroundColor: !state.isHavingOrder ? '#dc7d46': colors.grey3,width: "50%"
+            <TouchableOpacity style={{justifyContent:'center', borderRadius: 0, backgroundColor: !state.isHavingOrder ?isColor == true ?'#FFCC33': '#dc7d46': colors.grey3,width: "50%"
             }}
             onPress={() => {
               setState({isHavingOrder:false, iLoadNumber:state.iLoadNumber+1 });
@@ -437,7 +443,7 @@ export class CardDetailView extends React.Component {
             </TouchableOpacity>
              
             </View>
-            <View style={{ width: "100%",marginTop:1, height:Bordy.height-(Titlecf.height+TabTitle.height+(state.isHavingOrder ? TabTitle.height*2 : TabTitle.height))
+            <View style={{backgroundColor: isColor == true ? '#444444' :'#FFFFFF',  width: "100%",marginTop:1, height:Bordy.height-(Titlecf.height+TabTitle.height+(state.isHavingOrder ? TabTitle.height*2 : TabTitle.height))
             }}>
             <FlatList
               keyExtractor={(item, RowIndex) => RowIndex.toString()}
@@ -449,27 +455,27 @@ export class CardDetailView extends React.Component {
             </View>
             {state.isHavingOrder ? (
             <View style={{ height: TabTitle.height, width: "100%",  flexDirection: "column" }}>
-              <View style={{ width: "100%", height: TabTitle.height, flexDirection: "row", backgroundColor: colors.grey5 }}>
+              <View style={{ width: "100%", height: TabTitle.height, flexDirection: "row", backgroundColor:isColor == true ? '#222222' : colors.grey5 }}>
              
                   <View style={[styles.button_end_left_order, { width: "50%",textAlign:'left',paddingTop:(TabTitle.height-H2FontSize)/2  }]}> 
-                    <Text style={{ fontSize: H3FontSize, color: "#af3037",paddingLeft:10 }}>
+                    <Text style={{ fontSize: H3FontSize, color: isColor == true ? '#DAA520' : "#af3037",paddingLeft:10 }}>
                       {translate.Get("Số lượng")}: 
-                      <Text style={{ fontSize: H3FontSize, color: "black" }}>
+                      <Text style={{ fontSize: H3FontSize, color: isColor == true ? '#FFFFFF' :"black" }}>
                       {state.CartInfor.TotalQuantity}
                     </Text>
                       </Text>
                   </View>
                   <View style={[styles.button_end_left_order, { width: "50%",textAlign:'left',paddingTop:(TabTitle.height-H2FontSize)/2  }]}> 
-                    <Text style={{ fontSize: H3FontSize, color: "#af3037",paddingLeft:H2FontSize*0.2 }}>
+                    <Text style={{ fontSize: H3FontSize, color:isColor == true ? '#DAA520' : "#af3037",paddingLeft:H2FontSize*0.2 }}>
                     {translate.Get("Thành tiền")}:
-                      <Text style={{ fontSize: H3FontSize, color: "black",paddingLeft:5 }}>
+                      <Text style={{ fontSize: H3FontSize, color: isColor == true ? '#FFFFFF' :"black",paddingLeft:5 }}>
                       {formatCurrency(state.Config.B_ViewUnitPriceBefor ? state.CartInfor.ItemAmount : state.CartInfor.TotalAmount, "")}
                     </Text>
                       </Text>
                   </View>
               </View>
               <View style={[BookingsStyle.bottombar, { width: "100%", flexDirection: "row" ,height:TabTitle.height}]}>
-              <TouchableOpacity style={{justifyContent:'center', borderRadius: 0, backgroundColor:'#dc7d46',width: "50%"
+              <TouchableOpacity style={{justifyContent:'center', borderRadius: 0, backgroundColor:isColor == true ?'#009900':'#dc7d46',width: "50%"
             }}
             onPress={() => {
               CartToggleHandle(false);
@@ -508,15 +514,15 @@ export class CardDetailView extends React.Component {
           ) : (
             <View  style={{height:TabTitle.height,width: "100%",
                 position: "absolute", flexDirection: "row",
-                bottom: 0,right: 0,borderTopColor: colors.grey5,
-                borderTopWidth: 1,backgroundColor: colors.grey5,
+                bottom: 0,right: 0,borderTopColor: isColor == true ? '#222222' :colors.grey5,
+                borderTopWidth: 1,backgroundColor:isColor == true ? '#222222' : colors.grey5,
                 alignContent:'center',justifyContent:'space-between'
               }}>
                 <View style={{width:'100%',flexDirection: "row",alignItems: "center"}}>
-                <Text style={{ fontSize: H2FontSize,marginLeft:10 }}>
+                <Text style={{color:isColor == true ? '#FFFFFF' : '#000000', fontSize: H2FontSize,marginLeft:10 }}>
                       {translate.Get("Tạm tính")}:
                       </Text>
-                    <Text style={{ fontSize: H2FontSize, color: colors.red,marginLeft:10 }}>
+                    <Text style={{ fontSize: H2FontSize, color:isColor == true ? '#DAA520' : colors.red,marginLeft:10 }}>
                     {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? state.table.Ticket.TkItemAmout : state.table.Ticket.TkTotalAmount, "")}
                   </Text>
                 </View>

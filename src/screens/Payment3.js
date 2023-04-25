@@ -24,30 +24,6 @@ const pnLeft = { width: Bordy.width * 0.17, height: SCREEN_HEIGHT };
 const Center = { width: Bordy.width - pnLeft.width, height: Bordy.height };
 const Header = { width: Center.width, height: Bordy.height * 0.085 };
 const Booton = { width: Center.width, height: Center.height * 0.07 };
-const customStyles = {
-  stepIndicatorSize: H4_FONT_SIZE,
-  currentStepIndicatorSize:H1_FONT_SIZE*1.4,
-  separatorStrokeWidth: 2,
-  currentStepStrokeWidth: 3,
-  stepStrokeCurrentColor: '#009900',
-  stepStrokeWidth: 2,
-  stepStrokeFinishedColor: '#009900',
-  stepStrokeUnFinishedColor: '#aaaaaa',
-  separatorFinishedColor: '#009900',
-  separatorUnFinishedColor: '#aaaaaa',
-  stepIndicatorFinishedColor: '#ffffff',
-  stepIndicatorUnFinishedColor: '#ffffff',
-  stepIndicatorCurrentColor: '#009900',
-  stepIndicatorLabelFontSize: H5_FONT_SIZE,
-  stepIndicatorSize:H1_FONT_SIZE,
-  currentStepIndicatorLabelFontSize: H3_FONT_SIZE,
-  stepIndicatorLabelCurrentColor: '#ffffff',
-  stepIndicatorLabelFinishedColor: '#333d4c',
-  stepIndicatorLabelUnFinishedColor: '#aaaaaa',
-  labelColor: '#999999',
-  labelSize: H3_FONT_SIZE,
-  currentStepLabelColor: '#333d4c'
-}
 export default class Payment3 extends Component {
   constructor(props) {
     super(props);
@@ -58,6 +34,7 @@ export default class Payment3 extends Component {
     this.flatListRef = null;
     this.textInput = null;
     this.state = {
+      isColor:false,
       QRData:'',
       NameE_wallet:'',
       linkQrBank:'',
@@ -127,10 +104,12 @@ export default class Payment3 extends Component {
   };
   componentDidMount = async () => {
     this.translate = await this.translate.loadLang();
+    let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
+    isColor = JSON.parse(isColor);
     await this._setConfig();
     await this._getMasterData();
     await this._getPaymentAmount();
-    this.setState({ isPostBack: true });
+    this.setState({ isPostBack: true ,isColor});
   };
   _getPaymentAmount= async () => {
     let {PaymentAmount,Ticket} = this.state;
@@ -236,9 +215,9 @@ export default class Payment3 extends Component {
     const { BookingsStyle } = this.props;
       return (
         <View style={{ width: '100%', flexDirection: "row"}}>
-            <Text style={{fontSize:H3_FONT_SIZE,width:'5%'}}>{item.TkdQuantity} x </Text>
-            <Text style={{fontSize:H3_FONT_SIZE,width:'80%'}}>{item.PrdName}</Text>
-            <Text style={{fontSize:H3_FONT_SIZE, textAlign:'right',width:'15%',paddingRight:'1%'}}>{formatCurrency(item.TkdItemAmount,"")}</Text>
+            <Text style={{color:this.state.isColor == true ? '#ffffff' : '000000',fontSize:H3_FONT_SIZE,width:'5%'}}>{item.TkdQuantity} x </Text>
+            <Text style={{color:this.state.isColor == true ? '#ffffff' : '000000',fontSize:H3_FONT_SIZE,width:'80%'}}>{item.PrdName}</Text>
+            <Text style={{color:this.state.isColor == true ? '#ffffff' : '000000',fontSize:H3_FONT_SIZE, textAlign:'right',width:'15%',paddingRight:'1%'}}>{formatCurrency(item.TkdItemAmount,"")}</Text>
           </View>
       ); 
   };
@@ -395,10 +374,42 @@ export default class Payment3 extends Component {
       );
     }
     const labels = [this.translate.Get("Thông tin đơn hàng"),this.translate.Get("Xuất hóa đơn"),this.translate.Get("Thanh toán")];
-    const {Money,isShowBarCode,isShowBarCodeVip,showCall,Vip,isShowE_wallet,isShowCash,isShowCard,isShowBanking,isShowVip,lockTable} = this.state;
+    const {Money,isShowBarCode,isShowBarCodeVip,showCall,Vip,isShowE_wallet,isShowCash,isShowCard,isShowBanking,isShowVip,lockTable,isColor} = this.state;
+    const customStyles = {
+      stepIndicatorSize: H4_FONT_SIZE,
+      currentStepIndicatorSize:H1_FONT_SIZE*1.4,
+      separatorStrokeWidth: 2,
+      currentStepStrokeWidth: 3,
+      stepStrokeCurrentColor: isColor == true ? '#DAA520' :'#009900',
+      stepStrokeWidth: 2,
+      stepStrokeFinishedColor: isColor == true ? '#DAA520' :'#009900',
+      stepStrokeUnFinishedColor: '#aaaaaa',
+      separatorFinishedColor: isColor == true ? '#DAA520' :'#009900',
+      separatorUnFinishedColor: '#aaaaaa',
+      stepIndicatorFinishedColor: '#ffffff',
+      stepIndicatorUnFinishedColor: '#ffffff',
+      stepIndicatorCurrentColor: isColor == true ? '#DAA520' :'#009900',
+      stepIndicatorLabelFontSize: H5_FONT_SIZE,
+      stepIndicatorSize:H1_FONT_SIZE,
+      currentStepIndicatorLabelFontSize: H3_FONT_SIZE,
+      stepIndicatorLabelCurrentColor:isColor == true ? '#000000' : '#ffffff',
+      stepIndicatorLabelFinishedColor: '#333d4c',
+      stepIndicatorLabelUnFinishedColor: '#aaaaaa',
+      labelColor: '#999999',
+      labelSize: H3_FONT_SIZE,
+      currentStepLabelColor: isColor == true ? '#DAA520' :'#333d4c'
+    }
+    const Paydata = [
+      {payTitle: this.translate.Get('Tiền mặt'), payImg: require("../../assets/icons/iconCash-11.png"), payOnpress:this._ShowTM},
+      {payTitle: this.translate.Get('Quẹt thẻ'), payImg: require("../../assets/icons/IconQuetThe-11.png"), payOnpress:this._ShowATM},
+      {payTitle: this.translate.Get('Chuyển khoản'), payImg: require("../../assets/icons/IconBanking-11.png"), payOnpress:this._ShowBanking},
+      {payTitle: this.translate.Get('Ví điện tử'), payImg: require("../../assets/icons/IconViDienTu-11.png"), payOnpress:this._ShowE_wallet},
+      {payTitle: 'Voucher', payImg: require("../../assets/icons/IconVoucher-11.png"), payOnpress:this._isShowBarCode},
+      {payTitle: 'Vip', payImg: require("../../assets/icons/IconVIP-11.png"), payOnpress:this._ShowVip},
+    ]
     return (
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.Container}>
-        <View style={{ flexDirection: "row", height: Bordy.height * 0.08, width: Bordy.width, backgroundColor:'#333d4c',alignItems:'center'}}>
+        <View style={{ flexDirection: "row", height: Bordy.height * 0.08, width: Bordy.width, backgroundColor:isColor == true ? '#111111' :'#333d4c',alignItems:'center'}}>
         <TouchableOpacity onPress={this.onPressBack} style={{justifyContent: 'center', width:'12%',height:'100%',alignItems:'center',flexDirection:'row'}}>
                <Image style={{height: "55%", width: "30%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
                <Text style={{color:'white', fontSize:H2_FONT_SIZE,fontFamily: "RobotoBold"}}>{this.translate.Get("Trở lại")}</Text>
@@ -415,7 +426,7 @@ export default class Payment3 extends Component {
               <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: H2_FONT_SIZE }}>{this.translate.Get('Đang gọi ..')}</Text>
               </View>
               :
-              <View style={{backgroundColor:'#33FF33',height:'100%',justifyContent: "center",borderRadius: 25, flexDirection: "row", alignItems: "center", }}>
+              <View style={{backgroundColor:isColor == true ? '#DAA520' :'#33FF33',height:'100%',justifyContent: "center",borderRadius: 25, flexDirection: "row", alignItems: "center", }}>
                 <View style={{ width: "25%", alignItems:'center'}}>
                 <Image style={{height: "70%", width: "70%"}} resizeMode='contain' source={require("../../assets/icons/IconCall-11.png")}/>
               </View>
@@ -425,7 +436,7 @@ export default class Payment3 extends Component {
             </TouchableOpacity>
             {lockTable == false?
             <TouchableOpacity
-            onPress={this.onPressNext}
+            onPress={this.onPressHome}
               style={{ justifyContent: "center", width:'7%',alignItems:'center'}}>
               <Image style={{height: "55%", width: "55%",}} resizeMode='contain' source={require("../../assets/icons/IconHome-11.png")}/>
             </TouchableOpacity>
@@ -433,48 +444,48 @@ export default class Payment3 extends Component {
           </View>
           <View style={{height: Bordy.height * 0.54, width: Bordy.width ,  flexDirection: "row",shadowOffset: {width: 0,height: 5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6}}>
           <View style={{ width: "65%", height: "100%",}}>
-            <View style={{ height: "72%", width: "100%", backgroundColor:"#fff",paddingHorizontal:'1.5%'}}>
+            <View style={{ height: "72%", width: "100%",backgroundColor:isColor == true ? '#222222' : "FFFFFF",paddingHorizontal:'1.5%'}}>
             <FlatList
               keyExtractor={(item, Index) => Index.toString()}
               data={this.state.TicketDetail }
               renderItem={this.renderOrdered}
             /> 
             </View>
-            <View style={{ height: "28%", width: "100%",shadowColor: "#000",backgroundColor:'#fff', shadowOffset: {width: 0,height: -5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6 ,paddingHorizontal:'2%'}}>
+            <View style={{ height: "28%", width: "100%",shadowColor: "#000",backgroundColor:isColor == true ? '#444444' : 'ffffff', shadowOffset: {width: 0,height: -5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6 ,paddingHorizontal:'2%'}}>
               <View style={{height:'30%',flexDirection:'row',justifyContent:'space-between',paddingVertical:'0.5%',alignItems:'center'}}>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
-                  <Text style={{ fontSize: H3_FONT_SIZE }}>{this.translate.Get('Thành tiền')}:</Text>
-                  <Text style={{ fontSize: H3_FONT_SIZE, fontFamily:'RobotoBold' }}>{formatCurrency(this.state.Money.TkItemAmout,"")}</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE }}>{this.translate.Get('Thành tiền')}:</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE, fontFamily:'RobotoBold' }}>{formatCurrency(this.state.Money.TkItemAmout,"")}</Text>
                 </View>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between',}}>
-                  <Text style={{ fontSize: H3_FONT_SIZE ,}}>Voucher:</Text>
-                  <Text onChangeText={Voucher => this.setState({ Voucher })} style={{ fontSize: H3_FONT_SIZE, fontFamily:'RobotoBold'}}>{formatCurrency(this.state.SumVoucher,"")}</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE ,}}>Voucher:</Text>
+                  <Text onChangeText={Voucher => this.setState({ Voucher })} style={{ color:isColor == true ? '#ffffff' : '000000',fontSize: H3_FONT_SIZE, fontFamily:'RobotoBold'}}>{formatCurrency(this.state.SumVoucher,"")}</Text>
                   {/* <TouchableOpacity onPress={this._RemoveVoucher}>
                     <AntDesign name='closecircle' size={H3_FONT_SIZE} color='#BB0000' />
                   </TouchableOpacity> */}
                 </View>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between',}}>
-                  <Text style={{ fontSize: H3_FONT_SIZE ,}}>{this.translate.Get('Giảm giá')}:</Text>
-                  <Text style={{ fontSize: H3_FONT_SIZE ,fontFamily:'RobotoBold'}}>{formatCurrency(Money.TkTotalDiscount,"")}</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE ,}}>{this.translate.Get('Giảm giá')}:</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE ,fontFamily:'RobotoBold'}}>{formatCurrency(Money.TkTotalDiscount,"")}</Text>
                 </View>
               </View>
               <View style={{height:'30%',flexDirection:'row',justifyContent:'space-between',paddingVertical:'0.5%',alignItems:'center'}}>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between'}}>
-                  <Text style={{ fontSize: H3_FONT_SIZE }}>VAT ({formatCurrency(Money.TkVatPercent,"%")}):</Text>
-                  <Text style={{ fontSize: H3_FONT_SIZE , fontFamily:'RobotoBold'}}>{formatCurrency(Money.TkVatTotalAmount,"")}</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE }}>VAT ({formatCurrency(Money.TkVatPercent,"%")}):</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE , fontFamily:'RobotoBold'}}>{formatCurrency(Money.TkVatTotalAmount,"")}</Text>
                 </View>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between'}}>
-                  <Text style={{ fontSize: H3_FONT_SIZE ,}}>Tip:</Text>
-                  <Text style={{ fontSize: H3_FONT_SIZE , fontFamily:'RobotoBold'}}>{formatCurrency(parseFloat(Money.TkTipAmount), '')}</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE ,}}>Tip:</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE , fontFamily:'RobotoBold'}}>{formatCurrency(parseFloat(Money.TkTipAmount), '')}</Text>
                 </View>
               </View>
               <View style={{height:'40%', flexDirection: "row", justifyContent: "space-between", alignItems: "center",paddingVertical:'0.5%'}}>
-                <Text style={{ fontSize: H1_FONT_SIZE, textAlign: "center", justifyContent: "flex-start",fontFamily:'RobotoBold',}}>{this.translate.Get('Tổng tiền cần thanh toán')}</Text>
-                <Text style={{ fontSize: H1_FONT_SIZE, textAlign: "center", justifyContent: "flex-end", color: "#CC0000",fontFamily:'RobotoBold',}}>{formatCurrency(this.state.PaymentAmount,"")}</Text>
+                <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H1_FONT_SIZE, textAlign: "center", justifyContent: "flex-start",fontFamily:'RobotoBold',}}>{this.translate.Get('Tổng tiền cần thanh toán')}</Text>
+                <Text style={{ fontSize: H1_FONT_SIZE, textAlign: "center", justifyContent: "flex-end", color:isColor == true ? '#DAA520' : "#CC0000",fontFamily:'RobotoBold',}}>{formatCurrency(this.state.PaymentAmount,"")}</Text>
               </View>
             </View>
           </View>
-          <View style={{ width: "35%", height: "100%", backgroundColor:'#fff', shadowOffset: {width: -5,height: 0},shadowOpacity: 0.1,shadowRadius: 5,elevation:6}}>
+          <View style={{ width: "35%", height: "100%", backgroundColor:isColor == true ? '#444444' : 'ffffff',  shadowOffset: {width: -5,height: 0},shadowOpacity: 0.1,shadowRadius: 5,elevation:6}}>
           { isShowCash ? 
             <View style={{ height: "100%", width: "100%",}}>
               <View style={{height:'80%',alignItems:'center'}}>
@@ -483,7 +494,7 @@ export default class Payment3 extends Component {
                 </View>
               </View>
               <View style={{height:'20%',justifyContent:'center',paddingHorizontal:'7%'}}>
-                <Text style={{fontSize:H2_FONT_SIZE, color:'#0000EE',textAlign:'center'}}>{this.translate.Get('Bấm nút "Gọi nhân viên" để phục vụ tiếp nhận thanh toán tiền mặt')}</Text>
+                <Text style={{fontSize:H2_FONT_SIZE, color:isColor == true ? '#FFFFFF':'#0000EE',textAlign:'center'}}>{this.translate.Get('Bấm nút "Gọi nhân viên" để phục vụ tiếp nhận thanh toán tiền mặt')}</Text>
               </View>
             </View>
             :isShowCard ? 
@@ -494,12 +505,12 @@ export default class Payment3 extends Component {
                 </View>
               </View>
               <View style={{height:'20%',justifyContent:'center',paddingHorizontal:'7%'}}>
-                <Text style={{fontSize:H2_FONT_SIZE, color:'#0000EE',textAlign:'center'}}>{this.translate.Get('Bấm nút "Gọi nhân viên" để phục vụ tiếp nhận thanh toán quẹt thẻ')}</Text>
+                <Text style={{fontSize:H2_FONT_SIZE, color:isColor == true ? '#FFFFFF':'#0000EE',textAlign:'center'}}>{this.translate.Get('Bấm nút "Gọi nhân viên" để phục vụ tiếp nhận thanh toán quẹt thẻ')}</Text>
               </View>
             </View>
             :isShowBanking ? 
               <View style={{height:'100%',width:'100%',alignItems:'center'}}>
-                <Text style={{fontSize:H3_FONT_SIZE*1.2, textAlign:'center',color:'#FF0000', paddingHorizontal:'3%',textShadowColor:'#444444',textShadowOffset: {width:1, height:0.5 },textShadowRadius: 1}}>Quý khách vui lòng mở ứng dụng ngân hàng và quét mã để thanh toán</Text>
+                <Text style={{fontSize:H3_FONT_SIZE*1.2, textAlign:'center',color:isColor == true ? '#FFFFFF':'#FF0000', paddingHorizontal:'3%',textShadowColor:'#444444',textShadowOffset: {width:1, height:0.5 },textShadowRadius: 1}}>Quý khách vui lòng mở ứng dụng ngân hàng và quét mã để thanh toán</Text>
                 <View style={{width:'100%',height:'85%',justifyContent:'center',alignItems:'center'}}>
                   <Image style={{height: "90%", width: "100%",}} resizeMode='contain' source={{uri: this.state.linkQrBank}}/>
                 </View>
@@ -508,12 +519,12 @@ export default class Payment3 extends Component {
             <View style={{ height: "100%", width: "100%",}}>
               <View style={{height:'80%',alignItems:'center', paddingHorizontal:'3%'}}>
                 {this.state.NameE_wallet === 'VNPAY' ?
-                <Text style={{fontSize:H3_FONT_SIZE, textAlign:'center',color:'#FF0000', paddingHorizontal:'3%',textShadowColor:'#444444',textShadowOffset: {width:1, height:0.5 },textShadowRadius: 1}}>Quý khách vui lòng mở ứng dụng ngân hàng và quét mã để thanh toán</Text>
+                <Text style={{fontSize:H3_FONT_SIZE, textAlign:'center',color:isColor == true ? '#FFFFFF':'#FF0000', paddingHorizontal:'3%',textShadowColor:'#444444',textShadowOffset: {width:1, height:0.5 },textShadowRadius: 1}}>Quý khách vui lòng mở ứng dụng ngân hàng và quét mã để thanh toán</Text>
                 :
-                <Text style={{fontSize:H3_FONT_SIZE, textAlign:'center',color:'#FF0000', paddingHorizontal:'3%',textShadowColor:'#444444',textShadowOffset: {width:1, height:0.5 },textShadowRadius: 1}}>Quý khách vui lòng quét mã QR code này bằng ứng dụng {this.state.NameE_wallet} để thanh toán </Text>
+                <Text style={{fontSize:H3_FONT_SIZE, textAlign:'center',color:isColor == true ? '#FFFFFF':'#FF0000', paddingHorizontal:'3%',textShadowColor:'#444444',textShadowOffset: {width:1, height:0.5 },textShadowRadius: 1}}>Quý khách vui lòng quét mã QR code này bằng ứng dụng {this.state.NameE_wallet} để thanh toán </Text>
                 }
-                <View style={{width:'100%',height:'85%',justifyContent:'center',alignItems:'center'}}>
-                  <Image style={{height: "100%", width: "100%",}} resizeMode='contain' source= {{uri: `data:image/png;base64,${this.state.QRData}`}}/>
+                <View style={{width:'75%',height:'75%',justifyContent:'center',alignItems:'center'}}>
+                  <Image style={{height: "100%", width: "100%",borderColor:isColor == true ? 'black' : null, borderWidth:1}} resizeMode='contain' source= {{uri: `data:image/png;base64,${this.state.QRData}`}}/>
                 </View>
               </View>
               <View style={{height:'20%',justifyContent:'center',flexDirection:'row',width:'100%',}}>
@@ -531,31 +542,31 @@ export default class Payment3 extends Component {
             :isShowVip ? 
             <View style={{ height: "100%", width: "100%",}}>
               <View style={{height:'75%',alignItems:'center'}}>
-                <Text style={{height:'10%',fontSize:H2_FONT_SIZE}}>{this.translate.Get("Khách hàng VIP")}</Text>
+                <Text style={{color:isColor == true ? '#FFFFFF':'#000000',height:'10%',fontSize:H2_FONT_SIZE}}>{this.translate.Get("Khách hàng VIP")}</Text>
                 <View style={{width:'100%',height:'90%',justifyContent:'center',alignItems:'center',paddingHorizontal:'2%'}}>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center'}}>
-                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Tên khách hàng")}:</Text>
-                    <Text style={{width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.Name}</Text>
+                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Tên khách hàng")}:</Text>
+                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.Name}</Text>
                   </View>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center'}}>
-                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Số điện thoại")}:</Text>
-                    <Text style={{width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.SDT}</Text>
+                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Số điện thoại")}:</Text>
+                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.SDT}</Text>
                   </View>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center',}}>
-                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Ngày sinh")}:</Text>
-                    <Text style={{width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.date}</Text>
+                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Ngày sinh")}:</Text>
+                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.date}</Text>
                   </View>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center'}}>
-                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Mã thẻ")}:</Text>
-                    <Text style={{width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8}}>{Vip.cardNo}</Text>
+                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Mã thẻ")}:</Text>
+                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8}}>{Vip.cardNo}</Text>
                   </View>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center'}}>
-                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Điểm tích lũy")}:</Text>
-                    <Text style={{width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.point}</Text>
+                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Điểm tích lũy")}:</Text>
+                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.point}</Text>
                   </View>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center'}}>
-                    <Text style={{width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Hạng thẻ")}:</Text>
-                    <Text style={{width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.rank}</Text>
+                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Hạng thẻ")}:</Text>
+                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.rank}</Text>
                   </View>
                 </View>
               </View>
@@ -568,62 +579,32 @@ export default class Payment3 extends Component {
             : null}
           </View>
         </View>
-        <View style={{ height: Bordy.height * 0.18, width: Bordy.width, alignItems: "center",paddingHorizontal:'20%'}}>
+        <View style={{ height: Bordy.height * 0.18, width: Bordy.width, alignItems: "center",paddingHorizontal:Bordy.width*0.2,backgroundColor: isColor == true ?'#333333' : '#ffffff'}}>
           <View style={{flexDirection:'row',height:'45%',width:'100%', paddingVertical:'1%',alignItems:'center'}}>
             <View style={{width:'5%',height:'100%'}}>
             <Image style={{height: "100%", width: "100%",}} resizeMode='contain' source={require("../../assets/icons/IconThanhToan-11.png")}/>
             </View>
-            <Text style={{fontSize:H2_FONT_SIZE,}}>{this.translate.Get('Chọn hình thức thanh toán')}</Text>
+            <Text style={{color:isColor == true ? '#ffffff' : '000000',fontSize:H2_FONT_SIZE,}}>{this.translate.Get('Chọn hình thức thanh toán')}</Text>
           </View>
           <View style={{flexDirection:'row',height:'55%',width:'100%',justifyContent:'space-between'}}>
-            <TouchableOpacity onPress={ this._ShowTM} style={{width:'13%',height:'100%',flexDirection:'column',alignItems:'center',backgroundColor:'#fff', borderRadius:10,shadowOpacity: 0.3,shadowRadius: 4,elevation:6}}>
+          <FlatList
+            horizontal
+                keyExtractor={(item, Index) => Index.toString()}
+                data={Paydata}
+                renderItem={({ item, index }) => 
+                <TouchableOpacity onPress={ item.payOnpress} style={{width:Bordy.width*0.09,marginRight:Bordy.width*0.01,height:'100%',flexDirection:'column',alignItems:'center',backgroundColor:isColor == true ? '#555555' :'#fff', borderRadius:10,shadowOpacity: 0.3,shadowRadius: 4,elevation:6}}>
             <View style={{width:'100%',height:'70%',justifyContent:'center',alignItems:'center'}}>
-            <Image style={{height: "90%", width: "90%",}} resizeMode='contain' source={require("../../assets/icons/iconCash-11.png")}/>
+            <Image style={{height: "90%", width: "90%",}} resizeMode='contain' source={item.payImg}/>
             </View>
-            <Text style={{height:'30%', fontSize:H4_FONT_SIZE}}>{this.translate.Get('Tiền mặt')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={this._ShowATM} style={{width:'13%',height:'100%',flexDirection:'column',alignItems:'center',backgroundColor:'#fff', borderRadius:10,shadowOpacity: 0.3,shadowRadius: 4,elevation:6}}>
-            <View style={{width:'100%',height:'70%',justifyContent:'center',alignItems:'center'}}>
-            <Image style={{height: "90%", width: "90%",}} resizeMode='contain' source={require("../../assets/icons/IconQuetThe-11.png")}/>
-            </View>
-            <Text style={{height:'30%', fontSize:H4_FONT_SIZE}}>{this.translate.Get('Quẹt thẻ')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={this._ShowBanking} style={{width:'13%',height:'100%',flexDirection:'column',alignItems:'center',backgroundColor:'#fff', borderRadius:10,shadowOpacity: 0.3,shadowRadius: 4,elevation:6}}>
-            <View style={{width:'100%',height:'70%',justifyContent:'center',alignItems:'center'}}>
-            <Image style={{height: "90%", width: "90%",}} resizeMode='contain' source={require("../../assets/icons/IconBanking-11.png")}/>
-            </View>
-            <Text style={{height:'30%', fontSize:H4_FONT_SIZE*0.9}}>{this.translate.Get('Chuyển khoản')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={this._ShowE_wallet} style={{width:'13%',height:'100%',flexDirection:'column',alignItems:'center',backgroundColor:'#fff', borderRadius:10,shadowOpacity: 0.3,shadowRadius: 4,elevation:6}}>
-            <View style={{width:'100%',height:'70%',justifyContent:'center',alignItems:'center'}}>
-            <Image style={{height: "90%", width: "90%",}} resizeMode='contain' source={require("../../assets/icons/IconViDienTu-11.png")}/>
-            </View>
-            <Text style={{height:'30%', fontSize:H4_FONT_SIZE}}>{this.translate.Get('Ví điện tử')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={this._isShowBarCode} style={{width:'13%',height:'100%',flexDirection:'column',alignItems:'center',backgroundColor:'#fff', borderRadius:10,shadowOpacity: 0.3,shadowRadius: 4,elevation:6}}>
-            <View style={{width:'100%',height:'70%',justifyContent:'center',alignItems:'center'}}>
-            <Image style={{height: "90%", width: "90%",}} resizeMode='contain' source={require("../../assets/icons/IconVoucher-11.png")}/>
-            </View>
-            <Text style={{height:'30%', fontSize:H4_FONT_SIZE}}>Voucher</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={this._ShowVip} style={{width:'13%',height:'100%',flexDirection:'column',alignItems:'center',justifyContent:'center',backgroundColor:'#fff', borderRadius:10,shadowOpacity: 0.3,shadowRadius: 4,elevation:6}}>
-            <View style={{width:'100%',height:'70%',justifyContent:'center',alignItems:'center'}}>
-            <Image style={{height: "90%", width: "90%",}} resizeMode='contain' source={require("../../assets/icons/IconVIP-11.png")}/>
-            </View>
-            <Text style={{height:'30%', fontSize:H4_FONT_SIZE}}>Vip</Text>
-            </TouchableOpacity>
+            <Text style={{height:'30%',color:isColor == true ? '#FFFFFF' : '#000000', fontSize:H4_FONT_SIZE}}>{item.payTitle}</Text>
+            </TouchableOpacity>}
+              />
           </View>
         </View>
-        <View style={{ height: Bordy.height * 0.20, width: Bordy.width, alignItems: "center"}}>
-          <LinearGradient
-            colors={[ '#333d4c', '#333d4c']}
-            start={{ x: 0, y: 0 }}
-            end={{ x:0, y: 1 }}
-            style={{marginTop: 15, borderWidth: 1, height: '30%',borderRadius:35,width:'30%'}}>
-            <TouchableOpacity onPress={this.onPressNext} style={{  height: "100%", width: "100%", justifyContent: "center", alignItems: "center"}}>
-              <Text style={{ textAlign: "center",color:'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>{this.translate.Get('Xác nhận thanh toán')}</Text>
+        <View style={{ height: Bordy.height * 0.20, width: Bordy.width, alignItems: "center",backgroundColor: isColor == true ?'#333333' : '#ffffff'}}>
+            <TouchableOpacity onPress={this.onPressNext} style={{backgroundColor:isColor == true ? '#DAA520' :'#33FF33', marginTop: 15, borderWidth: 1, height: '30%',borderRadius:35,width:'30%', justifyContent: "center", alignItems: "center"}}>
+              <Text style={{ textAlign: "center",color:isColor == true ? '#000000' :'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>{this.translate.Get('Xác nhận thanh toán')}</Text>
             </TouchableOpacity>
-          </LinearGradient>
           <View style={{height:'70%', width: Bordy.width, justifyContent:'center'}}>
             <StepIndicator
               customStyles={customStyles}

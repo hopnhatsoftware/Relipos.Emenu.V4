@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import {TouchableOpacity,  Dimensions,  ActivityIndicator, UIManager, TextInput, TouchableWithoutFeedback,StyleSheet, Text, View, StatusBar, FlatList,Alert } from 'react-native';
 import Constants from 'expo-constants';
-import NetInfo from "@react-native-community/netinfo";
+import {NetInfo} from "@react-native-community/netinfo";
 import { _retrieveData, _storeData, _remove, _clearData } from '../services/storages';
 import { cacheFonts } from "../helpers/AssetsCaching";
 import { ListArea, ListTables, CheckAndGetOrder, Object_Search, Ticket_getById, Ticket_Flush } from '../services';
@@ -69,6 +69,7 @@ export default class TableView extends Component {
         ObjWaiter: '',
         ObjWaiterName: '',
       },
+      isColor:false,
       B_UseOrderDefault: true,
       ObjType: 2,
       KeySearch: '',
@@ -101,14 +102,24 @@ export default class TableView extends Component {
   //     console.log("Connection type2", state.type);
   //     console.log("Is connected2?", state.isConnected);
   //     if(state.isConnected == true){
-  //       Alert.alert('Thông báo',NetInfo.isConnected)
+  //       Alert.alert('Thông báo','Có kết nối internet')
   //     }
   //     else{
-  //       return ;
+  //       Alert.alert('Thông báo','Không kết nối internet')
   //     }
   // });
-  
-  // Unsubscribe
+//   NetInfo.isConnected.fetch().done((isConnected) => {
+//     if ( isConnected )
+//     {
+//         // Run your API call
+//         Alert.alert('Thông báo','Có kết nối internet')
+//     }
+//     else
+//     {
+//         // Ideally load from local storage
+//         Alert.alert('Thông báo','Không kết nối internet')
+//     }
+// });
   // unsubscribe();
     try {
     this.translate = await this.translate.loadLang();
@@ -124,37 +135,47 @@ export default class TableView extends Component {
     let user = await _retrieveData('APP@USER', JSON.stringify({}));
     if(user!='{}')
     user = JSON.parse(user);
+    let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
+    isColor = JSON.parse(isColor);
     let endpoint = await _retrieveData('APP@BACKEND_ENDPOINT', JSON.stringify({endpoint : ENDPOINT_URL}));
     endpoint = JSON.parse(endpoint);
     let Config = await _retrieveData('APP@CONFIG', '{}');
     if (Config!='{}')
     Config=JSON.parse(Config);
-    this.setState({ Config,settings, user });
+    this.setState({ Config,settings, user,isColor });
     await this.GetListCustomer();
     await this.getlistArea(()=> this.loadTables(0));
     StatusBar.setHidden(true);
     this.defaultFonts();
     this.setState({ fontLoaded:true})
-      
     } catch (error) {
-      Question.alert( this.translate.Get('Notice'),error, [
+      Alert.alert(this.t._('Notice'), error, [
         {
           text: "OK", onPress: () => {
-            this.setState({ fontLoaded:true});
           }
         }
-      ]);
+      ]
+      )
     }
   }
+//  checkConnection = () => {
+//     if (netInfo.isConnected && netInfo.isInternetReachable) {
+//       Alert.alert('You are online!');
+//     } else {
+//       Alert.alert('You are offline!');
+//     }
+//   };
   GetListCustomer = async () => {
+    try{
     const { ObjType, KeySearch, OgId, isGetOrg } = this.state;
     this.setState({ isWorking: true });
     Object_Search(ObjType, KeySearch, OgId, isGetOrg).then((res) => {
       let CustomerList = res.Data;
       this.setState({ CustomerList, isWorking: false });
-    }).catch(async (err) => {
+    })}
+    catch{(async (err) => {
       this.setState({ CustomerList: [],  isWorking: false });
-    });
+    })};
     this.setState({ isWorking: false,  });
   }
   defaultFonts() {
@@ -192,6 +213,7 @@ export default class TableView extends Component {
  * @param {*} callback 
  */
   getlistArea = async (callback) => {
+    try{
     let { settings,Config} = this.state;
     Config.PosId = settings.PosId;
     Config.I_BusinessType = 1;
@@ -203,7 +225,8 @@ export default class TableView extends Component {
       else {
         this.setState({ isWorking: false });
       }
-    }).catch(async (err) => {
+    })}
+    catch{(async (err) => {
       Question.alert( this.translate.Get('Notice'),err, [
         {
           text: "OK", onPress: () => {
@@ -212,9 +235,10 @@ export default class TableView extends Component {
         }
       ]);
      
-    });
+    })};
   }
   loadTables = async (selectedAreaIndex) => {
+    try{
     let { AreasList, tableStatus,settings,Config } = this.state;
     let AreaId = AreasList[selectedAreaIndex].AreID;
     Config.PosId = settings.PosId;
@@ -222,9 +246,17 @@ export default class TableView extends Component {
     this.setState({  isWorking: true});
     ListTables(Config, AreaId, tableStatus).then((res) => {
       this.setState({ selectedAreaIndex, TablesList: res.Data.Table, isWorking: false });
-    }).catch(async (err) => {
+    })}
+    catch{(async (err) => {
       this.setState({ selectedAreaIndex, isWorking: false});
-    });
+      Alert.alert(this.t._('Notice'), error, [
+        {
+          text: "OK", onPress: () => {
+          }
+        }
+      ]
+      )
+    })};
   }
   filter = (status) => {
     this.setState({ tableStatus: status }, () => { this.loadTables(this.state.selectedAreaIndex) });
@@ -237,6 +269,7 @@ export default class TableView extends Component {
       });
     }
     else {
+      try{
       this.setState({ isLoading: true });
       CheckAndGetOrder(item, OrdPlatform).then((res) => {
         item.OrderId = res.Data;
@@ -246,7 +279,8 @@ export default class TableView extends Component {
           () => {
             this.props.navigation.navigate("OrderView", { settings, user, table: item });
           });
-      }).catch((error) => {
+      })}
+      catch{((error) => {
         Question.alert( 'System Error',error, [
           {
             text: "OK", onPress: () => {
@@ -255,11 +289,12 @@ export default class TableView extends Component {
           }
         ]);
        
-      });
+      })};
     }
   }
 
   _handleChangeButton = async () => {
+    try{
     let {user,settings,Config, TicketInfor, sItemTable, B_UseOrderDefault, OrdPlatform, group, AreasList, selectedAreaIndex } = this.state;
   
     Config.PosId = settings && settings.PosId ? settings.PosId : 1;
@@ -302,7 +337,8 @@ export default class TableView extends Component {
       else {
         this.setState({ isWorking: false, })
       }
-    }).catch((error) => {
+    })}
+    catch{((error) => {
       Question.alert('System Error',error, [
         {
           text: "OK", onPress: () => {
@@ -312,7 +348,7 @@ export default class TableView extends Component {
       ]
       )
       this.setState({ isWorking: false, });
-    });
+    })};
   }
   _setItemCustomer = async (item, index) => {
     let { TicketInfor } = this.state;
@@ -334,7 +370,7 @@ export default class TableView extends Component {
     );
   };
   render() {
-    const {  AreasList,  TablesList,  Config,  showFilterPanel,  isShowTicketInfor,  showCustomer,  CustomerList,  TicketInfor,  } = this.state;
+    const {  AreasList,  TablesList,  Config,  showFilterPanel,  isShowTicketInfor,  showCustomer,  CustomerList,  TicketInfor,  isColor} = this.state;
     
     if (!this.state.fontLoaded) {
       return (
@@ -352,7 +388,7 @@ export default class TableView extends Component {
     let I_TableColumn=5;//(Config&&Config.I_TableColumn&&Config.I_TableColumn>0)?Config.I_TableColumn:5;
     let I_TableWidth=Bordy.width/I_TableColumn;
     return (
-      <View style={styles.container}>
+      <View style={[styles.container,{backgroundColor: isColor == true ? '#444444' : colors.grey5,}]}>
         <StatusBar hidden={true} />
         <View style={{ flex: 1 }}>
           <View style={[styles.toolbar,{height:pnHeaderheight,backgroundColor:"#333D4C"}]}>

@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { Alert,TouchableOpacity,Dimensions,Image,ActivityIndicator,KeyboardAvoidingView,StyleSheet,Text,View,StatusBar, Platform, Keyboard,Modal,FlatList} from 'react-native';
+import { Alert,TouchableOpacity,Dimensions,Image,ActivityIndicator,KeyboardAvoidingView,StyleSheet,Text,View,StatusBar, Platform, Keyboard,Modal,FlatList,Switch} from 'react-native';
 import * as Network from 'expo-network';
 import { LinearGradient } from 'expo-linear-gradient'
+import { AntDesign } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import Icon from '@expo/vector-icons/Entypo'
 import { login, CheckCasherIn,getLanguage } from '../services';
@@ -41,6 +42,7 @@ export default class LoginView extends Component {
       listLanguage2:{},
       languageText: '',
       languageImg: '',
+      isColor: false,
       LgIco:'',
       modalVisible : false,
       settings: {},
@@ -55,9 +57,12 @@ export default class LoginView extends Component {
 
   async componentDidMount()  {
     try{
+
     let { username } = this.state;
     let settings = await _retrieveData('settings', JSON.stringify({}));
     let user = await _retrieveData('APP@USER', JSON.stringify({}));
+    let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
+    isColor = JSON.parse(isColor);
     if (typeof user !== 'undefined') {
       user = JSON.parse(user);
       username = user.UserName;
@@ -107,7 +112,7 @@ export default class LoginView extends Component {
  
     StatusBar.setHidden(true);
     this.defaultFonts();
-    this.setState({ fontLoaded: true,endpoint, username, language: language, settings });
+    this.setState({ fontLoaded: true,endpoint, username, language: language, settings,isColor });
     await this._getLanguage(true);
   } catch (ex) {
     console.log('LoginView componentDidMount Error:' + ex);
@@ -184,6 +189,15 @@ BingdingConfig = async (user,Config,JwtToken) => {
     });
   });
 }
+  toggleSwitch = async() => {
+    let{isColor} = this.state
+    this.setState({ isColor : !isColor  })
+    _remove('APP@Interface', () => { 
+      _storeData("APP@Interface", JSON.stringify(this.state.isColor) ,()=>{
+      });
+    });
+   
+  };
   login = async () => {  
     let {  username, password} = this.state;
     let that = this;
@@ -263,13 +277,22 @@ const passwordValid = this.validatePassword();
         this.setState({ isLoading: false, isWorking: false, })
   }
   changeLanguage = async (lang , item) => {
+    try{
     if (this.state.language != lang) {
       _storeData("culture", lang.toString(), async () => {
         this.translate = await this.translate.loadLang();
         this.setState({ language: lang, languageText: item.LgName, languageImg: item.LgClsIco });
         this.getBranchesList();
       });
-    }
+    }}
+    catch{(async (err) => {
+      Question.alert( this.translate.Get('Notice'),err, [
+        {
+          text: "OK", onPress: () => {
+          }
+        }
+      ]);
+    })}
   }
   setModalVisible = (visible) => {
     this.setState({ modalVisible: visible });
@@ -311,7 +334,7 @@ _CombackView = () => {
   }
   render = () => {
     const { manifest } = Constants;
-    const {endpoint,  isLoading, fontLoaded,  password,  passwordValid,  username,  lockTable,  secureTextEntry,  usernameValid,listLanguage,modalVisible,languageImg } = this.state;
+    const {endpoint,  isLoading, fontLoaded,  password,  passwordValid,  username,  lockTable,  secureTextEntry,  usernameValid,listLanguage,modalVisible,languageImg,isColor } = this.state;
 let ImageWidth=Bordy.width*0.12
 
     if (!fontLoaded) {
@@ -319,7 +342,7 @@ let ImageWidth=Bordy.width*0.12
         <ActivityIndicator style={{ marginTop: Bordy.height / 2 - 20 }} size="large" color="red"></ActivityIndicator>);
     }
     return (
-      <View style={styles.container}>
+      <View style={[styles.container,{backgroundColor:isColor == true ?'#0D0D0D' : '#333D4C',}]}>
         {modalVisible ?
           <Modal
           animationType='fade'
@@ -327,9 +350,13 @@ let ImageWidth=Bordy.width*0.12
           visible={modalVisible}>
           <TouchableOpacity style={{height: Bordy.height,width: Bordy.width,backgroundColor: 'black',opacity: 0.5,zIndex: 1}} onPress={() => this.setModalVisible(!modalVisible)}>
           </TouchableOpacity>
-          <View style={{top: Bordy.height*0.3, left: Bordy.width*0.32, width: Bordy.width *0.36, height: Bordy.height*0.4, zIndex: 2, position: 'absolute',backgroundColor:'white',borderWidth:0.5}}>
-            <View style={{height:'15%',width:'100%',backgroundColor:'#257DBC',justifyContent:'center',borderBottomWidth:0.5}}>
-            <Text style={{fontSize:H2_FONT_SIZE, textAlign:'center', color:'white',fontFamily: "RobotoBold"}}>{this.translate.Get('language')}</Text>
+          <View style={{top: Bordy.height*0.3, left: Bordy.width*0.32, width: Bordy.width *0.36, height: Bordy.height*0.4, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+          <View style={{height:'15%',width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',borderBottomWidth:0.5,justifyContent:'space-between',flexDirection:'row',alignItems:'center',}}>
+            <TouchableOpacity><AntDesign name="close" style={{ color: isColor==true?'#111111':'#257DBC', left:5 }} size={H1_FONT_SIZE} /></TouchableOpacity>
+            <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold"}}>{this.translate.Get('language')}</Text>
+            <TouchableOpacity onPress={() => this.setModalVisible(!modalVisible)}>
+              <AntDesign name="close" style={{ color: isColor==true?'#DAA520':'white',  right:5 }} size={H1_FONT_SIZE} />
+            </TouchableOpacity>
             </View>
             <FlatList
             data={listLanguage}
@@ -338,9 +365,9 @@ let ImageWidth=Bordy.width*0.12
                 style={{ width: '100%',justifyContent:'center',borderBottomWidth:0.5,paddingVertical:20}}>
                 <View style={{width:'100%',flexDirection: "row",alignItems:'center'}}>
                   <Image resizeMode="contain" source={item.LgClsIco == 'icon-flagvn' ? require('../../assets/icons/icon-flagvn.png'): item.LgClsIco == 'icon-flagus' ? require('../../assets/icons/icon-flagus.png'):item.LgClsIco == 'icon-flagcn' ? require('../../assets/icons/icon-flagcn.png'): null} style={{ width: '20%',height:"100%", }}></Image>
-                  <Text style={{width:this.state.language == item.LgId ? '70%' : "80%",justifyContent:'center',textAlign:'left',fontSize:H3FontSize}} >{item.LgName}</Text>
+                  <Text style={{width:this.state.language == item.LgId ? '70%' : "80%",justifyContent:'center',textAlign:'left',fontSize:H3FontSize,color: isColor==true?'#FFFFFF':'#000000'}} >{item.LgName}</Text>
                   {this.state.language == item.LgId ?
-                    <Icon  name="check" type="entypo" style={{left: 2, color: '#009900',fontSize: H2_FONT_SIZE,}}/>
+                    <Icon  name="check" type="entypo" style={{left: 2, color: isColor==true?'#DAA520': '#009900',fontSize: H2_FONT_SIZE,}}/>
                     :null
                   }
                   
@@ -357,9 +384,9 @@ let ImageWidth=Bordy.width*0.12
               <Text style={{fontSize:H1_FONT_SIZE*1.2, color:'#fff',textAlign:'center'}}>{this.translate.Get("Quý khách vui lòng đợi nhân viên xác nhận thanh toán")}</Text>
             </View>
             :null}
-          <View style={styles.BorderLogin}>
+          <View style={[styles.BorderLogin,{backgroundColor:isColor == true ? '#252525':'#EEEEEE',borderColor: isColor == true ?'#FFA500' : '#166ead',}]}>
             <View style={styles.BorderFormLogin}>
-            <View><Text style={{ color: BACKGROUND_COLOR, textAlign: 'center', fontSize: H1FontSize, }}>{this.translate.Get('Đăng nhập hệ thống')}</Text></View> 
+            <View><Text style={{ color: isColor == true ?'#FEAD1D' : BACKGROUND_COLOR , textAlign: 'center', fontSize: H1FontSize, }}>{this.translate.Get('Đăng nhập hệ thống')}</Text></View> 
               <FormInput leftIcon={  <Icon  name="user"  type="antdesign"
                     style={{
                       backgroundColor: 'transparent',
@@ -437,14 +464,14 @@ let ImageWidth=Bordy.width*0.12
                 errorMessage={(passwordValid==true) ? null : this.translate.Get('login.fail.missing_password')}
               />
             </View>
-            <LinearGradient  colors={["#257DBC", "#1D75B3", "#166ead", "#0C629F"]}
+            <LinearGradient  colors={isColor == true ?  ['#444444','#444444','#444444']:["#257DBC", "#1D75B3", "#166ead", "#0C629F"]}
               style={{ marginTop: ITEM_FONT_SIZE, paddingHorizontal:10 }}>
               <View style={{ flexDirection: 'row', width: '100%', alignItems: 'center', justifyContent: 'space-between' }}>
                 <View style={{flexDirection: "row",height:"100%",alignItems:'center'}}>
                   <TouchableOpacity onPress={() => this.setModalVisible(!modalVisible )} 
-                  style={{height:'70%', flexDirection: "row", justifyContent:'space-around',borderWidth:1,borderColor: '#000000',backgroundColor: '#0176cd',borderRadius:8, alignItems:'center'}}>
-                    <Image resizeMode="contain" source={languageImg == 'icon-flagvn' ? require('../../assets/icons/icon-flagvn.png'): languageImg == 'icon-flagus' ? require('../../assets/icons/icon-flagus.png'):languageImg == 'icon-flagcn' ? require('../../assets/icons/icon-flagcn.png'): null} style={{ width: '20%',height:"100%", }}></Image>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:'white', textAlign:'center'}}>{this.state.languageText}</Text>
+                  style={{height:'70%', flexDirection: "row", justifyContent:'space-around',borderWidth:1,borderColor: '#000000',backgroundColor:isColor == true? '#DAA520': '#0176cd',borderRadius:8, alignItems:'center'}}>
+                    <Image source={languageImg == 'icon-flagvn' ? require('../../assets/icons/icon-flagvn.png'): languageImg == 'icon-flagus' ? require('../../assets/icons/icon-flagus.png'):languageImg == 'icon-flagcn' ? require('../../assets/icons/icon-flagcn.png'):null} style={{ width: '20%' ,height:'90%' , }} resizeMode={'contain'}></Image>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true? 'black':'white', textAlign:'center'}}>{this.state.languageText}</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={{ flexDirection: "row", alignContent: "center", paddingTop: ITEM_FONT_SIZE / 2, paddingBottom: ITEM_FONT_SIZE / 2, }}>
@@ -452,23 +479,23 @@ let ImageWidth=Bordy.width*0.12
                 <View style={{ paddingRight: ITEM_FONT_SIZE / 3 }}>
                   <Button
                     con={{name:"input", color:"white"}}
-                    buttonStyle={styles.button}
+                    buttonStyle={[styles.button,{backgroundColor:isColor == true? '#DAA520': '#0176cd'}]}
                     ontainerStyle={styles.buttonContainer}
                     title={this.translate.Get('Back')}
                     onPress={() => {
                       Keyboard.dismiss();
                       this._CombackView();
                     }}
-                    titleStyle={styles.buttonText}
+                    titleStyle={[styles.buttonText,{color:isColor == true? 'black':'white'}]}
                     disabled={isLoading}
                   /></View> 
                    : null}
-                  <View style={{}}><Button buttonStyle={styles.button}  title={this.translate.Get(this.login_button_text)}
+                  <View style={{}}><Button buttonStyle={[styles.button,{backgroundColor:isColor == true? '#DAA520': '#0176cd'}]}  title={this.translate.Get(this.login_button_text)}
                     onPress={() => {
                       Keyboard.dismiss();
                       this.login();
                     }}
-                    titleStyle={styles.buttonText}
+                    titleStyle={[styles.buttonText,{color:isColor == true? 'black':'white'}]}
                     disabled={isLoading}
                   /></View>
 
@@ -477,6 +504,7 @@ let ImageWidth=Bordy.width*0.12
               </View>
             </LinearGradient>
           </View>
+          
         </KeyboardAvoidingView>
 
          {/* <View style={styles.bottomImage}>
@@ -497,7 +525,9 @@ let ImageWidth=Bordy.width*0.12
              
           </TouchableOpacity>
         </View>  */}
-       
+       <View style={{height:'10%',width:'50%',bottom:'5%',zIndex:2,position:'absolute'}}>
+              <Image resizeMode='contain' style={{ width: '100%', height: '100%' }} source={require('../../assets/images/RelisoftLogo_trans-07.png')} />
+            </View>
         {this.state.isWorking ?
           <View style={styles.item_view_text}>
             <ActivityIndicator color={colors.primary} size="large"></ActivityIndicator>
@@ -509,7 +539,18 @@ let ImageWidth=Bordy.width*0.12
            <View style={{ width:'100%',alignItems:'center'}}>
              <Text style={{ color: colors.white }}>V.{manifest.version} _ {Platform.OS == 'ios' ?manifest.ios.buildNumber :manifest.android.versionCode}</Text></View>
           </View> 
+          <View position='absolute'  style={{width:Bordy.width * 0.2, alignItems:'baseline',top:5,right:0 ,flexDirection:'row', justifyContent:'center', alignItems:'center'}}>
+          <Text style={{fontSize:H2FontSize, color:'white',paddingRight:10}}>{this.translate.Get("Chế độ tối")}:</Text>
+          <Switch
+        trackColor={{false: '#767577', true: '81b0ff'}}
+        thumbColor={isColor ? 'f5dd4b' : 'f4f3f4'}
+        ios_backgroundColor="#3e3e3e"
+        onValueChange={this.toggleSwitch}
+        value={isColor}
+      />
+          </View> 
       </View>
+      
 
     );
   }
@@ -540,7 +581,7 @@ export const FormInput = props => {
 const styles = StyleSheet.create({
   container: {
     height:Bordy.height,width:Bordy.width,
-    backgroundColor: '#333D4C',
+    
     alignItems: 'center',
     justifyContent: 'space-around',
   },
@@ -597,7 +638,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     alignItems: "center",
-    fontSize: H2_FONT_SIZE,
+    fontSize: H3_FONT_SIZE,
   },
   bottomPanel: {
     flex: 1
@@ -635,9 +676,8 @@ const styles = StyleSheet.create({
     borderTopWidth: 3,
     borderBottomLeftRadius: 3,
     borderBottomRightRadius: 3,
-    borderColor: '#166ead',
-    borderBottomColor: '#0C629F',
-    backgroundColor: '#EEEEEE',
+    
+    // borderBottomColor: '#0C629F',
     width: Bordy.width * 0.55,
   },
   BorderFormLogin: {

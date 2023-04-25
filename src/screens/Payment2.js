@@ -28,30 +28,6 @@ const ProductList = {
   ColumnNum: 2,
   RowNum: 3,
 };
-const customStyles = {
-  stepIndicatorSize: H4_FONT_SIZE,
-  currentStepIndicatorSize:H1_FONT_SIZE*1.4,
-  separatorStrokeWidth: 2,
-  currentStepStrokeWidth: 3,
-  stepStrokeCurrentColor: '#009900',
-  stepStrokeWidth: 2,
-  stepStrokeFinishedColor: '#009900',
-  stepStrokeUnFinishedColor: '#aaaaaa',
-  separatorFinishedColor: '#009900',
-  separatorUnFinishedColor: '#aaaaaa',
-  stepIndicatorFinishedColor: '#ffffff',
-  stepIndicatorUnFinishedColor: '#ffffff',
-  stepIndicatorCurrentColor: '#009900',
-  stepIndicatorLabelFontSize: H5_FONT_SIZE,
-  stepIndicatorSize:H1_FONT_SIZE,
-  currentStepIndicatorLabelFontSize: H3_FONT_SIZE,
-  stepIndicatorLabelCurrentColor: '#ffffff',
-  stepIndicatorLabelFinishedColor: '#333d4c',
-  stepIndicatorLabelUnFinishedColor: '#aaaaaa',
-  labelColor: '#999999',
-  labelSize: H3_FONT_SIZE,
-  currentStepLabelColor: '#333d4c'
-}
 export default class Payment2 extends Component {
   constructor(props) {
     super(props);
@@ -63,6 +39,7 @@ export default class Payment2 extends Component {
     this.textInput = null;
     this.state = {
       alertt:false,
+      isColor:false,
       value :'',
       currentPosition: 1,
       showCall: false,
@@ -96,10 +73,12 @@ export default class Payment2 extends Component {
     clearInterval(this.interval);
   };
   componentDidMount = async () => {
+    let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
+    isColor = JSON.parse(isColor);
     this.translate = await this.translate.loadLang();
     await this._setConfig();
     await this._getinvoiceInfor();
-    this.setState({ isPostBack: true });
+    this.setState({ isPostBack: true ,isColor});
   };
   _setConfig = async () => {
     try{
@@ -318,18 +297,42 @@ export default class Payment2 extends Component {
       );
     }
     const labels = [this.translate.Get("Thông tin đơn hàng"),this.translate.Get("Xuất hóa đơn"),this.translate.Get("Thanh toán")];
-    const { lockTable} = this.state;
+    const { lockTable,isColor} = this.state;
+    const customStyles = {
+      stepIndicatorSize: H4_FONT_SIZE,
+      currentStepIndicatorSize:H1_FONT_SIZE*1.4,
+      separatorStrokeWidth: 2,
+      currentStepStrokeWidth: 3,
+      stepStrokeCurrentColor: isColor == true ? '#DAA520' :'#009900',
+      stepStrokeWidth: 2,
+      stepStrokeFinishedColor: isColor == true ? '#DAA520' :'#009900',
+      stepStrokeUnFinishedColor: '#aaaaaa',
+      separatorFinishedColor: isColor == true ? '#DAA520' :'#009900',
+      separatorUnFinishedColor: '#aaaaaa',
+      stepIndicatorFinishedColor: '#ffffff',
+      stepIndicatorUnFinishedColor: '#ffffff',
+      stepIndicatorCurrentColor: isColor == true ? '#DAA520' :'#009900',
+      stepIndicatorLabelFontSize: H5_FONT_SIZE,
+      stepIndicatorSize:H1_FONT_SIZE,
+      currentStepIndicatorLabelFontSize: H3_FONT_SIZE,
+      stepIndicatorLabelCurrentColor:isColor == true ? '#000000' : '#ffffff',
+      stepIndicatorLabelFinishedColor: '#333d4c',
+      stepIndicatorLabelUnFinishedColor: '#aaaaaa',
+      labelColor: '#999999',
+      labelSize: H3_FONT_SIZE,
+      currentStepLabelColor: isColor == true ? '#DAA520' :'#333d4c'
+    }
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.Container}>
+        style={[styles.Container,{backgroundColor:isColor == true ? '#333333' : '#FFFFFF', }]}>
           {this.state.isShowMash?
       <View style={styles.BackgroundMash}>
       <ActivityIndicator color={'#29ade3'} size="large"></ActivityIndicator>
     </View>
       :null}
           <ScrollView>
-          <View style={{ flexDirection: "row", height: Bordy.height * 0.08, width: Bordy.width, backgroundColor:'#333d4c',alignItems:'center'}}>
+          <View style={{ flexDirection: "row", height: Bordy.height * 0.08, width: Bordy.width, backgroundColor:isColor == true ? '#111111' :'#333d4c',alignItems:'center'}}>
           <TouchableOpacity onPress={this.onPressBack} style={{justifyContent: 'center', width:'12%',height:'100%',alignItems:'center',flexDirection:'row'}}>
                <Image style={{height: "55%", width: "30%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
                <Text style={{color:'white', fontSize:H2_FONT_SIZE,fontFamily: "RobotoBold"}}>{this.translate.Get("Trở lại")}</Text>
@@ -346,7 +349,7 @@ export default class Payment2 extends Component {
               <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: H2_FONT_SIZE }}>{this.translate.Get("Đang gọi ..")}</Text>
               </View>
               :
-              <View style={{backgroundColor:'#33FF33',height:'100%',justifyContent: "center",borderRadius: 25, flexDirection: "row", alignItems: "center", }}>
+              <View style={{backgroundColor:isColor == true ? '#DAA520' :'#33FF33',height:'100%',justifyContent: "center",borderRadius: 25, flexDirection: "row", alignItems: "center", }}>
                 <View style={{ width: "25%", alignItems:'center'}}>
                 <Image style={{height: "70%", width: "70%"}} resizeMode='contain' source={require("../../assets/icons/IconCall-11.png")}/>
               </View>
@@ -362,11 +365,11 @@ export default class Payment2 extends Component {
             </TouchableOpacity>
             :null}
           </View>
-          <View style={{ height: Bordy.height * 0.69, width: Bordy.width * 0.75, marginHorizontal: "12.5%",paddingTop:5}}>
+          <View style={{height: Bordy.height * 0.69, width: Bordy.width * 0.75, marginHorizontal: "12.5%",paddingTop:5}}>
             <View style={{ height: "74%",}}>
               <View style={{ height: "7%", flexDirection: "row", alignItems: "center"}}>
-                <Text style={{ fontSize: H3_FONT_SIZE, width: "51%" }}>{this.translate.Get('Mã số thuế')}:</Text>
-                <Text style={{ fontSize: H3_FONT_SIZE, width: "49%" }}>{this.translate.Get('Người nhận')}:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE, width: "51%", color: isColor == true ? '#FFFFFF' : '#000000' }}>{this.translate.Get('Mã số thuế')}:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE, width: "49%", color: isColor == true ? '#FFFFFF' : '#000000' }}>{this.translate.Get('Người nhận')}:</Text>
               </View>
               <View style={{ height: "11%", flexDirection: "row"}}>
                 <TextInput 
@@ -376,7 +379,7 @@ export default class Payment2 extends Component {
                   keyboardType="number-pad" 
                   style={{paddingHorizontal:8,fontSize:H3_FONT_SIZE, width: "44%",  backgroundColor:'#FFFFFF', borderColor: "#BBBBBB", borderWidth: 1}}>
                 </TextInput>
-                <TouchableOpacity onPress={()=>this._SearchTaxInfor(this.state.Tax.TaxCode) } style={{height: "100%", width: "5%",marginRight: "2%",backgroundColor:'#333d4c', justifyContent:'center',alignItems:'center'}}>
+                <TouchableOpacity onPress={()=>this._SearchTaxInfor(this.state.Tax.TaxCode) } style={{height: "100%", width: "5%",marginRight: "2%",backgroundColor:isColor == true ? '#333d4c' :'#333d4c', justifyContent:'center',alignItems:'center'}}>
                   <Image style={{height: "80%", width: "80%"}} resizeMode='contain' source={require("../../assets/icons/iconNew/IconFind-06.png")}/>
                 </TouchableOpacity>
                 <TextInput 
@@ -387,7 +390,7 @@ export default class Payment2 extends Component {
                 </TextInput>
               </View>
               <View style={{ height: "7%", flexDirection: "row", alignItems: "center",marginTop:'0.7%' }}>
-                <Text style={{ fontSize: H3_FONT_SIZE }}>{this.translate.Get('Tên công ty')}:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE, color: isColor == true ? '#FFFFFF' : '#000000' }}>{this.translate.Get('Tên công ty')}:</Text>
               </View>
               <View style={{ height: "21%", flexDirection: "row"}}>
                 <TextInput 
@@ -399,7 +402,7 @@ export default class Payment2 extends Component {
                 </TextInput>
               </View>
               <View style={{ height: "7%", flexDirection: "row", alignItems: "center",marginTop:'0.7%'}}>
-                <Text style={{ fontSize: H3_FONT_SIZE }}>{this.translate.Get('Địa chỉ')}:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE, color: isColor == true ? '#FFFFFF' : '#000000' }}>{this.translate.Get('Địa chỉ')}:</Text>
               </View>
               <View style={{ height: "21%", flexDirection: "row"}}>
                 <TextInput 
@@ -411,8 +414,8 @@ export default class Payment2 extends Component {
               </TextInput>
               </View>
               <View style={{ height: "7%", flexDirection: "row", alignItems: "center",marginTop:'0.7%'}}>
-                <Text style={{ fontSize: H3_FONT_SIZE, width: "51%", height: "100%",}}>Email:</Text>
-                <Text style={{ fontSize: H3_FONT_SIZE, width: "49%" }}>{this.translate.Get('SĐT')}:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE, width: "51%", height: "100%", color: isColor == true ? '#FFFFFF' : '#000000'}}>Email:</Text>
+                <Text style={{ fontSize: H3_FONT_SIZE, width: "49%" , color: isColor == true ? '#FFFFFF' : '#000000'}}>{this.translate.Get('SĐT')}:</Text>
               </View>
               <View style={{ height: "11%", flexDirection: "row"}}>
                 <TextInput
@@ -429,7 +432,7 @@ export default class Payment2 extends Component {
                 </TextInput>
               </View>
             </View>
-            <View style={{  backgroundColor: "#FFCCCC", opacity: 0.8, borderWidth: 1, borderColor: "#FF3333", width: "100%", paddingLeft: 5, paddingTop: 5,}} >
+            <View style={{  backgroundColor: isColor == true ? '#D4AF37' : "#FFCCCC", opacity: 0.8, borderWidth: 1, borderColor:isColor == true ? '#D2691E' : "#FF3333", width: "100%", paddingLeft: 5, paddingTop: 5,}} >
               <Text style={{fontSize: H3_FONT_SIZE }}>• Quý Khách vui lòng cung cấp thông tin xuất hóa đơn tài chính ngay tại thời điểm thanh toán.</Text>
               <Text style={{fontSize: H3_FONT_SIZE }}>• Trường hợp Quý khách không cung cấp thông tin xuất hóa đơn tài chính tại thời điểm thanh toán:</Text>
               <Text style={{ fontSize: H4_FONT_SIZE, paddingLeft: 8,}}>• Công ty sẽ xuất hóa đơn KHÁCH LẺ</Text>
@@ -439,7 +442,7 @@ export default class Payment2 extends Component {
           </View>
           <View style={{ height: Bordy.height * 0.23, width: Bordy.width, justifyContent: "center", alignItems: "center"}}>
             <View style={{ height: "30%", justifyContent: "center", alignItems: "center"}}>
-              <Text style={{ fontSize: H2_FONT_SIZE }}>{this.translate.Get("Chọn bỏ qua nếu bạn không xuất hóa đơn VAT")}</Text>
+              <Text style={{ fontSize: H2_FONT_SIZE ,color: isColor == true ? '#FFFFFF' : '#000000' }}>{this.translate.Get("Chọn bỏ qua nếu bạn không xuất hóa đơn VAT")}</Text>
             </View>
             <View style={{ height: "30%", flexDirection: "row" }}>
               <TouchableOpacity
@@ -447,15 +450,9 @@ export default class Payment2 extends Component {
                 style={{ backgroundColor: "#DDDDDD", height: "75%", width: "22%",borderRadius:35,marginRight:'2%', justifyContent: "center", alignItems: "center"}}>
                 <Text style={{ textAlign: "center", width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2,}}>{this.translate.Get('Bỏ qua')}</Text>
               </TouchableOpacity>
-              <LinearGradient
-              colors={[ '#333d4c', '#333d4c']}
-              start={{ x: 0, y: 0 }}
-              end={{ x:0, y: 1 }}
-              style={{ borderWidth: 1,height: '75%',borderRadius:35,width:'22%',shadowColor: "#000"}}>
-            <TouchableOpacity onPress={()=>this._FlushInvoiceInfor()} style={{  height: "100%", width: "100%", justifyContent: "center", alignItems: "center"}}>
-              <Text style={{ textAlign: "center",color:'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>{this.translate.Get('Xác nhận')}</Text>
+            <TouchableOpacity onPress={()=>this._FlushInvoiceInfor()} style={{ backgroundColor:isColor == true ? '#DAA520' :'#33FF33', borderWidth: 1,height: '75%',borderRadius:35,width:'22%',shadowColor: "#000", justifyContent: "center", alignItems: "center"}}>
+              <Text style={{ textAlign: "center",color:isColor == true ? '#000000' :'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>{this.translate.Get('Xác nhận')}</Text>
             </TouchableOpacity>
-            </LinearGradient>
             </View>
             <View style={{height:'40%', width: Bordy.width, justifyContent:'center'}}>
             <StepIndicator

@@ -63,6 +63,7 @@ export default class Settings extends Component {
         S_DepartmentName: '',
       },
       URL_LOGO: '',
+      isColor:false,
       imageName: null,
       imageType: null,
     };
@@ -82,6 +83,8 @@ export default class Settings extends Component {
 
   async componentDidMount() {
     this.translate = await this.translate.loadLang();
+    let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
+    isColor = JSON.parse(isColor);
     let settings = await _retrieveData('settings');
     if (settings == undefined) {
       settings = {};
@@ -105,7 +108,7 @@ export default class Settings extends Component {
     res = JSON.parse(res);
     let language = await _retrieveData('culture', 1);
     const isEndpointValid = this.state.endpoint.length > 0 && validUrl(this.state.endpoint);
-    this.setState({ settings, fontLoaded: true, isEndpointValid, endpoint: res, language, isReady: true }, () => this._retrievePos(settings));
+    this.setState({ settings, fontLoaded: true, isEndpointValid, endpoint: res, language, isReady: true,isColor }, () => this._retrievePos(settings));
     this.defaultFonts();
   }
   defaultFonts() {
@@ -210,7 +213,7 @@ export default class Settings extends Component {
     });
   }
   render() {
-    let { endpoint, isEndpointValid, PosList, Data, settings, item, URL_LOGO } = this.state;
+    let { endpoint, isEndpointValid, PosList, Data, settings, item, URL_LOGO ,isColor} = this.state;
     if (!this.state.fontLoaded) {
       return (
         <View style={[styles.container, { alignItems: 'center', justifyContent: "center" }]}>
@@ -219,7 +222,7 @@ export default class Settings extends Component {
     }
 
     return (
-      <View style={{ height:Bordy.height,width:Bordy.width, backgroundColor: '#EEEEEE' }}>
+      <View style={{ height:Bordy.height,width:Bordy.width, backgroundColor:isColor == true ? '#333333' : '#EEEEEE' }}>
         <StatusBar hidden={true} />
         {this.renderHeader()}
         <View style={{ flex: 1 }}>
@@ -228,7 +231,7 @@ export default class Settings extends Component {
               <View style={{ flexDirection: "row", paddingBottom: 5, borderBottomColor: 'white', borderBottomWidth: 1 }}>
                 <View style={{ flexDirection: "row", justifyContent: 'flex-start', alignItems: 'center', paddingLeft: 10, width: '100%' }}>
                   <View style={{ width: '25%', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
-                    <Text style={{ fontSize: 14 }} numberOfLines={5}>{this.translate.Get('Endpoint')}:</Text>
+                    <Text style={{color:isColor == true ? "#FFFFFF" :"#000000", fontSize: 14 }} numberOfLines={5}>{this.translate.Get('Endpoint')}:</Text>
                   </View>
                   <FormInput
                     refInput={input => (this.endpointInput = input)}
@@ -240,7 +243,7 @@ export default class Settings extends Component {
                         <Icon
                           name={'check'}
                           type="Entypo"
-                          color={'#0074D2'}
+                          color={isColor == true ? '#FFD700' : '#0074D2'}
                           size={26}
                           style={{
                             justifyContent: "space-between",
@@ -255,7 +258,7 @@ export default class Settings extends Component {
                     placeholder={this.translate.Get('Endpoint')}
                     returnKeyType="next"
                     keyboardType="url"
-                    inputStyle={[{ fontSize: 14, color: '#29ade3' }]}
+                    inputStyle={[{ fontSize: 14, color: isColor == true ? "#FFD700" :'#29ade3' }]}
                     onBlur={() => { this.setState({ endpoint }, () => { this.updateEndpoint() }); Keyboard.dismiss(); }}
                     onChangeText={endpoint => this.setState({ endpoint })}
                     errorMessage={isEndpointValid ? null : this.translate.Get('wrong endpoint')}
@@ -266,14 +269,14 @@ export default class Settings extends Component {
               <View style={{ flexDirection: "row", paddingBottom: 5, borderBottomColor: 'white', borderBottomWidth: 1 }}>
                 <View style={{ flexDirection: "row", justifyContent: 'flex-start', alignItems: 'center', paddingLeft: 10, width: '100%' }}>
                   <View style={{ width: '25%', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
-                    <Text style={{ fontSize: 14 }} numberOfLines={5}>{this.translate.Get('Pos')}:</Text>
+                    <Text style={{color:isColor == true ? "#FFFFFF" :"#000000",fontSize: 14 }} numberOfLines={5}>{this.translate.Get('Pos')}:</Text>
                   </View>
                   <FormInput
                     onFocus={() => { Keyboard.dismiss(); this.setState({ showPosPicker: true }); }}
                     refInput={input => this.PosPicker = input}
                     placeholder={this.translate.Get('Please select pos')}
                     inputContainerStyle={[{ borderBottomWidth: 1, borderColor: '#EEEEEE', width: '75%' }]}
-                    inputStyle={[{ fontSize: 14, color: '#29ade3' }]}
+                    inputStyle={[{ fontSize: 14, color:isColor == true ? "#FFD700" : '#29ade3' }]}
                     autoFocus={false}
                     color={colors.grey1}
                     autoCapitalize="none"
@@ -289,15 +292,17 @@ export default class Settings extends Component {
           </ScrollView>
         </View>
 
-        <View style={{ backgroundColor: colors.primary, alignContent: "center", flexDirection: 'row', alignItems: "center", justifyContent: "center", height: 70, maxHeight: 70, }}>
+        <View style={{ backgroundColor: isColor == true ? "#111111" : colors.primary, alignContent: "center", flexDirection: 'row', alignItems: "center", justifyContent: "center", height: 70, maxHeight: 70, }}>
           <Button
-            containerStyle={{ height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.white, width: Bordy.width / 3, maxHeight: 40, paddingLeft: 40 }}
+            containerStyle={{ height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor:isColor == true ? "#DAA520" : colors.white, width: Bordy.width / 3, maxHeight: 40, paddingLeft: 40 }}
+            isColor={isColor}
             buttonStyle={{ borderRadius: 0, backgroundColor: colors.white, paddingHorizontal: 50 }}
             title={this.translate.Get("Xoá dữ liệu tạm")}
             onPress={this._clearSettings}
           />
           <Button
-            containerStyle={{ height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.white, width: Bordy.width / 3, maxHeight: 40, marginLeft: 40 }}
+            containerStyle={{ height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor:isColor == true ? "#DAA520" : colors.white, width: Bordy.width / 3, maxHeight: 40, marginLeft: 40 }}
+            isColor={isColor}
             buttonStyle={{ borderRadius: 0, backgroundColor: colors.white, paddingHorizontal: 10 }}
             title={this.translate.Get("Apply")}
             onPress={this._saveSettings}
@@ -308,6 +313,7 @@ export default class Settings extends Component {
           <ComboBox data={PosList} translate={this.translate}
             keyId='PosId'
             value='PolName'
+            isColor={isColor}
             name={this.translate.Get("CHỌN MÁY POS")}
             selectedId={settings.PosId}
             onCancel={() => this.setState({ showPosPicker: false })}
@@ -325,14 +331,15 @@ export default class Settings extends Component {
   }
 
   renderHeader = () => {
+    let {isColor}=this.state;
     return (
       <View style={{
-        backgroundColor: colors.primary,
+        backgroundColor: isColor == true ? '#111111' : colors.primary,
         paddingVertical: 10,
         flexDirection: 'row',
         borderTopWidth: 1,
         borderBottomWidth: 1,
-        borderColor: colors.primary,
+        borderColor:isColor == true ? '#111111' : colors.primary,
       }}>
         <TouchableOpacity style={{ paddingTop: 10 }}
           onPress={() => this.props.navigation.navigate('LoginView')}>

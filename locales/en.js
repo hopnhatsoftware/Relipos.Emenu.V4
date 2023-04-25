@@ -81,6 +81,7 @@ export default en = {
     'Quẹt thẻ':'Card',
     'Tiền mặt':'Cash',
     'Thành tiền':'Amount',
+    "Power by Relisoft":"Power by Relisoft",
     'Tổng tiền cần thanh toán':'Total Amount',
     'Thông tin hóa đơn của bạn':'Tax information',
     'Bấm nút "Gọi nhân viên" để phục vụ tiếp nhận thanh toán tiền mặt':'Press "Call staff"',

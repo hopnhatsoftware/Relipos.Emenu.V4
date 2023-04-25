@@ -7,7 +7,7 @@ import { ITEM_FONT_SIZE } from "../config/constants";
 export class Button extends React.Component {
 
     render() {
-        const { title, titleStyle, containerStyle, disabled, onPress, icon } = this.props;
+        const { title, titleStyle, containerStyle, disabled, onPress, icon,isColor } = this.props;
         let iconSize = this.props.iconSize;
         iconSize = iconSize ? iconSize : ITEM_FONT_SIZE;
 
@@ -16,7 +16,7 @@ export class Button extends React.Component {
                 {icon ?
                     <Entypo name={icon} style={{ fontSize: iconSize, marginRight: iconSize * 0.5 }} color={colors.white} />
                     : null}
-                <Text style={[{ color: colors.primary, textAlign: 'center' }, titleStyle]}>
+                <Text style={[{ color:isColor == true ? '#000000': colors.primary, textAlign: 'center' }, titleStyle]}>
                     {title}
                 </Text>
             </View>);
@@ -26,7 +26,7 @@ export class Button extends React.Component {
                 {icon ?
                     <Entypo name={icon} style={{ fontSize: iconSize, marginRight: iconSize * 0.5 }} color={colors.white} />
                     : null}
-                <Text style={[{ color: colors.primary, textAlign: 'center' }, titleStyle]}>
+                <Text style={[{ color:isColor == true ? '#000000': colors.primary, textAlign: 'center' }, titleStyle]}>
                     {title}
                 </Text>
             </TouchableOpacity>)

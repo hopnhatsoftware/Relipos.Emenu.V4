@@ -27,30 +27,6 @@ const Center = { width: Bordy.width - pnLeft.width, height: Bordy.height };
 const Header = { width: Center.width, height: Bordy.height * 0.085 };
 const Booton = { width: Center.width, height: Center.height * 0.07 };
 
-const customStyles = {
-  stepIndicatorSize: H4_FONT_SIZE,
-  currentStepIndicatorSize:H1_FONT_SIZE*1.4,
-  separatorStrokeWidth: 2,
-  currentStepStrokeWidth: 3,
-  stepStrokeCurrentColor: '#009900',
-  stepStrokeWidth: 2,
-  stepStrokeFinishedColor: '#009900',
-  stepStrokeUnFinishedColor: '#aaaaaa',
-  separatorFinishedColor: '#009900',
-  separatorUnFinishedColor: '#aaaaaa',
-  stepIndicatorFinishedColor: '#ffffff',
-  stepIndicatorUnFinishedColor: '#ffffff',
-  stepIndicatorCurrentColor: '#009900',
-  stepIndicatorLabelFontSize: H5_FONT_SIZE,
-  stepIndicatorSize:H1_FONT_SIZE,
-  currentStepIndicatorLabelFontSize: H3_FONT_SIZE,
-  stepIndicatorLabelCurrentColor: '#ffffff',
-  stepIndicatorLabelFinishedColor: '#333d4c',
-  stepIndicatorLabelUnFinishedColor: '#aaaaaa',
-  labelColor: '#999999',
-  labelSize: H3_FONT_SIZE,
-  currentStepLabelColor: '#333d4c'
-}
 export default class Payment extends Component {
   constructor(props) {
     super(props);
@@ -62,7 +38,7 @@ export default class Payment extends Component {
     this.textInput = null;
     this.translate = new translate();
     this.state = {
-      
+      isColor:false,
       mod : 0,
       PaymentAmount:0,
       SumVoucher:0,
@@ -99,16 +75,25 @@ export default class Payment extends Component {
     }
   }
   componentDidMount = async () => {
+    try{
     this.translate = await this.translate.loadLang();
     this.setState({IsLoaded:true ,KeyCode:''});
+    let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
+    isColor = JSON.parse(isColor);
     await this._LoadSound();
-    this.setState({IsLoaded:true });
+    this.setState({IsLoaded:true ,isColor});
     await this._setConfig();
     await this._getMasterData();
     await this._getPaymentAmount();
       this.setState({ isPostBack: true });
+    }
+    catch (ex) {
+      this.setState({ isPostBack: true,});
+      console.log('Payment componentDidMount Error:' + ex);
+    }
   }
   _getMasterData = async () => {
+    try{
     let {Config,TicketDetail,Money,TicketPayment,SumVoucher,Ticket} = this.state;
     getMasterData( Ticket.TicketID, Config, '').then(res => {
       if ("TicketDetail" in res.Data)
@@ -123,8 +108,18 @@ export default class Payment extends Component {
       SumVoucher = TicketPayment.reduce((a,v) => {if (v.PaymentName === "VOUCHER"){return a + v.TkpAmount ;} return a;},0)
       }
       this.setState({ TicketDetail,Money,TicketPayment,SumVoucher,});
-    })
-  }
+    })}
+    catch{(async (err) => {
+      Question.alert( this.translate.Get('Notice'),err, [
+        {
+          text: "OK", onPress: () => {
+          }
+        }
+      ]);
+     
+    })}
+
+  };
   _getPaymentAmount = async () => {
     let {PaymentAmount,mod, Ticket} = this.state;
     getPaymentAmount( Ticket.TicketID , '').then(res => {
@@ -132,17 +127,26 @@ export default class Payment extends Component {
       if (PaymentAmount % 1000 != 0) {
       mod = 1000 - PaymentAmount % 1000
       }this.setState({ PaymentAmount, mod})
-      })  
+      }).catch(async (err) => {
+        Alert.alert( this.translate.Get('Notice'),err, [
+          {
+            text: "OK", onPress: () => {
+            }
+          }
+        ]);
+       
+      });
+      // onPress={()=> this.setState({value: parseFloat(this.state.value) + (parseFloat(this.state.mod))})} style={styles.tip}
     }
   
   renderOrdered= ({ item, Index }) => {
       return (
         <View style={{ width: '100%', flexDirection: "row"}}>
-            <Text style={{fontSize:H3_FONT_SIZE,width:'5%'}}>{item.TkdQuantity} x</Text>
-            <Text style={{fontSize:H3_FONT_SIZE,width:'80%'}}>{item.PrdName}</Text>
-            <Text style={{fontSize:H3_FONT_SIZE, textAlign:'right',width:'15%',}}>{formatCurrency(item.TkdItemAmount,"")}</Text>
+            <Text style={{color:this.state.isColor == true ? '#ffffff' : '000000',fontSize:H3_FONT_SIZE,width:'5%'}}>{item.TkdQuantity} x</Text>
+            <Text style={{color:this.state.isColor == true ? '#ffffff' : '000000',fontSize:H3_FONT_SIZE,width:'80%'}}>{item.PrdName}</Text>
+            <Text style={{color:this.state.isColor == true ? '#ffffff' : '000000',fontSize:H3_FONT_SIZE, textAlign:'right',width:'15%',}}>{formatCurrency(item.TkdItemAmount,"")}</Text>
           </View>
-      ); 
+      )
   };
   onCallServices= async() => {
     let { settings,table } = this.state;
@@ -302,10 +306,43 @@ static getDerivedStateFromProps = (props, state) => {
       );
     }
     const labels = [this.translate.Get("Thông tin đơn hàng"),this.translate.Get("Xuất hóa đơn"),this.translate.Get("Thanh toán")];
-    const { showCall,Money,lockTable} = this.state;
+    const { showCall,Money,lockTable,isColor} = this.state;
+    const tipdata = [
+      {tipMoney:50000,tipTitle: +50000,tipOnPress:{value: parseFloat(this.state.value) + 50000}},
+      {tipMoney:100000,tipTitle: +100000,tipOnPress:{value: parseFloat(this.state.value) + 100000}},
+      {tipMoney:200000,tipTitle: +200000,tipOnPress:{value: parseFloat(this.state.value) + 200000}},
+      {tipMoney:500000,tipTitle: +500000,tipOnPress:{value: parseFloat(this.state.value) + 500000}},
+      {tipMoney:1000000,tipTitle: +1000000,tipOnPress:{value: parseFloat(this.state.value) + 1000000}},
+      {tipMoney:this.translate.Get('Không Tip'),tipTitle: +0,tipOnPress:{PaymentAmount: this.state.PaymentAmount - Money.TkTipAmount ,Money: {...Money, TkTipAmount : 0},value : 0}}
+    ]
+    
+    const customStyles = {
+      stepIndicatorSize: H4_FONT_SIZE,
+      currentStepIndicatorSize:H1_FONT_SIZE*1.4,
+      separatorStrokeWidth: 2,
+      currentStepStrokeWidth: 3,
+      stepStrokeCurrentColor: isColor == true ? '#DAA520' :'#009900',
+      stepStrokeWidth: 2,
+      stepStrokeFinishedColor: isColor == true ? '#DAA520' :'#009900',
+      stepStrokeUnFinishedColor: '#aaaaaa',
+      separatorFinishedColor: isColor == true ? '#DAA520' :'#009900',
+      separatorUnFinishedColor: '#aaaaaa',
+      stepIndicatorFinishedColor: '#ffffff',
+      stepIndicatorUnFinishedColor: '#ffffff',
+      stepIndicatorCurrentColor: isColor == true ? '#DAA520' :'#009900',
+      stepIndicatorLabelFontSize: H5_FONT_SIZE,
+      stepIndicatorSize:H1_FONT_SIZE,
+      currentStepIndicatorLabelFontSize: H3_FONT_SIZE,
+      stepIndicatorLabelCurrentColor:isColor == true ? '#000000' : '#ffffff',
+      stepIndicatorLabelFinishedColor: '#333d4c',
+      stepIndicatorLabelUnFinishedColor: '#aaaaaa',
+      labelColor: '#999999',
+      labelSize: H3_FONT_SIZE,
+      currentStepLabelColor: isColor == true ? '#DAA520' :'#333d4c'
+    }
     return (
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{height:Bordy.height,width:Bordy.width,justifyContent: "center",}}>
-          <View style={{ flexDirection: "row", height: Bordy.height * 0.08, width: Bordy.width, backgroundColor:'#333d4c',alignItems:'center'}}>
+          <View style={{ flexDirection: "row", height: Bordy.height * 0.08, width: Bordy.width, backgroundColor:isColor == true ? '#111111' :'#333d4c',alignItems:'center'}}>
             <TouchableOpacity onPress={this.onPressBack} style={{justifyContent: 'center', width:'12%',height:'100%',alignItems:'center',flexDirection:'row'}}>
                <Image style={{height: "55%", width: "30%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
                <Text style={{color:'white', fontSize:H2_FONT_SIZE,fontFamily: "RobotoBold"}}>{this.translate.Get("Trở lại")}</Text>
@@ -322,7 +359,7 @@ static getDerivedStateFromProps = (props, state) => {
               <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: H2_FONT_SIZE }}>{this.translate.Get("Đang gọi ..")}</Text>
               </View>
               :
-              <View style={{backgroundColor:'#33FF33',height:'100%',justifyContent: "center",borderRadius: 25, flexDirection: "row", alignItems: "center", }}>
+              <View style={{backgroundColor:isColor == true ? '#DAA520' :'#33FF33',height:'100%',justifyContent: "center",borderRadius: 25, flexDirection: "row", alignItems: "center", }}>
                 <View style={{ width: "25%", alignItems:'center'}}>
                 <Image style={{height: "70%", width: "70%"}} resizeMode='contain' source={require("../../assets/icons/IconCall-11.png")}/>
               </View>
@@ -338,119 +375,76 @@ static getDerivedStateFromProps = (props, state) => {
           </View>
           <View style={{height: Bordy.height * 0.68, width: Bordy.width ,  flexDirection: "row",shadowOffset: {width: 0,height: 5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6}}>
           <View style={{ width: "70%", height: "100%",}}>
-            <View style={{ height: "78%", width: "100%", backgroundColor:"#fff",paddingHorizontal:'1.5%' }}>
+            <View style={{ height: "78%", width: "100%", backgroundColor:isColor == true ? '#222222' : "FFFFFF",paddingHorizontal:'1.5%' }}>
             <FlatList
               keyExtractor={(item, Index) => Index.toString()}
               data={this.state.TicketDetail }
               renderItem={this.renderOrdered}
             /> 
             </View>
-            <View style={{ height: "22%", width: "100%",shadowColor: "#000",backgroundColor:'#fff', shadowOffset: {width: 0,height: -5},shadowOpacity: 0.1,shadowRadius: 5,elevation: 6 ,paddingHorizontal:'2%',}}>
+            <View style={{ height: "22%", width: "100%",shadowColor: "#000",backgroundColor:isColor == true ? '#444444' : 'ffffff', shadowOffset: {width: 0,height: -5},shadowOpacity: 0.1,shadowRadius: 5,elevation: 6 ,paddingHorizontal:'2%',}}>
               <View style={{flexDirection:'row',justifyContent:'space-between',paddingVertical:'0.5%'}}>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between'}}>
-                  <Text style={{ fontSize: H3_FONT_SIZE, }}>{this.translate.Get('Thành tiền')}:</Text>
-                  <Text style={{ fontSize: H3_FONT_SIZE, fontFamily:'RobotoBold'}}>{formatCurrency(Money.TkItemAmout,"")}</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE, }}>{this.translate.Get('Thành tiền')}:</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE, fontFamily:'RobotoBold'}}>{formatCurrency(Money.TkItemAmout,"")}</Text>
                 </View>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between'}}>
-                  <Text style={{ fontSize: H3_FONT_SIZE ,}}>Voucher:</Text>
-                  <Text style={{ fontSize: H3_FONT_SIZE ,fontFamily:'RobotoBold'}}>{formatCurrency(this.state.SumVoucher,"")}</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE ,}}>Voucher:</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE ,fontFamily:'RobotoBold'}}>{formatCurrency(this.state.SumVoucher,"")}</Text>
                 </View>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between'}}>
-                  <Text style={{ fontSize: H3_FONT_SIZE,}}>{this.translate.Get('Giảm giá')}:</Text>
-                  <Text style={{ fontSize: H3_FONT_SIZE, fontFamily:'RobotoBold'}}>{formatCurrency(Money.TkTotalDiscount,"")}</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE,}}>{this.translate.Get('Giảm giá')}:</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE, fontFamily:'RobotoBold'}}>{formatCurrency(Money.TkTotalDiscount,"")}</Text>
                 </View>
               </View>
               <View style={{flexDirection:'row',justifyContent:'space-between',paddingVertical:'0.5%'}}>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between'}}>
-                  <Text style={{ fontSize: H3_FONT_SIZE}}>VAT ({formatCurrency(Money.TkVatPercent,"%")}):</Text>
-                  <Text style={{ fontSize: H3_FONT_SIZE, fontFamily:'RobotoBold'}}>{formatCurrency(Money.TkVatTotalAmount,"")}</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE}}>VAT ({formatCurrency(Money.TkVatPercent,"%")}):</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE, fontFamily:'RobotoBold'}}>{formatCurrency(Money.TkVatTotalAmount,"")}</Text>
                 </View>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between'}}>
-                  <Text style={{ fontSize: H3_FONT_SIZE,}}>Tip:</Text>
-                  <Text style={{ fontSize: H3_FONT_SIZE, fontFamily:'RobotoBold'}}>{formatCurrency((parseFloat(Money.TkTipAmount) + parseFloat(this.state.value)) , '')}</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE,}}>Tip:</Text>
+                  <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE, fontFamily:'RobotoBold'}}>{formatCurrency((parseFloat(Money.TkTipAmount) + parseFloat(this.state.value)) , '')}</Text>
                 </View>
               </View>
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center",paddingVertical:'0.5%'}}>
-                <Text style={{ fontSize: H1_FONT_SIZE, textAlign: "center", justifyContent: "flex-start",fontFamily:'RobotoBold',}}>{this.translate.Get('Tổng tiền cần thanh toán')}</Text>
-                <Text style={{ fontSize: H1_FONT_SIZE, textAlign: "center", justifyContent: "flex-end", color: "#CC0000",fontFamily:'RobotoBold',}}>{formatCurrency(parseFloat(this.state.PaymentAmount)+ parseFloat(this.state.value),"")}</Text>
+                <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H1_FONT_SIZE, textAlign: "center", justifyContent: "flex-start",fontFamily:'RobotoBold',}}>{this.translate.Get('Tổng tiền cần thanh toán')}</Text>
+                <Text style={{color:isColor == true ? '#DAA520' : '#CC0000', fontSize: H1_FONT_SIZE, textAlign: "center", justifyContent: "flex-end", fontFamily:'RobotoBold',}}>{formatCurrency(parseFloat(this.state.PaymentAmount)+ parseFloat(this.state.value),"")}</Text>
               </View>
             </View>
           </View> 
-          <View style={{ width: "30%", height: "100%", backgroundColor:'#fff', shadowOffset: {width: -5,height: 0},shadowOpacity: 0.1,shadowRadius: 5,elevation:6}}>
+          <View style={{ width: "30%", height: "100%", backgroundColor:isColor == true ? '#444444' : 'ffffff', shadowOffset: {width: -5,height: 0},shadowOpacity: 0.1,shadowRadius: 5,elevation:6}}>
             <View style={{ height: "100%", width: "100%",}}>
               <View style={{ height: "10%", width: "100%", flexDirection: "row",justifyContent:'center',alignItems:'center'}}>
                 <Image style={{height: "60%", width: "12%",marginRight:'2%'}} resizeMode='contain' source={require("../../assets/icons/IconTIP-11.png")}/>
-                <Text style={{ fontSize: H2_FONT_SIZE, color:'#333d4c'}}>Tip</Text>
+                <Text style={{ fontSize: H2_FONT_SIZE, color:isColor == true ? '#ffffff' :'#333d4c'}}>Tip</Text>
               </View>
-              <View style={{ height: "20%", width: "100%", flexDirection: "row",justifyContent:'center',}}>
+              <FlatList
+                keyExtractor={(item, Index) => Index.toString()}
+                numColumns={2}
+                data={tipdata}
+                renderItem={({ item, index }) =>
                 <TouchableOpacity 
-                // onPress={()=> this.setState({value: parseFloat(this.state.value) + (parseFloat(this.state.mod))})} style={styles.tip}
-                onPress={()=> this.setState({value: parseFloat(this.state.value) + 50000})} style={styles.tip}>
-                  <View style={styles.tipView}>
-                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>{this.translate.Get('Tổng')}: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 50000 + (parseFloat(this.state.value)),"")}</Text>
+                onPress={()=> this.setState(item.tipOnPress)} 
+                style={{borderRadius: 8, borderWidth: 1, borderColor:"#CCCCCC", width: "46%", height: Bordy.height * 0.68 *0.19, marginHorizontal: "2%",marginVertical: "1%", backgroundColor:isColor == true ? '#444444' : 'ffffff'}}>
+                  <View style={{borderBottomWidth: 1, height: "35%", alignItems: "center", justifyContent: "center",borderBottomColor:"#CCCCCC",}}>
+                    <Text style={{ fontSize: H4_FONT_SIZE, color:isColor == true ?'#FFDF00' : '#008800' }}>{this.translate.Get('Tổng')}: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + item.tipTitle + (parseFloat(this.state.value)),"")}</Text>
                   </View>
                   <View style={{height: "65%", alignItems: "center" ,justifyContent:'center'}}>
-                    <Text style={{ fontSize: H4_FONT_SIZE,}}>{this.translate.Get('Tiền tip')}</Text>
-                    <Text style={{ fontSize: H3_FONT_SIZE, }}>+ {formatCurrency(50000,"")}</Text>
+                    <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H4_FONT_SIZE,}}>{this.translate.Get('Tiền tip')}</Text>
+                    <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE, }}>+ {formatCurrency(item.tipMoney,"")}</Text>
                   </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=> this.setState({value: parseFloat(this.state.value) + 100000})} style={styles.tip} >
-                  <View style={styles.tipView}>
-                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>{this.translate.Get('Tổng')}: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 100000 + (parseFloat(this.state.value)),"")}</Text>
-                  </View>
-                  <View style={{height: "65%", alignItems: "center" ,justifyContent:'center'}}>
-                    <Text style={{ fontSize: H4_FONT_SIZE,}}>{this.translate.Get('Tiền tip')}</Text>
-                    <Text style={{ fontSize: H3_FONT_SIZE, }}>{formatCurrency("+ 100000","")}</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-              <View style={{ height: "20%", width: "100%", flexDirection: "row",justifyContent:'center'}}>
-              <TouchableOpacity onPress={()=> this.setState({value: parseFloat(this.state.value) + 200000})} style={styles.tip} >
-                  <View style={styles.tipView}>
-                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>{this.translate.Get('Tổng')}: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 200000 + (parseFloat(this.state.value)),"")}</Text>
-                  </View>
-                  <View style={{height: "65%", alignItems: "center",justifyContent:'center' }}>
-                    <Text style={{ fontSize: H4_FONT_SIZE,}}>{this.translate.Get('Tiền tip')}</Text>
-                    <Text style={{ fontSize: H3_FONT_SIZE, }}>{formatCurrency("+ 200000","")}</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=> this.setState({value: parseFloat(this.state.value) + 500000})} style={styles.tip} >
-                  <View style={styles.tipView}>
-                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>{this.translate.Get('Tổng')}: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 500000 + (parseFloat(this.state.value)),"")}</Text>
-                  </View>
-                  <View style={{height: "65%", alignItems: "center" ,justifyContent:'center'}}>
-                    <Text style={{ fontSize: H4_FONT_SIZE,}}>{this.translate.Get('Tiền tip')}</Text>
-                    <Text style={{ fontSize: H3_FONT_SIZE, }}>{formatCurrency("+ 500000","")}</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-              <View style={{ height: "20%", width: "100%", flexDirection: "row",justifyContent:'center'}}>
-              <TouchableOpacity onPress={()=> this.setState({value: parseFloat(this.state.value) + 1000000})} style={styles.tip} >
-                  <View style={styles.tipView}>
-                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>{this.translate.Get('Tổng')}: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + 1000000 + (parseFloat(this.state.value)),"")}</Text>
-                  </View>
-                  <View style={{height: "65%", alignItems: "center",justifyContent:'center' }}>
-                    <Text style={{ fontSize: H4_FONT_SIZE,}}>{this.translate.Get('Tiền tip')}</Text>
-                    <Text style={{ fontSize: H3_FONT_SIZE, }}>{formatCurrency("+ 1000000","")}</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={()=> this.setState({PaymentAmount: this.state.PaymentAmount - Money.TkTipAmount ,Money: {...Money, TkTipAmount : 0},value : 0})} style={styles.tip} >
-                  <View style={styles.tipView}>
-                    <Text style={{ fontSize: H4_FONT_SIZE, color: '#008800' }}>{this.translate.Get('Tổng')}: {formatCurrency(this.state.PaymentAmount,"")}</Text>
-                  </View>
-                  <View style={{height: "65%", alignItems: "center" ,justifyContent:'center'}}>
-                    <Text style={{ fontSize: H4_FONT_SIZE,}}>{this.translate.Get('Tiền tip')}</Text>
-                    <Text style={{ fontSize: H3_FONT_SIZE, }}>{this.translate.Get('Không Tip')}</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
+                </TouchableOpacity>}
+              />
+              
               <View style={{ height: "10%", width: "100%", alignItems:'center',justifyContent:'center'}}>
                 <TextInput
                   placeholder={this.translate.Get("Nhập số tiền tip (đ)")}
+                  placeholderTextColor={isColor == true ? '#ffffff' : "#000000"}
                   keyboardType="number-pad"
                   value={this.state.value}
                   onChangeText={(number) => this.setState({value : number}) }
-                  style={[{paddingHorizontal:8,fontSize: H3_FONT_SIZE, borderRadius: 8, borderWidth: 1,backgroundColor:'#FFFFFF', borderColor: colors.grey3, height: H1_FONT_SIZE*2, width: "95%",height:'80%'}]}>
+                  style={[{paddingHorizontal:8,fontSize: H3_FONT_SIZE, borderRadius: 8, borderWidth: 1,color:isColor == true ? '#ffffff' : "#000000", backgroundColor: isColor == true ? '#444444':'#FFFFFF', borderColor: colors.grey3, height: H1_FONT_SIZE*2, width: "95%",height:'80%'}]}>
                 </TextInput>
                 <View style={{position: 'absolute', right: '5%', top: '7%', backgroundColor: "transpanent", zIndex: 10,flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-end',}}>
                   <TouchableOpacity onPress={()=> this.setState({PaymentAmount: this.state.PaymentAmount - Money.TkTipAmount ,Money: {...Money, TkTipAmount : 0},value : 0})} style={{ justifyContent: 'flex-end', alignItems: 'flex-end', paddingTop: 5 }}>
@@ -459,19 +453,19 @@ static getDerivedStateFromProps = (props, state) => {
                 </View>
               </View>
               <View style={{height: "7%", width: "100%",justifyContent:'center' }}>
-                <Text style={{marginLeft:'2%', color: "#CC0000", fontSize: H3_FONT_SIZE}}>{this.translate.Get("Tip có xuất hóa đơn hay không?")}</Text>
+                <Text style={{marginLeft:'2%', color:isColor == true ? '#ffffff' : "#CC0000", fontSize: H3_FONT_SIZE}}>{this.translate.Get("Tip có xuất hóa đơn hay không?")}</Text>
               </View>
               <View style={{ width: "100%", height:'13%', flexDirection: "row",justifyContent:'center'}}>
-                <CheckBox checked={Money.TkeIsInvoiceTip ? true : false} onPress={()=> {this.setState({Money: {...Money, TkeIsInvoiceTip : Money.TkeIsInvoiceTip ? false : true}})}} textStyle={{fontSize:H3_FONT_SIZE}} size={H2_FONT_SIZE} containerStyle={{width:'45%', backgroundColor:'#fff'}} title={this.translate.Get('Có')}/>
-                <CheckBox checked={Money.TkeIsInvoiceTip ? false : true} onPress={()=> {this.setState({Money: {...Money, TkeIsInvoiceTip : Money.TkeIsInvoiceTip ? false : true}})}} textStyle={{fontSize:H3_FONT_SIZE}} size={H2_FONT_SIZE} containerStyle={{width:'45%', backgroundColor:'#fff',}}  title={this.translate.Get('Không')}/>
+                <CheckBox checked={Money.TkeIsInvoiceTip ? true : false} onPress={()=> {this.setState({Money: {...Money, TkeIsInvoiceTip : Money.TkeIsInvoiceTip ? false : true}})}} textStyle={{fontSize:H3_FONT_SIZE,color:isColor == true ?'#ffffff' : '#000000'}} size={H2_FONT_SIZE} containerStyle={{width:'45%', backgroundColor:isColor == true ?'#333333' :'#fff'}} title={this.translate.Get('Có')}/>
+                <CheckBox checked={Money.TkeIsInvoiceTip ? false : true} onPress={()=> {this.setState({Money: {...Money, TkeIsInvoiceTip : Money.TkeIsInvoiceTip ? false : true}})}} textStyle={{fontSize:H3_FONT_SIZE,color:isColor == true ?'#ffffff' : '#000000'}} size={H2_FONT_SIZE} containerStyle={{width:'45%', backgroundColor:isColor == true ?'#333333' : '#fff',}}  title={this.translate.Get('Không')}/>
               </View>
             </View>
           </View>
         </View>
-          <View style={{ height: Bordy.height * 0.24, width: Bordy.width, alignItems: "center", }}>
+          <View style={{ height: Bordy.height * 0.24, width: Bordy.width, alignItems: "center", backgroundColor: isColor == true ?'#333333' : '#ffffff'}}>
           <View style={{marginTop: Bordy.height * 0.04, height: '30%',width:'20%',justifyContent:'center'}}>
-            <TouchableOpacity onPress={()=> this._HandleTip ()} style={{ backgroundColor:'#333d4c',borderRadius:35,  borderWidth: 1,height: "80%", width: "100%", justifyContent: "center", alignItems: "center"}}>
-              <Text style={{ textAlign: "center",color:'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>{this.translate.Get('Xác nhận')}</Text>
+            <TouchableOpacity onPress={()=> this._HandleTip ()} style={{ backgroundColor:isColor == true ? '#DAA520' :'#333d4c',borderRadius:35,  borderWidth: 1,height: "80%", width: "100%", justifyContent: "center", alignItems: "center"}}>
+              <Text style={{ textAlign: "center",color:isColor == true ? '#000000' :'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>{this.translate.Get('Xác nhận')}</Text>
             </TouchableOpacity>
             </View>
             <View style={{height:'70%', width: Bordy.width, justifyContent:'center'}}>
@@ -500,22 +494,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: SCREEN_WIDTH,
     justifyContent: "center",
-  },
-  tip:{
-    borderRadius: 8,
-    borderWidth: 2, 
-    borderColor: "#CCCCCC", 
-    width: "46%", 
-    height: "90%", 
-    marginHorizontal: "2%", 
-    backgroundColor: "#FFFFFF"
-  },
-  tipView: {
-    borderBottomWidth: 2, 
-    borderBottomColor: "#CCCCCC", 
-    height: "35%", 
-    alignItems: "center", 
-    justifyContent: "center"
   },
   pnLeft: {
     flexDirection: "column",

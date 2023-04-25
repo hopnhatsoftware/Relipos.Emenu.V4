@@ -65,6 +65,7 @@ export default class OrderView extends Component {
       Ticket: {},
       table: {},
       settings: {},
+      isColor:false,
       buttontext: props.defaultValue,
       keysearch: "",
       ShowFullCart: true,
@@ -111,6 +112,8 @@ export default class OrderView extends Component {
     await  this._BindingFont();
     StatusBar.setHidden(true);
     that = this;
+    let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
+    isColor = JSON.parse(isColor);
     let state = await _retrieveData("OrderView@STATE", "");
     if (state!='') 
       state = JSON.parse(state);
@@ -132,7 +135,7 @@ export default class OrderView extends Component {
       await this._getLanguage(true);
       await this.fetchData();
       await this.CaculatorCardInfor();
-      this.setState({  isPostBack: true });
+      this.setState({  isPostBack: true,isColor });
     //  this.interval = setInterval(() => {
     //    this.setState({ TimeToNextBooking: this.state.TimeToNextBooking - 1 });
     //  }, 1000);
@@ -375,7 +378,7 @@ onCallServices= async() => {
     if ("TicketID" in table && table.TicketID > 0) {
       getTicketInfor(Config, table).then(res => {
         if (!("Table" in res.Data) || res.Data.Table.length == 0) {
-          ;
+          
         }
         if ("Table2" in res.Data) {
           ProductsOrdered = res.Data.Table2;
@@ -1173,7 +1176,7 @@ if (ProductChoise==null) {
       );
   };
   renderProduct = ({ item, index }) => {
-    let { Config } = this.state;
+    let { Config,isColor } = this.state;
     let iWith=(ProductList.width/ProductList.ColumnNum);
     let iHeight=iWith*3/6;
     let {CartFilter}= this._getCartItems(item,null);
@@ -1205,46 +1208,47 @@ if (ProductChoise==null) {
                       style={{ width: H3FontSize * 1.2, height: H3FontSize * 1.2, }} />
                   </View>
                   : null} 
-                <View style={{ position: "absolute", paddingTop: (iHeight-36)/2, right: -15 }}>
+                {/* <View style={{ position: "absolute", paddingTop: (iHeight-36)/2, right: -15 }}>
                   <Icon  name="caretleft" type="antdesign" iconStyle={{ justifyContent: "space-between", color: "#EEEEEE", fontSize: 36 }} />
-                </View>
+                </View> */}
               </ImageBackground>
             </TouchableOpacity>
           </View> 
-          <View style={{ flexDirection: "column", flexWrap: "wrap", width: "40%", height: '100%',paddingLeft:5,paddingRight:5,backgroundColor: "#EEEEEE" }}>
+          <View style={{ flexDirection: "column", flexWrap: "wrap", width: "40%", height: '100%',paddingLeft:5,paddingRight:5,backgroundColor: isColor == true ? '#48515E' : "#EEEEEE" }}>
           <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:'100%'}}>
              {Config.B_ViewProductNo?
-               <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:iHeight-(H2FontSize+10)}}>
+               <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:iHeight-(H2FontSize*1.5+10)}}>
               <View name='pnProductNo' style={{width: '100%',height:H3FontSize*1.5 ,marginTop:5 }}>
-                <Text style={{ color: "#0d65cd", textAlign: 'center', width: '95%',fontSize: H3FontSize, fontFamily: "RobotoBold"}} numberOfLines={2}> 
+                <Text style={{ color: isColor == true ? '#FFFFFF' : "#0d65cd", textAlign: 'center', width: '95%',fontSize: H3FontSize, fontFamily: "RobotoBold"}} numberOfLines={2}> 
                   {item.PrdNo}
                 </Text>
               </View>
               <View name='pnProductName' style={{width: '100%',paddingTop:2 }}>
-                <Text style={{color: "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H4FontSize,flexWrap:"wrap"}} numberOfLines={5}>
+                <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H4FontSize,flexWrap:"wrap"}} numberOfLines={5}>
                   {item.PrdName} 
                 </Text>
-                <Text style={{fontStyle:'italic',color: "#af3037",marginLeft:7,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left',marginTop:3}}>
+                <Text style={{fontStyle:'italic',color: isColor == true ?'#FFFFFF' : "#af3037",fontFamily:'RobotoBold',marginLeft:7,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left',marginTop:3}}>
               {this.translate.Get("Giá")}:{" "}{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPrice : item.UnitPriceAfter, "")}
                 </Text>
               </View>
               </View>
               :
-              <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:iHeight-(H2FontSize+10)}}>
+              <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:iHeight-(H2FontSize*1.5+10)}}>
             <View name='pnProductName' style={{width: '100%',marginTop:5}}>
-              <Text style={{color: "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H3FontSize,fontWeight:'bold',flexWrap:"wrap"}} numberOfLines={5}>
+              <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H3FontSize,fontWeight:'bold',flexWrap:"wrap"}} numberOfLines={5}>
                 {item.PrdName} 
               </Text>
-              <Text style={{fontStyle:'italic',color: "#af3037",marginLeft:7,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left',marginTop:3}}>
+              <Text style={{fontStyle:'italic',color:isColor == true ?'#FFFFFF' : "#af3037",fontFamily:'RobotoBold',marginLeft:7,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left',marginTop:3}}>
               {this.translate.Get("Giá")}:{" "}{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPrice : item.UnitPriceAfter, "")}
                 </Text>
             </View>
             </View>
              }
-              <View style={{width: "100%", height: H2FontSize,paddingTop:5}}>
+              <View style={{width: "100%", height: H2FontSize*1.7,paddingTop:5}}>
                 <View style={{ flexDirection: "row", justifyContent: 'space-evenly',  width: "100%", height: '100%'}}  >
                   {item.OrddQuantity> 0 ?
-                    <TouchableOpacity 
+                    <TouchableOpacity
+                    style={{width:(iWith-4)*0.4*0.3,height:'100%', alignItems:'flex-start',justifyContent: 'flex-end' }}
                     onPress={() => { 
                 if (item.PrdIsSetMenu == true&&item.PrdViewSetMenuType && item.PrdViewSetMenuType == 1){
                       this.setState({ showSetInCart: true,SetItemsFilter:CartFilter.items, CartItemSelected: CartFilter.FirstItem, CartProductIndex :CartFilter.FirstIndex})
@@ -1258,16 +1262,16 @@ if (ProductChoise==null) {
                       <Icon name='edit'  type="antdesign" containerStyle={{ justifyContent: "center" }}
                       size={H2FontSize}  iconStyle={{ color: colors.yellow1, fontFamily: "RobotoRegular" }}  />
                       :
-                      <Image resizeMode='center' source={require('../../assets/icons/IconDelete.png')} style={{ width: H2FontSize, height: H2FontSize,}} />
+                      <Image resizeMode='contain' source={require('../../assets/icons/IconDelete.png')} style={{ width: H2FontSize, height: H2FontSize,}} />
                       }
                     </TouchableOpacity> :
                     <View style={{  width:H2FontSize, height: H2FontSize, justifyContent: 'center', alignItems: 'center', }}>
                     </View>
                   }
-                  <View style={{ width:(iWith-4)*0.4*0.6, height: H2FontSize, justifyContent: 'center' }}>
+                  <View style={{ width:(iWith-4)*0.4*0.4, height: '100%', justifyContent: 'flex-end' }}>
                  {( (item.PrdIsSetMenu != true|| item.PrdViewSetMenuType != 1) && item.OrddQuantity>0)?
                       <TextInput ref={input => this.textInput = input}
-                        style={{  color: "#af3037",width: '100%',fontSize:H2FontSize*0.8,textAlign:"center",fontFamily: "RobotoBold", }}
+                        style={{  color:isColor == true ?'#FFFFFF' :  "#af3037",width: '100%',fontSize:H2FontSize*0.8,textAlign:"center",fontFamily: "RobotoBold", }}
                         autoFocus={false}
                         autoCapitalize="none"
                         autoCorrect={false}
@@ -1295,7 +1299,7 @@ if (ProductChoise==null) {
                       :null
                      }
                   </View>
-                  <TouchableOpacity style={{}} onPress={() => {
+                  <TouchableOpacity style={{width:(iWith-4)*0.4*0.3,height:'100%',alignItems:'flex-end',justifyContent: 'flex-end' }} onPress={() => {
                      if (item.PrdIsSetMenu == true ) 
                      this.PrerenderProductModal(item,CartFilter,index);
                      else {
@@ -1303,7 +1307,7 @@ if (ProductChoise==null) {
                     this.CaculatorCardInfor(true);
                      }
                   }}>
-                    <Image resizeMode='center' source={require('../../assets/icons/IconAdd.png')}
+                    <Image resizeMode='contain' source={require('../../assets/icons/IconAdd.png')}
                       style={{width: H2FontSize, height: H2FontSize, }} />
                   </TouchableOpacity>
                 </View>
@@ -1328,14 +1332,14 @@ if (ProductChoise==null) {
         </View>
       );
     }
-    const {ProductGroupList,endpoint,PrdChildGroups,Products,CartInfor,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config,ProductsOrdered} = this.state; 
+    const {ProductGroupList,endpoint,PrdChildGroups,Products,CartInfor,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config,ProductsOrdered,isColor} = this.state; 
    
     return (
-      <View style={{height:Bordy.height,width:Bordy.width}}>
+      <View style={{height:Bordy.height,width:Bordy.width, backgroundColor: isColor == true ? '#333333' : "#FFFFFF"}}>
         
         <View style={{flexDirection: "row"}}>
-          <View name='pbLeft' style={[{ backgroundColor: "#333D4C",width:pnLeft.width, flexDirection: "column",height: "95%" }]}>
-            <View style={{ justifyContent: 'center', alignItems: 'center', height: pnLeft.width*4/6, }}>
+          <View name='pbLeft' style={[{ backgroundColor: "#333D4C",width:pnLeft.width, flexDirection: "column",height: Bordy.height }]}>
+            <View style={{ justifyContent: 'center', alignItems: 'center', height: Bordy.height/6, }}>
               <Image resizeMode='contain' 
                source={{uri:endpoint+'/Resources/Images/View/Logo.jpg'}}
                 style={{ width: '99%', height: '99%' }} />
@@ -1346,15 +1350,15 @@ if (ProductChoise==null) {
               SelectedGroupIndex={SelectedGroupIndex}
               _GroupClick={(index) => this._GroupClick(index)}
               setState={(state) => this.setState(state)}
-              pnheight={Bordy.height-pnLeft.width*4/6-Booton.height}
+              pnheight={Bordy.height-Bordy.height/6}
               BookingsStyle={BookingsStyle}
               PrdChildGroups={PrdChildGroups}
               SelectedChildGroupIndex={SelectedChildGroupIndex}
               _selectChildGroup={(item,index) => this._selectChildGroup(item,index)}
             />
-            <View style={{position:'absolute',height:Booton.height,width:'100%',bottom:0,zIndex:2}}>
+            {/* <View style={{height:Booton.height,width:'100%',bottom:0,zIndex:2, backgroundColor:'#333D4C'}}>
               <Image resizeMode='contain' style={{ width: '99%', height: '99%' }} source={require('../../assets/images/RelisoftLogo_trans-07.png')} />
-            </View>
+            </View> */}
           </View>
           <View style={{width:Center.width,height:Center.height, flexDirection: "column"}}>
             <_HeaderNew
@@ -1390,8 +1394,8 @@ if (ProductChoise==null) {
             {this.state.ShowFullCart ? 
               <View style={{ width: "100%", flexDirection: "row" }}>
                 <View style={{ flexDirection: "row",justifyContent: "center",alignItems: "center", width: (Center.width * 0.4)}}>                    
-                <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-                    <Text style={{fontSize:H3FontSize, fontFamily:'RobotoBold',color:"#000000",textShadowColor:'#FFFFFF',textShadowOffset: {width:1, height:0.5 },textShadowRadius: 1 }}>{Config.B_ViewUnitPriceBefor ? this.translate.Get("Giá chưa bao gồm VAT") : this.translate.Get("Giá đã bao gồm VAT")}</Text>
+                <View style={{ width: '100%',height:'100%', justifyContent: 'center', alignItems: 'center',backgroundColor:isColor == true ? '#333333' : "#FFFFFF" }}>
+                    <Text style={{fontSize:H3FontSize, fontFamily:'RobotoBold',color:isColor == true ?'#FFFFFF' :"#000000",textShadowColor:'#FFFFFF',textShadowOffset: {width:1, height:0.5 },textShadowRadius: 1 }}>{Config.B_ViewUnitPriceBefor ? this.translate.Get("Giá chưa bao gồm VAT") : this.translate.Get("Giá đã bao gồm VAT")}</Text>
                     
                    </View>
                 </View> 

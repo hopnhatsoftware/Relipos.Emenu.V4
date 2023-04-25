@@ -30,6 +30,7 @@ export default class SetMenuView extends Component {
     this._nextIndex = null;
     this.state = {
       endpoint: '',
+      isColor: false,
       language: 1,
       IsPostBack: false,
       isShowFullImage:false,
@@ -131,6 +132,9 @@ export default class SetMenuView extends Component {
      // console.log('componentDidMount ');
       this.translate = await this.translate.loadLang();
       StatusBar.setHidden(true);
+      let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
+    isColor = JSON.parse(isColor);
+    that.setState({isColor})
       let state = await _retrieveData("SetMenuView@State", '{}');
       if (state=='{}') {
         state =this.state;
@@ -139,6 +143,7 @@ export default class SetMenuView extends Component {
           let item = state.Product;
           let UnitPrice = parseFloat(('TkdBasePrice' in item) ? item.TkdBasePrice : item.UnitPrice);
           let ProductSet = {
+            isColor: false,
             PrdId: item.PrdId,
             PrdNo: item.PrdNo,
             PrdName: item.PrdName,
@@ -196,8 +201,8 @@ export default class SetMenuView extends Component {
         lStyle.PnCenter.ItemHeight= lStyle.PnCenter.Height/lStyle.PnCenter.RowNumer;
         state.lStyle=lStyle;
       
-      that.setState(state);
-     
+      that.setState(state,);
+      
       await this.fetchData(); 
     } catch (ex) {
       console.log('componentDidMount Error:' + ex);
@@ -556,21 +561,22 @@ export default class SetMenuView extends Component {
     });
   };
   RenderRowDetail = ({ item, index }) => {
+    let{isColor}= that.state;
     return (
-      <View style={{ width: '100%',paddingTop:5,paddingBottom:5, flexDirection: "row", borderBottomWidth: 1, borderBottomEndRadius: 1, borderBottomColor: colors.grey4}}>
+      <View style={{ width: '100%',paddingTop:5,paddingBottom:5, flexDirection: "row", borderBottomWidth: 1, borderBottomEndRadius: 1,backgroundColor:isColor == true ? "#444444" : "#FFFFFF",borderBottomColor: colors.grey4}}>
         <View key={index} style={{ width: '10%', justifyContent: 'center', alignItems: 'center', }}>
-          <Text style={{ color: "#000000", width: '100%', fontSize: H4FontSize, textAlign: 'center' }} numberOfLines={2}>
+          <Text style={{ color: isColor == true ? "#FFFFFF" :"#000000", width: '100%', fontSize: H4FontSize, textAlign: 'center' }} numberOfLines={2}>
           {this._showQty(item)} 
           </Text>
         </View>
         <View style={{ width: '90%', flexDirection: "row", justifyContent: 'center', alignItems: 'center', }}>
           <View style={{ flexDirection: "row",  justifyContent: "flex-start", alignContent: 'flex-start', alignItems: 'flex-start', width: '53%', }}>
-            <Text style={[{ color: "#000000", width: '100%', fontSize: H4FontSize, textAlign: 'left', }]} numberOfLines={5}>
+            <Text style={[{ color:isColor == true ? "#FFFFFF" : "#000000", width: '100%', fontSize: H4FontSize, textAlign: 'left', }]} numberOfLines={5}>
             {item.PrdName}
             </Text>  
           </View>
           <View style={{ flexDirection: "row", justifyContent: "center", alignContent: 'center', alignItems: 'center', width: '35%', paddingRight: 5, }}>
-            <Text style={{color: "#000000", paddingRight: 5, fontSize: H3FontSize * 0.8 }}>
+            <Text style={{color: isColor == true ? "#FFFFFF" :"#000000", paddingRight: 5, fontSize: H3FontSize * 0.8 }}>
               {formatCurrency(item.TksdPrice, '')}</Text>
           </View>
           {item.SmnId && item.SmnId > 0 ?
@@ -603,13 +609,14 @@ export default class SetMenuView extends Component {
   };
   renderProduct = ({ item, index }) => {
     let { lStyle,Config } = this.state;
+    let { isColor } = that.state;
     let width=lStyle.PnCenter.ItemWidth;
     let LeftWidth=lStyle.PnCenter.ItemWidth*0.6;
     let RightWidth=lStyle.PnCenter.ItemWidth*0.4;
     return ( 
       <TouchableHighlight style={{borderWidth:1, borderColor: colors.grey5, width:width,height: lStyle.PnCenter.ItemHeight,}}>
         <View style={{ flexDirection: "row", flexWrap: "wrap", width: width, height: '100%' }}>
-          <View style={{ backgroundColor: "grey", width: LeftWidth, height: '100%' }}>
+          <View style={{ backgroundColor:isColor == true ? "#333333" : "grey", width: LeftWidth, height: '100%' }}>
           <TouchableOpacity style={{}} onPress={() =>  this._ShowFullImage(item,true)}>
             <ImageBackground resizeMode="contain"
               source={item.PrdImageUrl ? {  uri:this.state.endpoint + "/Resources/Images/Product/" +  item.PrdImageUrl 
@@ -640,31 +647,31 @@ export default class SetMenuView extends Component {
             </ImageBackground>
             </TouchableOpacity>
           </View>
-          <View style={{ flexDirection: "column", flexWrap: "wrap", width:RightWidth, height: '100%', backgroundColor: "#EEEEEE" }}>
+          <View style={{ flexDirection: "column", flexWrap: "wrap", width:RightWidth, height: '100%', backgroundColor:isColor == true ? "#48515E" : "#EEEEEE" }}>
             <View style={{ flexDirection: "column",marginLeft:2,marginRight:2, flexWrap: "wrap", width: "100%"}}>
            
             {Config.B_ViewProductNo?
              <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:lStyle.PnCenter.ItemHeight-(H3FontSize*1.2+5+H3FontSize )}}>
               <View style={{ height: H3FontSize*1.2, width: '100%',paddingTop:5}}>
-                <Text style={{ color: "#0d65cd", textAlign: 'center', width: '99%', fontSize: H3FontSize, fontFamily: "RobotoBold"  }} numberOfLines={5}>
+                <Text style={{ color:isColor == true ? "#FFFFFF" : "#0d65cd", textAlign: 'center', width: '99%', fontSize: H3FontSize, fontFamily: "RobotoBold"  }} numberOfLines={5}>
                   {item.PrdNo} 
                 </Text>
               </View> 
               <View style={{  width: '100%',paddingTop:5 }}>
-                <Text style={{ width: '99%',fontSize: H4FontSize,textAlign:'left', alignContent:'center', flexWrap: "wrap" }} numberOfLines={15}>
+                <Text style={{  color:isColor == true ? "#FFFFFF" : "#0d65cd",width: '99%',fontSize: H4FontSize,textAlign:'left', alignContent:'center', flexWrap: "wrap" }} numberOfLines={15}>
                   {item.PrdName}
                 </Text>    
               </View> 
                </View>
               :
               <View style={{  width: '99%',textAlign:'left',paddingTop:10 }}>
-                <Text style={{ marginLeft:2,marginRight:2,fontSize: H4FontSize*1.1,textAlign: 'left', flexWrap: "wrap" ,fontWeight:'bold'}} numberOfLines={15}>
+                <Text style={{color:isColor == true ? "#FFFFFF" : "#000000", marginLeft:2,marginRight:2,fontSize: H4FontSize*1.1,textAlign: 'left', flexWrap: "wrap" ,fontWeight:'bold'}} numberOfLines={15}>
                   {item.PrdName}
                 </Text>    
               </View> 
             }
               <View style={{ height: H3FontSize, width: '100%',marginTop:5 }}>
-              <Text style={{ color: "#000000",marginLeft:10, fontSize: H3FontSize * 0.8 ,fontStyle:'italic'}}>
+              <Text style={{ color: isColor == true ? "#FFFFFF" :"#000000",marginLeft:10, fontSize: H3FontSize * 0.8 ,fontStyle:'italic'}}>
                     {item.TksdPrice>0? this.translate.Get("Giá :")+' '+formatCurrency(item.TksdPrice, ""):''}
                   </Text>
               </View> 
@@ -682,7 +689,7 @@ export default class SetMenuView extends Component {
                   }
                   </View>
                 <View style={{ width:RightWidth-10-(H2FontSize*2), justifyContent: 'center', }}>
-                  <Text style={{ color: "#af3037", width: '100%', fontSize: H2FontSize*0.8 , textAlign: "center" }} >
+                  <Text style={{ color:isColor == true ? "#FFFFFF" : "#af3037", width: '100%', fontSize: H2FontSize*0.8 , textAlign: "center" }} >
                     {this._showQty(item)} 
                   </Text>
                 </View> 
@@ -699,6 +706,7 @@ export default class SetMenuView extends Component {
   };
   render() {
     const { ProductGroupList, ChoiceSet, CategorySelectedIndex, ProductSet, IsPostBack,lStyle,language } = this.state;
+    const{isColor}= that.state;
     if (!IsPostBack) {
       return (
         <View style={[styles.container, styles.horizontal]}  >
@@ -715,7 +723,7 @@ export default class SetMenuView extends Component {
           BookingsStyle={BookingsStyle} islockTable={false} backgroundColor="#333D4C"
           iheight={Header.height} language={language}   style={{height:Header.height}}  />
         <View style={styles.mainContainer}> 
-          <View style={{ width: lStyle.PnLeft.width, height: GridHeight , backgroundColor: '#FFFFFF',borderRightColor: colors.grey4, borderRightWidth: 0.5, borderRightRadius: 1 }}>
+          <View style={{ width: lStyle.PnLeft.width, height: GridHeight , backgroundColor:isColor == true ? "#444444" : '#FFFFFF',borderRightColor: colors.grey4, borderRightWidth: 0.5, borderRightRadius: 1 }}>
             <View name='pnGridDetail' style={{ flexDirection: 'column', width: "100%",  height: GridHeight-(H2FontSize*2+H2FontSize*2) }}>
             <FlatList
                   keyExtractor={(item, index) => index.toString()}
@@ -725,9 +733,9 @@ export default class SetMenuView extends Component {
                   contentContainerStyle={{ backgroundColor: colors.white}}
                 />
             </View> 
-            <View style={{ height:H2FontSize+H2FontSize*1.5,backgroundColor: colors.grey5, flexDirection: 'row', width: '100%',alignItems: "center", justifyContent: "center"}}>
+            <View style={{ height:H2FontSize+H2FontSize*1.5,backgroundColor:isColor == true ? "#333333" : colors.grey5, flexDirection: 'row', width: '100%',alignItems: "center", justifyContent: "center"}}>
             <View style={{ height:'100%', flexDirection: 'row', width: '98%',alignItems: "center", justifyContent: "center"}}>
-                    <Text style={{ color: '#000000', textAlign: 'left', fontSize: H3FontSize,width:'30%',marginLeft:5 }}> 
+                    <Text style={{ color:isColor == true ? "#FFFFFF" : '#000000', textAlign: 'left', fontSize: H3FontSize,width:'30%',marginLeft:5 }}> 
                       {this.translate.Get('Số lượng :')}
                     </Text>
                     <View style={{width:'10%'}}>
@@ -745,7 +753,7 @@ export default class SetMenuView extends Component {
                       </View>
                     <View style={{ flexDirection: 'row',marginLeft:5, alignItems: "center", justifyContent: "center", width: '47%',borderColor: colors.grey4, borderWidth: 1, height:H2FontSize*1.3}}>
                       <TextInput ref={input => this.textInput = input}
-                        style={{  color: "#af3037",
+                        style={{  color:isColor == true ? "#FFFFFF" :  "#af3037",
                         fontSize: H2FontSize*0.8, width: '100%', textAlign: 'left', }}
                         autoFocus={false}
                         autoCapitalize="none"
@@ -785,7 +793,7 @@ export default class SetMenuView extends Component {
                         </View>
                    </View>  
             </View>
-            <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center',height: H2FontSize*2, borderColor: colors.white,  backgroundColor: '#dc7d46', flexDirection: 'row' }}>
+            <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center',height: H2FontSize*2, borderColor: colors.white,  backgroundColor:isColor == true ? "#444444" : '#dc7d46', flexDirection: 'row' }}>
             <Text style={{ width:'49%',marginLeft:5, fontSize: H2FontSize, color: colors.white,fontWeight:'bold', }}>
                     {this.translate.Get('Tổng tiền')} :
                     </Text>
@@ -794,7 +802,7 @@ export default class SetMenuView extends Component {
                   </Text>
               </View>
           </View>
-          <View style={{ width: lStyle.PnCenter.width, backgroundColor: '##FFFFFF' }}>
+          <View style={{ width: lStyle.PnCenter.width, backgroundColor:isColor == true ? "#222222" :  '##FFFFFF' }}>
             <_ChoiceCategory  state={this.state} translate={this.translate} ProductGroupList={ProductGroupList}
               CategorySelectedIndex={CategorySelectedIndex}
               _ChoiceCategorySelect={(item, index) => this._ChoiceCategorySelect(item, index)}
@@ -804,7 +812,7 @@ export default class SetMenuView extends Component {
               pnHeight={lStyle.pnChoiceCategory.Height}
               ItemWidth={lStyle.pnChoiceCategory.ItemWidth} /> 
             <FlatList data={ChoiceSet}  renderItem={this.renderProduct} numColumns={2}  extraData={this.state}  contentContainerStyle={{ paddingBottom: SCREEN_HEIGHT * 0.08 }} />
-            <View style={[styles.navigationBar, { width:lStyle.PnCenter.width, backgroundColor: colors.white, flexDirection: 'row',alignContent:'flex-end', height: lStyle.Bottonbar.Height }]}>
+            <View style={[styles.navigationBar, { width:lStyle.PnCenter.width, backgroundColor:isColor == true ? "#222222" : colors.white, flexDirection: 'row',alignContent:'flex-end', height: lStyle.Bottonbar.Height }]}>
             <View style={{width:lStyle.PnCenter.width-lStyle.Bottonbar.Width*2}} />
                 <TouchableOpacity onPress={() => this._Cancel()}>
                   <View style={[BookingsStyle.bottombar, {

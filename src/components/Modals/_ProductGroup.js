@@ -31,15 +31,14 @@ export class _ProductGroup extends React.Component {
   render() {
     let { ProductGroupList,PrdChildGroups, _GroupClick,_selectChildGroup,SelectedChildGroupIndex, SelectedGroupIndex,pnheight} = this.props;
     return ( 
-      <View style={[{ height:pnheight+100,width:'100%' }]}>
       <View style={[{ height:pnheight,width:'100%' }]}>
         <FlatList data={ProductGroupList} renderItem={({ item, index }) => 
         <View>
         <TouchableOpacity  key={index} style={{  width: '100%', justifyContent: 'center', alignItems: 'center',borderTopWidth:1,borderTopColor:colors.grey5  }}
             onPress={() => { _GroupClick(index) }}> 
             <View style={{ flexDirection: 'row', width: '100%',  justifyContent: 'flex-start', alignItems:'center', 
-              borderRadius: 1, borderWidth: 1, borderColor: index == SelectedGroupIndex ? '#F87D26' : '#333D4C',
-              height: H3FontSize*2.5, backgroundColor: index == SelectedGroupIndex ? '#F87D26' : '#333D4C',
+              borderRadius: 1, borderWidth: 1, borderColor: index == SelectedGroupIndex ? '#990000' : '#333D4C',
+              height: H3FontSize*2.5, backgroundColor: index == SelectedGroupIndex ? '#990000' : '#333D4C',
             }}> 
               <Text style={{ fontSize: H4FontSize,marginLeft:1, textAlign:'left',width:'89%', 
               color: index == SelectedGroupIndex ? colors.white : colors.grey4,
@@ -54,7 +53,7 @@ export class _ProductGroup extends React.Component {
           {SelectedGroupIndex== index ? 
           PrdChildGroups.map((ChildItem, Childindex) => { 
             return ( 
-              <TouchableOpacity key={Childindex}  style={{ width: '100%', justifyContent: 'center', alignItems: 'center',backgroundColor: Childindex == SelectedChildGroupIndex ? '#F99751' : '#48515E', }}
+              <TouchableOpacity key={Childindex}  style={{ width: '100%', justifyContent: 'center', alignItems: 'center',backgroundColor: Childindex == SelectedChildGroupIndex ? '#BB0000' : '#48515E', }}
                 onPress={() => { _selectChildGroup(ChildItem, Childindex); }}  >
               <View style={{ flexDirection: 'row', width: '100%',marginLeft:H4FontSize, justifyContent: 'flex-start', alignItems:'center', 
               height: H4FontSize*2.5, 
@@ -75,7 +74,6 @@ export class _ProductGroup extends React.Component {
        
           </FlatList>
       </View>
-    </View>
     );
   }
 }

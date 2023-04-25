@@ -35,7 +35,7 @@ export class _ChoiceCategory extends React.Component {
         <TouchableOpacity  key={index}  style={{width:ItemWidth, height:'100%', justifyContent: 'center', alignItems: 'center',  }}
             onPress={() => { _ChoiceCategorySelect(item, index) }}>
             <View style={{  width:'100%',height:'100%', flexDirection: 'row', borderRadius: 4, borderWidth: 1, borderColor: colors.grey4,
-               justifyContent: 'center', alignItems: 'center', backgroundColor: index == CategorySelectedIndex ? '#39ADFF' : 'white',
+               justifyContent: 'center', alignItems: 'center', backgroundColor: index == CategorySelectedIndex ? '#39ADFF' : '#676767',
             }}>
               <Text style={{  fontSize: H3FontSize , color: index == CategorySelectedIndex ? colors.white : colors.grey4,
                 fontFamily: index == CategorySelectedIndex ? 'RobotoBold' : 'RobotoRegular',
