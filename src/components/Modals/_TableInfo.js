@@ -21,7 +21,7 @@ import colors from '../../config/colors';
 import { _retrieveData, _storeData } from '../../services/storages';
 import { FormInputText, Button } from '../../components';
 import { Icon } from "react-native-elements";
-import { LOGIN_INPUT_FONT_SIZE, ITEM_FONT_SIZE, BACKGROUND_COLOR, H2FontSize ,H3FontSize,H4FontSize} from '../../config/constants';
+import { LOGIN_INPUT_FONT_SIZE, ITEM_FONT_SIZE, BACKGROUND_COLOR, H2FontSize ,H3FontSize,H4FontSize,H3_FONT_SIZE, H2_FONT_SIZE} from '../../config/constants';
 import styles from '../../styles/general'
 import Question from '../../components/Question';
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -41,9 +41,13 @@ export class _TableInfo extends React.Component {
     keysearch: '',
   }
   state = {
-    top: 0,
+      isColor:false,
+      top: 0,
   };
   async componentDidMount() {
+    let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
+    isColor = JSON.parse(isColor);
+    this.setState({isColor: isColor});
     await Font.loadAsync({
       RobotoBlack: require("../../../assets/fonts/Roboto-Black.ttf"),
       RobotoBlackItalic: require("../../../assets/fonts/Roboto-BlackItalic.ttf"),
@@ -68,15 +72,14 @@ export class _TableInfo extends React.Component {
     const { onClose, onPress, onPressShow, TicketInfor, translate, isLoading,backgroundColor,pnHeaderheight } = this.props;
     return (
       <View style={{ backgroundColor: "rgba(98,98,98,0.6)", position: "absolute", width: SCREEN_WIDTH, justifyContent: 'center', alignItems: 'center', height: SCREEN_HEIGHT + Constants.statusBarHeight }}>
-        <View style={[{ backgroundColor: colors.white, borderWidth: 1, position: "absolute",  width: SCREEN_WIDTH*0.6,height:'60%', borderColor: backgroundColor},]}>
+        <View style={[{ backgroundColor:this.state.isColor == true ? "#222222" : colors.white, borderWidth: 1, position: "absolute",  width: SCREEN_WIDTH*0.65,height:'60%', borderColor: backgroundColor},]}>
           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopLeftRadius: 8, borderTopRightRadius: 8, borderColor: backgroundColor,marginTop:-1,marginRight:-1,marginLeft:-1,
           backgroundColor: backgroundColor, height: pnHeaderheight,paddingTop:10,paddingBottom:10 }}> 
             <Text style={{ height: 35, fontSize:H2FontSize, color: colors.white, textAlign: 'center', fontFamily: 'RobotoBold' }}>{translate.Get("Thông tin phiếu")}</Text>
           </View>
           <ScrollView style={{ width: '100%', }}> 
             <KeyboardAvoidingView behavior='position' style={{ paddingBottom: 70 }}>
-             
-                <View style={{ backgroundColor: 'white',borderRadius: 8, }}>
+                <View style={{ backgroundColor: this.state.isColor == true ? "#222222" :'white',borderRadius: 8, }}>
                   <View style={{ flexDirection: 'row', paddingTop: 10, paddingLeft: 10, paddingRight: 10, width: '100%' }}>
                   </View>
                   <View style={{ flexDirection: 'row', paddingTop: 10, paddingLeft: 10, paddingRight: 10, width: '100%' }}>
@@ -89,12 +92,12 @@ export class _TableInfo extends React.Component {
                           autoCapitalize='none'
                           keyboardType="numeric"
                           autoCorrect={false}
-                          color='#000'
+                          color={this.state.isColor == true ? "#FFFFFF" :'#000'}
                           returnKeyType='next'
-                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor: '#FFFFFF', }}
+                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', }}
                           icon='user'
                           inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
-                          textStyle={{ color: '#000000' }}
+                          textStyle={{backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', color:this.state.isColor == true ? "#FFFFFF" : '#000000' }}
                           placeholder={translate.Get('Số lượng khách nam')}
                           placeholderTextColor="#bdc6cf"
                           refInput={input => this.textInputMaleQuantity = input}
@@ -114,11 +117,11 @@ export class _TableInfo extends React.Component {
                           autoCapitalize='none'
                           keyboardType="numeric"
                           autoCorrect={false}
-                          color='#000'
-                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor: '#FFFFFF', }}
+                          color={this.state.isColor == true ? "#FFFFFF" :'#000'}
+                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', }}
                           returnKeyType='next'
                           inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
-                          textStyle={{ color: '#000000' }}
+                          textStyle={{backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', color:this.state.isColor == true ? "#FFFFFF" : '#000000' }}
                           placeholder={translate.Get('Số lượng khách nữ')}
                           placeholderTextColor="#bdc6cf"
                           refInput={input => this.textInputFemaleQuantity = input}
@@ -141,11 +144,11 @@ export class _TableInfo extends React.Component {
                           autoCapitalize='none'
                           autoCorrect={false}
                           keyboardType="numeric"
-                          color='#000'
+                          color={this.state.isColor == true ? "#FFFFFF" :'#000'}
                           returnKeyType='next'
-                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor: '#FFFFFF', }}
+                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', }}
                           inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
-                          textStyle={{ color: '#000000' }}
+                          textStyle={{backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', color:this.state.isColor == true ? "#FFFFFF" : '#000000' }}
                           placeholder={translate.Get('Số lượng trẻ em')}
                           placeholderTextColor="#bdc6cf"
                           refInput={input => this.textInputChildrenQuantity = input}
@@ -166,11 +169,11 @@ export class _TableInfo extends React.Component {
                           autoCapitalize='none'
                           autoCorrect={false}
                           keyboardType="numeric"
-                          color='#000'
-                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor: '#FFFFFF', }}
+                          color={this.state.isColor == true ? "#FFFFFF" :'#000'}
+                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', }}
                           returnKeyType='next'
                           inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
-                          textStyle={{ color: '#000000' }}
+                          textStyle={{backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', color:this.state.isColor == true ? "#FFFFFF" : '#000000' }}
                           placeholder={translate.Get('SL khách nước ngoài')}
                           placeholderTextColor="#bdc6cf"
                           refInput={input => this.textInputForeignQuantity = input}
@@ -193,11 +196,11 @@ export class _TableInfo extends React.Component {
                           keyboardType="numeric"
                           autoCapitalize='none'
                           autoCorrect={false}
-                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor: '#FFFFFF', }}
-                          color='#000'
+                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', }}
+                          color={this.state.isColor == true ? "#FFFFFF" :'#000'}
                           returnKeyType='next'
                           inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
-                          textStyle={{ color: '#000000' }}
+                          textStyle={{backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', color:this.state.isColor == true ? "#FFFFFF" : '#000000' }}
                           placeholder={translate.Get('Số lượng khách')}
                           placeholderTextColor="#bdc6cf"
                           refInput={input => this.textInputCustomquantity = input}
@@ -216,12 +219,12 @@ export class _TableInfo extends React.Component {
                           autoFocus={false}
                           autoCapitalize='none'
                           autoCorrect={false}
-                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor: '#FFFFFF', }}
-                          color='#000'
+                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', }}
+                          color={this.state.isColor == true ? "#FFFFFF" :'#000'}
                           onFocus={() => { Keyboard.dismiss(); onPressShow.apply(null, []); }}
                           returnKeyType='next'
                           inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
-                          textStyle={{ color: '#000000' }}
+                          textStyle={{backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', color:this.state.isColor == true ? "#FFFFFF" : '#000000' }}
                           placeholder={translate.Get('Dạng khách')}
                           placeholderTextColor="#bdc6cf"
                           refInput={input => this.textInputCustomerName = input} />
@@ -244,11 +247,11 @@ export class _TableInfo extends React.Component {
                           autoFocus={false}
                           autoCapitalize='none'
                           autoCorrect={false}
-                          color='#000'
-                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor: '#FFFFFF', }}
+                          color={this.state.isColor == true ? "#FFFFFF" : '#000'}
+                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor: this.state.isColor == true ? "#222222" :'#FFFFFF', }}
                           returnKeyType='next' 
                           inputStyle={{ height: H3FontSize * 5, paddingLeft: 10 }}
-                          textStyle={{ color: '#000000' }}
+                          textStyle={{backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', color:this.state.isColor == true ? "#FFFFFF" : '#000000' }}
                           placeholder={translate.Get('Diễn giải thông tin khách hàng')}
                           placeholderTextColor="#bdc6cf"
                           refInput={input => this.textInputDescription = input}
@@ -261,9 +264,13 @@ export class _TableInfo extends React.Component {
                     </View>
                   </View>
                 </View>
-            
+                <View style={{ width: '100%', justifyContent:'center'}}>
+            <Text style={{color: this.state.isColor == true ? "#FFFFFF" : "red",textAlign:'center' ,fontSize:H2_FONT_SIZE*0.9}}>Sau khi vào bàn, bạn hãy khóa bàn trước khi giao cho khách</Text>
+            </View>
             </KeyboardAvoidingView>
+            
           </ScrollView>
+          
           <View style={{
             width: '100%', flexDirection: 'row',  position: 'absolute', bottom: 0, justifyContent: 'space-evenly', alignItems: 'center', height: pnHeaderheight,marginBottom:-1
           }}>

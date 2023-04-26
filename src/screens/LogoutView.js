@@ -26,6 +26,7 @@ export default class LogoutView extends LoginView {
       endpoint: '',
       secretPassword: '',
       isShowPassword: false,
+      isColor: false,
       branchesList: [],
       passwordValid: true,
       secureTextEntry: true,
@@ -42,6 +43,8 @@ export default class LogoutView extends LoginView {
   async componentDidMount() {
     //await this.props.componentDidMount();
     let settings = await _retrieveData('settings', JSON.stringify({}));
+    let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
+    isColor = JSON.parse(isColor);
     if (settings == undefined) {
       settings = {};
     }
@@ -60,7 +63,7 @@ export default class LogoutView extends LoginView {
     let language = await _retrieveData('culture', 1);
     let endpoint =await _retrieveData( "APP@BACKEND_ENDPOINT",  JSON.stringify(ENDPOINT_URL));
     endpoint=JSON.parse(endpoint);
-    this.setState({ fontLoaded: true,endpoint, language: language, dictionary: dictionary, settings });
+    this.setState({ fontLoaded: true,endpoint, language: language, dictionary: dictionary, settings,isColor });
     await this._getLanguage(true);
     StatusBar.setHidden(true);
   }

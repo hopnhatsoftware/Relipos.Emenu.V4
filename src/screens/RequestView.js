@@ -51,6 +51,7 @@ export default class RequestView extends Component {
     //const data = Array.apply(null, {length: 20}).map(Number.call, Number);
 
     this.state = {
+      isColor: false,
       isLoading: false,
       selectedType: null,
       fontLoaded: false,
@@ -89,6 +90,8 @@ export default class RequestView extends Component {
       RobotoLightItalic: require("../../assets/fonts/Roboto-LightItalic.ttf"),
       RobotoRegular: require("../../assets/fonts/Roboto-Regular.ttf"),
     }); 
+    let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
+    isColor = JSON.parse(isColor);
     let settings = await _retrieveData('settings');
     if(settings == undefined)
     {
@@ -101,7 +104,7 @@ export default class RequestView extends Component {
     a = JSON.parse(a);
     let user = await _retrieveData('APP@USER', JSON.stringify({}));
     user = JSON.parse(user);
-    this.setState({settings, user,a,  fontLoaded:true, isLoading:false,});
+    this.setState({settings, user,a,  fontLoaded:true, isLoading:false,isColor});
     StatusBar.setHidden(true);
  
     this.defaultFonts();
@@ -209,6 +212,7 @@ export default class RequestView extends Component {
       Products1,
       Products2,
       Product,
+      isColor
     } = this.state;
     if ( !this.state.fontLoaded) {
       return (
@@ -224,10 +228,10 @@ export default class RequestView extends Component {
       )
     }
     return (
-      <View style={styles.container}>
+      <View style={[styles.container,{backgroundColor:isColor == true ? '#222222':'#ffffff'}]}>
         <StatusBar hidden={true} />
         <View style={{flex: 1, height:'100%'}}>
-          <View style={[styles.toolbar,{height:'10%'}]}>
+          <View style={[styles.toolbar,{height:'10%',backgroundColor:isColor == true ? '#222222':colors.primary}]}>
             <TouchableOpacity onPress={()=>this.onPressBack()} >
               <Icon name="arrowleft" iconStyle={{color:colors.white,paddingLeft: ITEM_FONT_SIZE * 1,}}  fontSize={TITLE_FONT_SIZE} type="antdesign"></Icon>        
             </TouchableOpacity> 
@@ -239,9 +243,9 @@ export default class RequestView extends Component {
               <View style={{width:'8%', height:3, backgroundColor: colors.white}}></View>
             </View>
           </View>
-          <View style={{backgroundColor:colors.white, height:'90%'}}>
-            <View style={[styles.header,{flexDirection:'row', backgroundColor:colors.grey5, height:  '10%',}]}>
-              <View style={{backgroundColor:colors.grey5, justifyContent:'flex-start', paddingTop: ITEM_FONT_SIZE/2,}}>
+          <View style={{backgroundColor:isColor == true ? '#444444':colors.white, height:'90%'}}>
+            <View style={[styles.header,{flexDirection:'row', backgroundColor:isColor == true ? '#333333':colors.grey5, height:  '10%',}]}>
+              <View style={{backgroundColor:isColor == true ? '#222222':colors.grey5, justifyContent:'flex-start', paddingTop: ITEM_FONT_SIZE/2,}}>
                 {/* <FlatList
                   horizontal={true}
                   data={Product.itemDescription}

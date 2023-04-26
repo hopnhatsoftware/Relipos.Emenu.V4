@@ -352,6 +352,11 @@ let ImageWidth=Bordy.width*0.12
     }
     return (
       <View style={[styles.container,{backgroundColor:isColor == true ?'#0D0D0D' : '#333D4C',}]}>
+         {this.state.notification ?
+            <View style={{position:'absolute', top:'5%', width: Bordy.width * 0.55, justifyContent:'center',alignItems:'center'}} >
+              <Text style={{fontSize:H1_FONT_SIZE*1.2, color:'#fff',textAlign:'center'}}>{this.translate.Get("Quý khách vui lòng đợi nhân viên xác nhận thanh toán")}</Text>
+            </View>
+            :null}
         {modalVisible ?
           <Modal
           animationType='fade'
@@ -388,11 +393,6 @@ let ImageWidth=Bordy.width*0.12
           : null}
           <StatusBar hidden={true} />
         <KeyboardAvoidingView  keyboardType='light' behavior= 'padding' contentContainerStyle={styles.formContainer}  >
-            {this.state.notification ?
-            <View style={{ marginBottom:'5%', width: Bordy.width * 0.55, justifyContent:'center',alignItems:'center'}} >
-              <Text style={{fontSize:H1_FONT_SIZE*1.2, color:'#fff',textAlign:'center'}}>{this.translate.Get("Quý khách vui lòng đợi nhân viên xác nhận thanh toán")}</Text>
-            </View>
-            :null}
           <View style={[styles.BorderLogin,{backgroundColor:isColor == true ? '#252525':'#EEEEEE',borderColor: isColor == true ?'#FFA500' : '#166ead',}]}>
             <View style={styles.BorderFormLogin}>
             <View><Text style={{ color: isColor == true ?'#FEAD1D' : BACKGROUND_COLOR , textAlign: 'center', fontSize: H1FontSize, }}>{this.translate.Get('Đăng nhập hệ thống')}</Text></View> 

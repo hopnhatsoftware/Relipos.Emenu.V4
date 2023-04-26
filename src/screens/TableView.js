@@ -374,11 +374,11 @@ export default class TableView extends Component {
               <Icon name="filter" iconStyle={{ color: colors.white, marginRight: 10 }} fontSize={H1FontSize} type="font-awesome"></Icon>
             </TouchableOpacity>
           </View>
-          <View name='pnArea' style={{width:'100%',height:pnAreaheight, borderBottomWidth: 1,borderColor: colors.grey5,}}>
+          <View name='pnArea' style={{width:'100%',height:pnAreaheight, borderBottomWidth: 1,borderColor:isColor == true ? '#444444' : colors.grey5,}}>
             <FlatList horizontal={true}  extraData={this.state.selectedAreaIndex}  data={AreasList}
               renderItem={({ item, index }) => <TouchableOpacity key={index}
                 style={{
-                  width: Bordy.width/5, height:pnAreaheight, borderRadius: 2, borderWidth: 0.5, borderColor: 'white', justifyContent: 'center', alignItems: 'center', backgroundColor:
+                  width: Bordy.width/5-3, height:pnAreaheight, borderRadius: 2, borderWidth: 0.5,marginHorizontal:1.5, borderColor: isColor == true ? '#444444' : colors.grey5, justifyContent: 'center', alignItems: 'center', backgroundColor:
                     index == this.state.selectedAreaIndex ? '#ea6721' : '#2e7cc6',
                 }}
                 onPress={() => { this.loadTables(index) }}>
@@ -394,9 +394,9 @@ export default class TableView extends Component {
           <FlatList numColumns={5}   data={TablesList} 
             renderItem={({ item, index }) =>
               <TouchableOpacity onPress={() => this._onPressTable(item, index)}
-                style={{ width: I_TableWidth, backgroundColor: colors.grey0, borderRadius: 2, borderWidth: 0.5, borderColor: 'white', }}>
+                style={{ width: I_TableWidth-3, borderRadius: 5, borderWidth: 0.5, borderColor:isColor == true ? '#444444' : colors.grey5, marginHorizontal:1.5,marginVertical:1.5}}>
                 <View style={{
-                  justifyContent: "center", alignItems: 'center', height: Bordy.height * 0.18, borderRadius: 2, borderColor: 'white',
+                  justifyContent: "center", alignItems: 'center', height: Bordy.height * 0.18, borderRadius: 5, borderColor:isColor == true ? '#444444' : colors.grey5,
                   backgroundColor: getTableColor(item.Status)
                 }}>
                   <View style={{ position: 'absolute', justifyContent: 'center', alignItems: 'center', top: 0, paddingTop: 3.6 }}>

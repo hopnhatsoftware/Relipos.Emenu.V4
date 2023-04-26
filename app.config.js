@@ -9,9 +9,9 @@ const commonConfig = {
     ],
     version: "1.0.0",
     orientation: "landscape",
-    icon: "./assets/Customer/splash.png",
+    icon: "./assets/Customer/logo_Menu-18-18-18.png",
     splash: {
-      image: "./assets/Customer/splash.png",
+      image: "./assets/Customer/logo_Menu-18.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff"
     },

@@ -443,7 +443,7 @@ export class CardDetailView extends React.Component {
             </TouchableOpacity>
              
             </View>
-            <View style={{backgroundColor: isColor == true ? '#444444' :'#FFFFFF',  width: "100%",marginTop:1, height:Bordy.height-(Titlecf.height+TabTitle.height+(state.isHavingOrder ? TabTitle.height*2 : TabTitle.height))
+            <View style={{backgroundColor: isColor == true ? '#444444' :'#FFFFFF',  width: "100%",marginTop:1, height:Bordy.height-(Titlecf.height+TabTitle.height+(state.isHavingOrder ? TabTitle.height*2.4 : TabTitle.height))
             }}>
             <FlatList
               keyExtractor={(item, RowIndex) => RowIndex.toString()}
@@ -474,8 +474,8 @@ export class CardDetailView extends React.Component {
                       </Text>
                   </View>
               </View>
-              <View style={[BookingsStyle.bottombar, { width: "100%", flexDirection: "row" ,height:TabTitle.height}]}>
-              <TouchableOpacity style={{justifyContent:'center', borderRadius: 0, backgroundColor:isColor == true ?'#009900':'#dc7d46',width: "50%"
+              <View style={{ backgroundColor: isColor == true ? '#444444' :'#FFFFFF',width: "100%", flexDirection: "row" ,height:TabTitle.height*1.4, justifyContent:'space-evenly',alignItems:'center'}}>
+              <TouchableOpacity style={{justifyContent:'center', borderRadius: 8, backgroundColor:isColor == true ?'#009900':'#dc7d46',width: "48%",height:"80%"
             }}
             onPress={() => {
               CartToggleHandle(false);
@@ -484,7 +484,7 @@ export class CardDetailView extends React.Component {
                 {translate.Get("Đặt thêm")}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={{justifyContent:'center', borderRadius: 0, backgroundColor:!state.CartInfor.TotalQuantity||state.CartInfor.TotalQuantity <= 0 ?colors.grey0: '#af3037',width: "50%"
+            <TouchableOpacity style={{justifyContent:'center', borderRadius: 8, backgroundColor:!state.CartInfor.TotalQuantity||state.CartInfor.TotalQuantity <= 0 ?colors.grey0: '#af3037',width: "48%",height:"80%"
             }}
             onPress={() => {
              if(!state.CartInfor.TotalQuantity||state.CartInfor.TotalQuantity <= 0 )

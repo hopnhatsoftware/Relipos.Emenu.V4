@@ -108,7 +108,7 @@ export const execFetch = async (Path, Method, Data) => {
       return data;
     }).catch(async (error) => {
       Alert.alert( "System Error",
-        URL + " " + error,
+      'Emenu đang mất kết nối, vui lòng kiểm tra wifi, máy chủ...',
       )
     });
   }
@@ -137,7 +137,7 @@ export const execFetch = async (Path, Method, Data) => {
   }).catch(async (error) => {
     Alert.alert(
       "Error",
-      URL + " " + error,
+      'Emenu đang mất kết nối, vui lòng kiểm tra wifi, máy chủ...',
     )
   });
 }
@@ -169,7 +169,7 @@ export const execFetchNoMessenger = async (Path, Method, Data) => {
     }).catch(async (error) => {
       Alert.alert(
         "Error",
-        URL + " " + error,
+        'Emenu đang mất kết nối, vui lòng kiểm tra wifi, máy chủ...',
       )
     });
   }
@@ -188,7 +188,7 @@ export const execFetchNoMessenger = async (Path, Method, Data) => {
   }).catch(async (error) => {
     Alert.alert(
       "Error",
-      URL + " " + error,
+      'Emenu đang mất kết nối, vui lòng kiểm tra wifi, máy chủ...',
     )
   });
 }
