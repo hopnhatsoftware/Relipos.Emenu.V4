@@ -129,13 +129,6 @@ export default class TableView extends Component {
       )
     }
   }
-//  checkConnection = () => {
-//     if (netInfo.isConnected && netInfo.isInternetReachable) {
-//       Alert.alert('You are online!');
-//     } else {
-//       Alert.alert('You are offline!');
-//     }
-//   };
   GetListCustomer = async () => {
     try{
     const { ObjType, KeySearch, OgId, isGetOrg } = this.state;
