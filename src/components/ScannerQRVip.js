@@ -68,8 +68,8 @@ export class ScannerQRVip extends Component {
   render() {
     const { hasCameraPermission, IsScanedVip,isViewCamera } = this.state;
     const { height, width } = Dimensions.get('window');
-    const maskRowHeight = Math.round((height ) / 20);
-    const maskColWidth = (width ) / 2;
+    const maskRowHeight = Math.round((height-300 ) / 20);
+    const maskColWidth = (width - 300) / 2;
     if (hasCameraPermission === null) {
               return <Text style={{ paddingTop: Constants.statusBarHeight, textAlign: 'center' }}>Requesting for camera permission</Text>;
             }
@@ -99,6 +99,15 @@ export class ScannerQRVip extends Component {
         onBarCodeScanned={ IsScanedVip ? undefined : this.handleBarCodeScannedVip}
         style={StyleSheet.absoluteFillObject}
       />
+      <View style={styles.maskOutter}>
+                            <View style={[{ flex: maskRowHeight }, styles.maskRow, styles.maskFrame]} />
+                            <View style={[{ flex: 30 }, styles.maskCenter]}>
+                                <View style={[{ width: maskColWidth }, styles.maskFrame]} />
+                                <View style={styles.maskInner} />
+                                <View style={[{ width: maskColWidth }, styles.maskFrame]} />
+                            </View>
+                            <View style={[{ flex: maskRowHeight }, styles.maskRow, styles.maskFrame]} />
+                        </View>
       {IsScanedVip && (
         <Button title={'Tap to Scan Again'} onPress={() => this.setState({ IsScanedVip: false })} />
       )}

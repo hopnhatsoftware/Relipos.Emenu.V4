@@ -68,6 +68,8 @@ export class ScannerQR extends Component {
      onSelect(BarCode, Quantity);
   }
   render() {
+    const maskRowHeight = Math.round((SCREEN_HEIGHT - 300) / 20);
+        const maskColWidth = (SCREEN_WIDTH - 300) / 2;
     const { hasCameraPermission, IsScaned, isViewCamera } = this.state;
     if (hasCameraPermission === null) {
               return <Text style={{ paddingTop: Constants.statusBarHeight, textAlign: 'center' }}>Requesting for camera permission</Text>;
@@ -91,6 +93,15 @@ export class ScannerQR extends Component {
           onBarCodeScanned={ IsScaned ? undefined : this.handleBarCodeScanned}
           style={StyleSheet.absoluteFillObject}
         />
+        <View style={styles.maskOutter}>
+                            <View style={[{ flex: maskRowHeight }, styles.maskRow, styles.maskFrame]} />
+                            <View style={[{ flex: 30 }, styles.maskCenter]}>
+                                <View style={[{ width: maskColWidth }, styles.maskFrame]} />
+                                <View style={styles.maskInner} />
+                                <View style={[{ width: maskColWidth }, styles.maskFrame]} />
+                            </View>
+                            <View style={[{ flex: maskRowHeight }, styles.maskRow, styles.maskFrame]} />
+                        </View>
         {IsScaned && (
           <Button title={'Tap to Scan Again'} onPress={() => this.setState({ IsScaned: false })} />
         )}

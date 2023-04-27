@@ -635,7 +635,7 @@ export default class Payment3 extends Component {
                 </View>
               </View>
               <View style={{height:'25%',justifyContent:'center',flexDirection:'row',width:'100%',}}>
-                  <TouchableOpacity onPress={this._isShowBarCodeVip} style={{marginHorizontal:'2%',height:'90%', width:'25%',alignItems:'center',borderRadius:8, justifyContent:'center',shadowOpacity:0.3, shadowRadius: 4,elevation:6,backgroundColor:'#333d4c'}}>
+                  <TouchableOpacity onPress={this._isShowBarCodeVip} style={{marginHorizontal:'2%',height:'90%', width:'25%',alignItems:'center',borderRadius:8, justifyContent:'center',shadowOpacity:0.3, shadowRadius: 4,elevation:6,backgroundColor:'#333d4c',borderColor:isColor == true ? '#ffffff' : "#333d4c",borderWidth:0.6}}>
                     <Image style={{height: "80%", width: "80%",}} resizeMode='contain' source={require("../../assets/icons/IconQR-11.png")}/>
                   </TouchableOpacity>
               </View>
