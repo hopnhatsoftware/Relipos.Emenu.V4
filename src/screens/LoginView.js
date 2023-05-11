@@ -40,7 +40,7 @@ export default class LoginView extends Component {
       language: 1,
       listLanguage:[],
       listLanguage2:{},
-      languageText: '',
+      languageText: 'Tiếng Việt / VietNamese',
       languageImg: '',
       isColor: false,
       LgIco:'',
@@ -132,6 +132,7 @@ export default class LoginView extends Component {
     try{
       let {listLanguage,language,listLanguage2,} = this.state;
       getLanguage(IsActive).then(res => {
+        console.log(res)
         listLanguage = res.Data
         this.setState({listLanguage: listLanguage})
        
@@ -479,7 +480,7 @@ let ImageWidth=Bordy.width*0.12
                 <View style={{flexDirection: "row",height:"100%",alignItems:'center'}}>
                   <TouchableOpacity onPress={() => this.setModalVisible(!modalVisible )} 
                   style={{height:'70%', flexDirection: "row", justifyContent:'space-around',borderWidth:1,borderColor: '#000000',backgroundColor:isColor == true? '#DAA520': '#0176cd',borderRadius:8, alignItems:'center'}}>
-                    <Image source={languageImg == 'icon-flagvn' ? require('../../assets/icons/icon-flagvn.png'): languageImg == 'icon-flagus' ? require('../../assets/icons/icon-flagus.png'):languageImg == 'icon-flagcn' ? require('../../assets/icons/icon-flagcn.png'):null} style={{ width: '20%' ,height:'90%' , }} resizeMode={'contain'}></Image>
+                    <Image source={languageImg == 'icon-flagvn' ? require('../../assets/icons/icon-flagvn.png'): languageImg == 'icon-flagus' ? require('../../assets/icons/icon-flagus.png'):languageImg == 'icon-flagcn' ? require('../../assets/icons/icon-flagcn.png'):require('../../assets/icons/icon-flagvn.png')} style={{ width: '20%' ,height:'90%' , }} resizeMode={'contain'}></Image>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true? 'black':'white', textAlign:'center'}}>{this.state.languageText}</Text>
                   </TouchableOpacity>
                 </View>
