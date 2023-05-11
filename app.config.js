@@ -1,17 +1,17 @@
 const commonConfig = {
-    name: "SOS OfflineMenu",
-    slug: "SOS-OfflineMenu",
-    privacy: "public",
-    platforms: [
-      "ios",
-      "android",
-      "web"
-    ],
-    version: "1.0.0",
+  name: "Relipos eMenu",
+  slug: "relipos-EmenuV4",
+  privacy: "public",
+  platforms: [
+    "ios",
+    "android",
+    "web"
+  ],
+    version: "2.0",
     orientation: "landscape",
-    icon: "./assets/Customer/logo_Menu-18-18-18.png",
+    icon: "./assets/Customer/Logo.png",
     splash: {
-      image: "./assets/Customer/logo_Menu-18.png",
+      image: "./assets/Customer/Logo1.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff"
     },
@@ -56,11 +56,11 @@ const commonConfig = {
         }
       },
       "supportsTablet": true,
-      "bundleIdentifier": "com.SOS.OfflineMenu"
+      bundleIdentifier: "com.relipos.Emenu"
     },
-    "android": {
-      "versionCode": 1,
-      "package": "com.SOS.OfflineMenu",
+    android: {
+      versionCode: 47,
+      package: "com.relipos.Emenu",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",
@@ -90,7 +90,7 @@ const commonConfig = {
     "description": "New Version",
     "extra": {
       "eas": {
-        "projectId": "7fa2b6f8-9aa9-4a04-826c-697534534f12"
+        "projectId": "51ced16b-2562-41bf-8cfd-e4c8c12e1dce"
       }
     }
   
