@@ -187,7 +187,7 @@ export class CardDetailView extends React.Component {
     if (item.TkdQuantity <= 0&&item.TksdQuantity<=0)
     return null;
       return (
-        <View style={{backgroundColor:isColor ==true ? '#333333':'#000000', width: Contentcf.width, justifyContent:'flex-start', borderBottomColor: colors.grey5, borderBottomWidth: 0.5,paddingBottom:1, }}>
+        <View style={{backgroundColor:isColor ==true ? '#333333':'#FFFFFF', width: Contentcf.width, justifyContent:'flex-start', borderBottomColor: colors.grey5, borderBottomWidth: 0.5,paddingBottom:1, }}>
        
        {item.TkdType==0||item.TkdType==1?
         <View style={{ width: Contentcf.width, flexDirection: "row"}}> 
@@ -244,7 +244,7 @@ export class CardDetailView extends React.Component {
             {'  #'+formatNumber(item.TksdQuantity)} {item.PrdName}
           </Text>
           <Text style={{
-                color: "#000000",
+                color: isColor ==true ? '#FFFFFF':"#000000",
                 width:Contentcf.width*0.1,
                 justifyContent: 'center',
                 fontSize: H3FontSize,
@@ -253,7 +253,7 @@ export class CardDetailView extends React.Component {
               {formatCurrency(item.TkdBasePrice, "")}
             </Text>
           <Text style={{
-              color: "#000000",
+              color: isColor ==true ? '#FFFFFF':"#000000",
               width:Contentcf.width*0.1,
               justifyContent: 'center',
               fontSize: H4FontSize,
@@ -367,18 +367,18 @@ export class CardDetailView extends React.Component {
             </View>
           </View>
           <View style={{ width: Contentcf.width* 0.555,flexDirection: "row",alignContent:'center', justifyContent:'flex-start', marginLeft: Contentcf.width* 0.005, }}>
-          <Text style={{  fontSize: H4FontSize,textAlign:'left'}}>
+          <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H4FontSize,textAlign:'left'}}>
            {item.TksdQuantity}
             </Text> 
-            <Text style={{  fontSize: H4FontSize,textAlign:'left',textAlignVertical:'bottom'}}>
+            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H4FontSize,textAlign:'left',textAlignVertical:'bottom'}}>
             {'# '}
             </Text> 
-            <Text style={{ fontSize: H4FontSize,  flexWrap: "wrap",textAlign:'left'}}>
+            <Text style={{color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H4FontSize,  flexWrap: "wrap",textAlign:'left'}}>
          {item.PrdName}
             </Text> 
           </View>
           <View style={{  justifyContent:'center',width: Contentcf.width* 0.1 ,}}>
-            <Text style={{ fontSize: H4FontSize ,textAlign:'right' }}>
+            <Text style={{color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H4FontSize ,textAlign:'right' }}>
               {formatCurrency(item.TksdPrice, "")}
             </Text>
           </View>
