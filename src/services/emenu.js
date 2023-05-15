@@ -336,7 +336,6 @@ export const Ticket_Flush = async (settings, B_UseOrderDefault, sItemTable, grou
  * @returns 
  */
 export const API_Print = async (OrgId,TicketId,PrintType) => {
-  const culture = await _retrieveData('culture', 1);
   const URL = '/Ticket/API_Print';
   return await execFetch(URL, 'GET', { OrgId: OrgId,TicketId:TicketId,PrintType });
 }

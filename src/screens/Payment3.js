@@ -284,7 +284,7 @@ export default class Payment3 extends Component {
   onCallServices= async() => {
     let { settings,table,user } = this.state;
  
-    await CallServices(settings.I_BranchID,table.TabId,table.TicketID,1,user.ObjId);
+    await CallServices(user.BranchId,table.TabId,table.TicketID,1,user.ObjId);
   }
   _onPlaybackStatusUpdate = playbackStatus => {
     if (!playbackStatus.isLoaded) {
@@ -421,9 +421,13 @@ export default class Payment3 extends Component {
   /**
    * Xác nhận thanh toán in qua Services
    */
-  AcceptPayment = async () => {
+  _AcceptPayment = async () => {
     let{Ticket,user} = this.state;
-    API_Print (user.I_BranchID, Ticket.TicketID,1 ).then(res => {
+    // console.log('AcceptPayment ----------')
+    // console.log('BranchId:',user.BranchId)
+    // console.log('TicketID',Ticket.TicketID)
+    API_Print (user.BranchId, Ticket.TicketID,1 ).then(res => {
+      console.log('API_Print',res)
       if (res.Status == 1){
        this.onPressNext();
       }
@@ -686,7 +690,9 @@ export default class Payment3 extends Component {
           </View>
         </View>
         <View style={{ height: Bordy.height * 0.20, width: Bordy.width, alignItems: "center",backgroundColor: isColor == true ?'#333333' : '#ffffff'}}>
-            <TouchableOpacity onPress={this.AcceptPayment()} style={{backgroundColor:isColor == true ? '#DAA520' :'#33FF33', marginTop: 15, borderWidth: 1, height: '30%',borderRadius:35,width:'30%', justifyContent: "center", alignItems: "center"}}>
+            <TouchableOpacity style={{backgroundColor:isColor == true ? '#DAA520' :'#33FF33', marginTop: 15, borderWidth: 1, height: '30%',borderRadius:35,width:'30%', justifyContent: "center", alignItems: "center"}} 
+             onPress={()=>{this._AcceptPayment()}}
+            >
               <Text style={{ textAlign: "center",color:isColor == true ? '#000000' :'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>
                 {this.translate.Get('Xác nhận thanh toán')}</Text>
             </TouchableOpacity>

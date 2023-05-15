@@ -14,7 +14,7 @@ import colors from '../config/colors';
 import { formatCurrency } from "../services/util";
 import AreasStyle from "../styles/areas";
 import Question from '../components/Question';
-import { TITLE_FONT_SIZE, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, ENDPOINT_URL,H1FontSize, H2FontSize, H3FontSize, H4FontSize } from '../config/constants';
+import { TITLE_FONT_SIZE, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize, H2FontSize, H3FontSize, H4FontSize } from '../config/constants';
 
 // Enable LayoutAnimation on Android
 UIManager.setLayoutAnimationEnabledExperimental &&
@@ -107,8 +107,6 @@ export default class TableView extends Component {
     user = JSON.parse(user);
     let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
     isColor = JSON.parse(isColor);
-    let endpoint = await _retrieveData('APP@BACKEND_ENDPOINT', JSON.stringify({endpoint : ENDPOINT_URL}));
-    endpoint = JSON.parse(endpoint);
     let Config = await _retrieveData('APP@CONFIG', '{}');
     if (Config!='{}')
     Config=JSON.parse(Config);
@@ -167,7 +165,7 @@ export default class TableView extends Component {
   onPressLogout = () => {
     let that = this;
     _remove('APP@USER', () => { 
-      console.log('logout from request'); 
+     
       that.props.navigation.navigate('LoginView') ;
     });
   }
