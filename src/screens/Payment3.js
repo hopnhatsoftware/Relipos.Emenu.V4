@@ -9,7 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ScannerQR, ScannerQRVip, _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor,} from "../components";
 import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, H1_FONT_SIZE,H2_FONT_SIZE,H3_FONT_SIZE,H4_FONT_SIZE,H5_FONT_SIZE} from "../config/constants";
 import translate from "../services/translate";
-import {getVipCardInfor,getQrCode,ApplyVipCard,ApplyVoucher,getLinkQrBank,getPaymentAmount,getMasterData, CallServices} from "../services";
+import {getVipCardInfor,getQrCode,ApplyVipCard,ApplyVoucher,API_Print,getLinkQrBank,getPaymentAmount,getMasterData, CallServices} from "../services";
 import { formatCurrency } from "../services/util";
 import colors from "../config/colors";
 import Question from "../components/Question";
@@ -95,7 +95,10 @@ export default class Payment3 extends Component {
           'I_BusinessType':1
           }));
     Config = JSON.parse(Config);
-    this.setState({endpoint,language,settings,Config,Ticket});
+    let user = await _retrieveData('APP@USER', JSON.stringify({ObjId:-1}));
+    if (user!='{}') 
+    user = JSON.parse(user);
+    this.setState({endpoint,language,settings,Config,Ticket,user});
   }
   catch(ex){
     console.log('_setConfig Error :'+ex)
@@ -279,9 +282,8 @@ export default class Payment3 extends Component {
       ); 
   };
   onCallServices= async() => {
-    let { settings,table } = this.state;
-    let user = await _retrieveData('APP@USER', JSON.stringify({ObjId:-1}));
-      user = JSON.parse(user);
+    let { settings,table,user } = this.state;
+ 
     await CallServices(settings.I_BranchID,table.TabId,table.TicketID,1,user.ObjId);
   }
   _onPlaybackStatusUpdate = playbackStatus => {
@@ -415,6 +417,24 @@ export default class Payment3 extends Component {
       notification = true
       this.props.navigation.navigate("LogoutView", { lockTable , notification});
     }
+  }
+  /**
+   * Xác nhận thanh toán in qua Services
+   */
+  AcceptPayment = async () => {
+    let{Ticket,user} = this.state;
+    API_Print (user.I_BranchID, Ticket.TicketID,1 ).then(res => {
+      if (res.Status == 1){
+       this.onPressNext();
+      }
+    }).catch((error) => {
+      Question.alert( 'System Error',error, [
+        {
+          text: "OK", onPress: () => {
+          }
+        }
+      ]);
+    }); 
   }
   /**
    *
@@ -666,8 +686,9 @@ export default class Payment3 extends Component {
           </View>
         </View>
         <View style={{ height: Bordy.height * 0.20, width: Bordy.width, alignItems: "center",backgroundColor: isColor == true ?'#333333' : '#ffffff'}}>
-            <TouchableOpacity onPress={this.onPressNext} style={{backgroundColor:isColor == true ? '#DAA520' :'#33FF33', marginTop: 15, borderWidth: 1, height: '30%',borderRadius:35,width:'30%', justifyContent: "center", alignItems: "center"}}>
-              <Text style={{ textAlign: "center",color:isColor == true ? '#000000' :'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>{this.translate.Get('Xác nhận thanh toán')}</Text>
+            <TouchableOpacity onPress={this.AcceptPayment()} style={{backgroundColor:isColor == true ? '#DAA520' :'#33FF33', marginTop: 15, borderWidth: 1, height: '30%',borderRadius:35,width:'30%', justifyContent: "center", alignItems: "center"}}>
+              <Text style={{ textAlign: "center",color:isColor == true ? '#000000' :'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>
+                {this.translate.Get('Xác nhận thanh toán')}</Text>
             </TouchableOpacity>
           <View style={{height:'70%', width: Bordy.width, justifyContent:'center'}}>
             <StepIndicator
