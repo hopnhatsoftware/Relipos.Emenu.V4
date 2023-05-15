@@ -292,7 +292,7 @@ const passwordValid = this.validatePassword();
       _storeData("culture", lang.toString(), async () => {
         this.translate = await this.translate.loadLang();
         this.setState({ language: lang, languageText: item.LgName, languageImg: item.LgClsIco });
-        this.getBranchesList();
+       
       });
     }}
     catch{(async (err) => {

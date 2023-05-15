@@ -1,6 +1,6 @@
 
 import { _retrieveData, _storeData, _clearData } from './storages';
-import { execFetch, fetchFile, execFormData } from './services';
+import { execFetch,execFetch_NoAuthor, fetchFile, execFormData } from './services';
 
 
 
@@ -55,7 +55,7 @@ export const GetViewGroup = async (Config, item) => {
 export const getLanguage = async ( IsActive) => {
   const culture = await _retrieveData('culture', 1);
   const URL = '/Global/getAllCulture';
-  return await execFetch(URL, 'GET', {
+  return await execFetch_NoAuthor(URL, 'GET', {
     IsActive:IsActive
   });
 }
