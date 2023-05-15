@@ -80,18 +80,12 @@ export default class LoginView extends Component {
         return;
       }
     }
-    if (user != null && user.UserId > 0) {
-      let table = await _retrieveData('APP@TABLE', JSON.stringify({}));
-      table = JSON.parse(table);
-      if (table != null && table.TicketID > 0) {
-        this.props.navigation.navigate("OrderView", { settings, user, table });
-        return;
-      }
-      else {
-        this.props.navigation.navigate("TableView", { settings, user });
-        return;
-      }
-    }
+    // if (user != null && user.UserId > 0) {
+    //   let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
+    //   let JwtToken = await _retrieveData('APP@JWT', JSON.stringify({}));
+  
+    // this._LoginSucess(user,Config,JwtToken);
+    // }
     this.translate = await this.translate.loadLang();
     await cacheFonts({
       RobotoLight: require("../../assets/fonts/Roboto-Light.ttf"),
@@ -159,15 +153,15 @@ export default class LoginView extends Component {
     }
     setCustomText(customTextProps)
   }
-BingdingConfig = async (user,Config,JwtToken) => { 
+  _LoginSucess = async (user,Config,JwtToken) => { 
   let { password, settings } = this.state;
   user.PassWord = password;
   user.BranchId = Config.I_BranchId;
-  //console.log('Config.I_ItemGroupLevel:'+JSON.stringify(Config.I_ItemGroupLevel))
   _storeData('APP@USER', JSON.stringify(user), () => {
       _storeData('APP@CONFIG', JSON.stringify(Config), () => {
         _storeData('APP@JWT', JSON.stringify(JwtToken), () => {
           CheckCasherIn(Config).then(res => { 
+        
             if (res.Status == 1) 
             {
               this.setState({ isLoading: false, isWorking: false, }, () => {
@@ -246,7 +240,7 @@ const passwordValid = this.validatePassword();
                 {
                   text: this.translate.Get('AlertOK'), onPress: () => {
                     if (res.Data != undefined && 'UserId' in res.Data && res.Data.UserId > 0) {
-                      this.BingdingConfig(res.Data,res.Config,res.JwtToken);
+                      this._LoginSucess(res.Data,res.Config,res.JwtToken);
                     }
                     else {
                       Question.alert( this.translate.Get('Notice'),
@@ -263,7 +257,7 @@ const passwordValid = this.validatePassword();
              return;
             }
               if (res.Data != undefined && 'UserId' in res.Data && res.Data.UserId > 0) {
-                this.BingdingConfig(res.Data,res.Config,res.JwtToken);
+                this._LoginSucess(res.Data,res.Config,res.JwtToken);
               }
               else {
                 Question.alert(  this.translate.Get('Notice'),

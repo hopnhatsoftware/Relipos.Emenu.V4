@@ -330,9 +330,9 @@ onCallServices= async() => {
           table = JSON.parse(table);
         }
         if ("TicketID" in table && table.TicketID > 0) {
-          
           this.setState( { isShowMash:true});
           CheckAndGetOrder(table, OrdPlatform).then(res => {
+            console.log('CheckAndGetOrder',res);
             table.OrderId = res.Data;
             _storeData("APP@TABLE", JSON.stringify(table), () => {
               GetViewGroup(Config, table).then(res => {
