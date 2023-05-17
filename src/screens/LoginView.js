@@ -126,7 +126,6 @@ export default class LoginView extends Component {
     try{
       let {listLanguage,language,listLanguage2,} = this.state;
       getLanguage(IsActive).then(res => {
-        console.log(res)
         listLanguage = res.Data
         this.setState({listLanguage: listLanguage})
        
@@ -409,6 +408,7 @@ let ImageWidth=Bordy.width*0.12
                 placeholder={this.translate.Get('username')}
                 placeholderTextColor="#7384B4"
                 refInput={(input) => this.usernameInput = input}
+                style={{fontSize:H2_FONT_SIZE*1.2}}
                 onChangeText={username =>{ this.setState({ username })
                 this.ValidaUsername();
               }
@@ -454,6 +454,7 @@ let ImageWidth=Bordy.width*0.12
                 returnKeyType='next'
                 placeholder={this.translate.Get('password')}
                 placeholderTextColor="#7384B4"
+                style={{fontSize:H2_FONT_SIZE*1.2}}
                 refInput={(input) => this.passwordInput = input}
                 onChangeText={password =>{ 
                   this.setState({ password })
