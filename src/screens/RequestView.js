@@ -16,7 +16,8 @@ import {
   Text,
   View,
   StatusBar,
-  FlatList
+  FlatList,
+  TextInput
 } from 'react-native';
 import {_retrieveData, _storeData,_remove,_clearData} from '../services/storages';
 import { cacheFonts } from "../helpers/AssetsCaching";
@@ -29,7 +30,7 @@ import colors from '../config/colors';
 
 import { formatCurrency } from "../services/util";
 import AreasStyle from "../styles/areas";
-import { TITLE_FONT_SIZE ,BUTTON_FONT_SIZE,ITEM_FONT_SIZE} from '../config/constants';
+import { TITLE_FONT_SIZE ,BUTTON_FONT_SIZE,ITEM_FONT_SIZE,H2_FONT_SIZE,H1_FONT_SIZE} from '../config/constants';
 import Constants from 'expo-constants';
 import Question from '../components/Question';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -74,6 +75,7 @@ export default class RequestView extends Component {
         // SelectedItem: 0,
         // MrqDescription : '',
       },
+      TksdNote:'',
       state:{},
       user:{},
       tableStatus:2,
@@ -149,7 +151,7 @@ export default class RequestView extends Component {
       return {
         ReturnScreen: props.navigation.getParam('ReturnScreen', state.ReturnScreen),
         Product: props.navigation.getParam("Product", state.Product),
-        Product: props.navigation.getParam("RowIndex", state.RowIndex)
+        RowIndex: props.navigation.getParam("RowIndex", state.RowIndex)
       };
     }
     // Return null if the state hasn't changed
@@ -158,38 +160,40 @@ export default class RequestView extends Component {
  
   IncrementDescription = (item,index) => {
     if (index < 0) return;
-    let { Product } = this.state;
-    let existed = false;
-    if(!('itemDescription' in Product))
-    {
-      Product.itemDescription =[];
-    }
-    Product.itemDescription.forEach(prd => {
-      if (prd.MrqId == item.MrqId) {
-        existed = true;
-        if (prd.SelectedItem > 0) {
-          prd.SelectedItem++;
-        } else {
-          Product.itemDescription.splice(index, 1);
-        }
-        return existed;
-      }
-    });
-    if (!existed) {
-      item.SelectedItem = 1;
-      if(!('TksdNote' in Product) || Product.TksdNote == undefined){
-        Product.TksdNote =item.MrqDescription + ' ';
-      }
-      else{
-        Product.TksdNote +=item.MrqDescription + ' ';
-      }
-      Product.itemDescription.push({
-        MrqId : item.MrqId,
-        MrqDescription: item.MrqDescription,
-        SelectedItem : item.SelectedItem,
-      });
-    }
-    Product.SelectedItem++;
+    let { Product,TksdNote } = this.state;
+
+    this.setState({TksdNote: TksdNote + item.MrqDescription +''})
+    // let existed = false;
+    // if(!('itemDescription' in Product))
+    // {
+    //   Product.itemDescription =[];
+    // }
+    // Product.itemDescription.forEach(prd => {
+    //   if (prd.MrqId == item.MrqId) {
+    //     existed = true;
+    //     if (prd.SelectedItem > 0) {
+    //       prd.SelectedItem++;
+    //     } else {
+    //       Product.itemDescription.splice(index, 1);
+    //     }
+    //     return existed;
+    //   }
+    // });
+    // if (!existed) {
+    //   item.SelectedItem = 1;
+    //   if(!('TksdNote' in Product) || Product.TksdNote == undefined){
+    //     Product.TksdNote =item.MrqDescription + ' ';
+    //   }
+    //   else{
+    //     Product.TksdNote +=item.MrqDescription + ' ';
+    //   }
+    //   Product.itemDescription.push({
+    //     MrqId : item.MrqId,
+    //     MrqDescription: item.MrqDescription,
+    //     SelectedItem : item.SelectedItem,
+    //   });
+    // }
+    // Product.SelectedItem++;
     this.setState({ Product });
   };
   RequestAdd = async() =>{
@@ -245,7 +249,7 @@ export default class RequestView extends Component {
           </View>
           <View style={{backgroundColor:isColor == true ? '#444444':colors.white, height:'90%'}}>
             <View style={[styles.header,{flexDirection:'row', backgroundColor:isColor == true ? '#333333':colors.grey5, height:  '10%',}]}>
-              <View style={{backgroundColor:isColor == true ? '#222222':colors.grey5, justifyContent:'flex-start', paddingTop: ITEM_FONT_SIZE/2,}}>
+              <View style={{width:'100%',backgroundColor:isColor == true ? '#222222':colors.grey5, justifyContent:'flex-start', }}>
                 {/* <FlatList
                   horizontal={true}
                   data={Product.itemDescription}
@@ -253,10 +257,16 @@ export default class RequestView extends Component {
                   renderItem={({item, index}) =>
                   <Text style={{height:  ITEM_FONT_SIZE*2, fontSize: 17, paddingLeft:10, color:colors.primary, }}>{item.MrqDescription}</Text>}
                 /> */}
+                <TextInput
+                  // keyboardType="number-pad"
+                  value={this.state.TksdNote}
+                  onChangeText={(number) => this.setState({TksdNote : number}) }
+                  style={[{width:'100%',height:'100%',paddingLeft:12,paddingRight:ITEM_FONT_SIZE*4.5,borderWidth:0.5,fontSize: H1_FONT_SIZE,color:isColor == true ? '#ffffff' : "#000000", backgroundColor: isColor == true ? '#333333':'#FFFFFF',}]}>
+                </TextInput>
               </View>
               <View style={{position:'absolute',right:ITEM_FONT_SIZE*3, borderRadius:ITEM_FONT_SIZE, paddingTop: ITEM_FONT_SIZE/2,}}> 
                 <TouchableOpacity style={{width: ITEM_FONT_SIZE*1.5, height: ITEM_FONT_SIZE*2,}} 
-                  onPress={this.deleteRequest} >
+                  onPress={()=> this.setState({TksdNote : ''})} >
                   <Icon
                     name="close"
                     type="antdesign"
