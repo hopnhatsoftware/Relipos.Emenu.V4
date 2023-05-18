@@ -1,5 +1,12 @@
 
 export default en = {
+    "Khách nam" : "Male customer",
+    "Khách nữ" : "Female customer",
+    "Trẻ em" : "Children",
+    "Khách nước ngoài" : "Foreign guest",
+    "Số lượng khách" : "Guest count",
+    "Khách hàng" : "Customer",
+    "Ghi chú" : "Note",
     "Tên khách hàng":"Customer name",
     "Số điện thoại":"Phone number",
     "Ngày sinh":"Date of birth",

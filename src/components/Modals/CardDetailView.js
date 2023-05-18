@@ -2,7 +2,7 @@ import React from "react";
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet, Image,
   Animated, Platform, FlatList, ActivityIndicator, KeyboardAvoidingView, Keyboard,
-  Dimensions,Alert
+  Dimensions,Alert,Modal
 } from "react-native";
 import { Audio } from 'expo-av';
 import colors from "../../config/colors";
@@ -10,7 +10,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Button, Icon } from "react-native-elements";
 import Constants from "expo-constants";
 import { _retrieveData, _storeData, _remove } from "../../services/storages";
-import { H1FontSize,H2FontSize,H3FontSize,H4FontSize,H3_FONT_SIZE } from "../../config/constants";
+import {SetMenu_getExtraRequestFromProductId,Addnote} from '../../services';
+import { H1FontSize,H2FontSize,H3FontSize,H4FontSize,H3_FONT_SIZE,H1_FONT_SIZE,H2_FONT_SIZE ,H4_FONT_SIZE} from "../../config/constants";
 import { formatCurrency, formatNumber } from "../../services/util";
 import Question from '../Question';
 import { ScrollView } from "react-navigation";
@@ -48,10 +49,19 @@ export class CardDetailView extends React.Component {
       KeyCode:'',
       showCall:false,
       sound:null,
-      showS_CodeHandleData:false
+      showS_CodeHandleData:false,
+      modalNote : false,
+      TksdNote:'',
+      Products:[],
+      Products1:[],
+      Products2:[],
+      textModal:'',
+      item:{}
     }
   }
-
+  setModalNote = (visible) => {-
+    this.setState({ modalNote: visible });
+  }
   _onPlaybackStatusUpdate = playbackStatus => {
     
     if (!playbackStatus.isLoaded) {
@@ -89,6 +99,37 @@ export class CardDetailView extends React.Component {
     }
     return null;
   }
+  _loadExtraRequest = async (item) =>{
+    let{modalNote,textModal,TksdNote}=this.state;
+    this.setState({textModal: item.PrdName,item:item,TksdNote:item.OrddDescription})
+    this.setModalNote(!modalNote )
+    SetMenu_getExtraRequestFromProductId(item.PrdId).then((res) => {
+      if ("Table" in res.Data) {
+        let Products1 = res.Data.Table;
+        this.setState({ Products1 });
+      }
+      if ("Table1" in res.Data) {
+        let Products2 = res.Data.Table1;
+        this.setState({ Products2 });
+      }
+    }).catch((error)=>{
+      Question.alert(
+        this.translate.Get('Notice'),
+        this.translate.Get("ServerError"+':'+error),[
+          {text:"OK", onPress: () =>{
+            this.setState({isLoading: false, fontLoaded:true, });
+          }}
+        ],
+        { cancelable: false }
+      )
+      this.setState({isLoading: false });
+    });
+  }
+  IncrementDescription = (item,index) => {
+    let {TksdNote} = this.state;
+    this.setState({TksdNote: TksdNote + item.MrqDescription +' '})
+  };
+  
     _HandleSound= async () => {
     try{
         let { showCall,sound } = this.state;
@@ -131,14 +172,21 @@ export class CardDetailView extends React.Component {
   _HandleQuantity = async (item,OrddQuantity,isReplace) => {
     try {
       const { HandleQuantity,state  } = this.props;
+      
       HandleQuantity(item,OrddQuantity,isReplace);
       state.iLoadNumber=state.iLoadNumber+1;
-     setState({state });
+
     } catch (error) {
       console.log('AddQuantity Error:'+error);
       return null;
     } 
   };
+  _Addnote = async (value) =>{
+    let {HandleDescription} = this.props;
+    let { item,TksdNote,modalNote} = this.state;
+    HandleDescription(item,TksdNote)
+    this.setModalNote(!modalNote )
+  }
   onPressNext = async () => {
     this.props.onPressNext();
   }
@@ -269,9 +317,9 @@ export class CardDetailView extends React.Component {
   // Đang Order
   renderOrder = ({ item, RowIndex }) => {
     let {_addExtraRequestToItem} = this.props;
-    let{isColor}=this.state
+    let{isColor,modalNote}=this.state
     const Column1=Contentcf.width* 0.17;
-    const QuantityWidth=Column1-H2FontSize*3;-2
+    const QuantityWidth=Column1-H2FontSize*3
     return (
       <View style={{backgroundColor: isColor == true ? '#333333' :'#FFFFFF',  width: Contentcf.width,height:'auto', justifyContent:'flex-start', borderBottomColor: colors.grey5, borderBottomWidth: 1,}}>
         <View style={{ width: Contentcf.width, paddingTop:1,paddingBottom:1}}> 
@@ -302,7 +350,7 @@ export class CardDetailView extends React.Component {
               />
             </View>
            
-           <TouchableOpacity name='btnAddQuantity' style={{width: H2FontSize, height: H2FontSize, justifyContent: "center", alignItems: "center" }} onPress={() =>{
+           <TouchableOpacity name='btnAddQuantity' style={{width: H2FontSize, justifyContent: "center", alignItems: "center" }} onPress={() =>{
                if (item.PrdIsSetMenu)
                return;
                this._HandleQuantity(item, 1, false)
@@ -313,19 +361,21 @@ export class CardDetailView extends React.Component {
            : null
           }
            </TouchableOpacity>
-           <TouchableOpacity style={{ width: H2FontSize,justifyContent: "center", alignItems: "flex-start" }}  onPress={() => { 
-            _addExtraRequestToItem(item, RowIndex);
-              }}>
+           <TouchableOpacity style={{ width: H2FontSize,justifyContent: "center", alignItems: "center" }}  
+          //  onPress={() => { 
+          //   _addExtraRequestToItem(item, RowIndex);
+          //     }}
+              onPress={()=>this._loadExtraRequest(item)}>
             <Icon name='edit'  type="antdesign" size={H2FontSize}  iconStyle={{ color: colors.red,  fontFamily: "RobotoBold",height:H2FontSize}} />
           </TouchableOpacity> 
             </View>
 
-          <View style={{ width: Contentcf.width* 0.555, justifyContent:'center', }}>
+          <View style={{ width: Contentcf.width* 0.555,paddingLeft:5, justifyContent:'center', }}>
             <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", width: Contentcf.width* 0.555, fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left', }} numberOfLines={5}>
               {item.PrdName}
             </Text> 
             {item.OrddDescription?
-            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", width: Contentcf.width* 0.555, fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left', }} numberOfLines={5}>
+            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", width: Contentcf.width* 0.555, fontSize: H4_FONT_SIZE*0.8,  flexWrap: "wrap",textAlign:'left',marginLeft:15 }} numberOfLines={5}>
                {item.OrddDescription}
             </Text> 
             :null
@@ -357,6 +407,7 @@ export class CardDetailView extends React.Component {
     );
   };
   RenderSubItem = ({ item, RowIndex }) => {
+    let{isColor}=this.state;
     const { translate } = this.props;
     return (
         <View style={{ width: Contentcf.width, flexDirection: "row",paddingBottom:2,paddingTop:2 }}>
@@ -389,7 +440,7 @@ export class CardDetailView extends React.Component {
       )};
   render() {
     let { state,setState, onSendOrder,lockTable, BookingsStyle, CartToggleHandle,onPressNext, translate, settings, ProductsOrdered} = this.props;
-    let {isColor}= this.state;
+    let {isColor,modalNote,Products1,Products2,}= this.state;
     if (!this.state.IsLoaded) {
       return (
         <View style={[styles.pnbody, styles.horizontal]}>
@@ -405,6 +456,90 @@ export class CardDetailView extends React.Component {
           backgroundColor: "rgba(0, 0, 0, 0.6)"
         }}
       > 
+      {modalNote ?
+          <Modal
+          animationType='fade'
+          transparent={true}
+          visible={modalNote}>
+          <TouchableOpacity style={{height: Bordy.height,width: Bordy.width,backgroundColor: 'black',opacity: 0.7,zIndex: 1}}>
+          </TouchableOpacity>
+          <View style={{top: Bordy.height*0.2, left: Bordy.width*0.25, width: Bordy.width *0.5, height: Bordy.height*0.6, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+            <View style={{height:Bordy.height*0.6*0.1,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
+            <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{this.state.textModal}</Text>
+            </View>
+            <View style={{height: Bordy.height*0.4*0.12,justifyContent:'center',alignItems:'center',marginVertical:5}}>
+            <TextInput
+                  placeholder={translate.Get("Nhập ghi chú")}
+                  placeholderTextColor={isColor == true ? '#808080' : "#777777"}
+                  value={this.state.TksdNote}
+                  iconStyle
+                  onChangeText={(number) => this.setState({TksdNote : number}) }
+                  style={[{width:'95%',height:Bordy.height*0.4*0.12,paddingLeft:12,paddingRight:Bordy.height*0.4*0.12+5,borderWidth:0.5,borderRadius:10,fontSize: H2_FONT_SIZE,color:isColor == true ? '#ffffff' : "#000000", backgroundColor: isColor == true ? '#333333':'#FFFFFF',}]}>
+                </TextInput>
+                <TouchableOpacity style={{position:'absolute',width: Bordy.height*0.4*0.12, height: Bordy.height*0.4*0.12,right:15}} 
+                  onPress={()=> this.setState({TksdNote : ''})} >
+                  <Icon
+                    name="close"
+                    type="antdesign"
+                    containerStyle={{
+                      borderRadius:10,
+                      width: Bordy.height*0.4*0.12, 
+                      height: Bordy.height*0.4*0.12,
+                    }}
+                    iconStyle={{ 
+                      color: 'red',
+                      fontWeight:'bold',
+                      fontSize: Bordy.height*0.4*0.12,
+                    }}
+                  />
+                </TouchableOpacity>
+            </View>
+            
+            <View style={{height: Bordy.height*0.6*0.68+6}}>
+            <ScrollView  style={{flexDirection:'row', width:Bordy.width *0.5, height:'100%'}}>
+                  <View  style={{flexDirection:'row', width:Bordy.width *0.5, height:'100%'}}>
+                    <FlatList
+                      numColumns={3}
+                      data={Products1}
+                      extraData={this.state.selectedIndex}
+                      style={{width:Bordy.width *0.5/2}}
+                      renderItem={({item, index}) =>
+                      <TouchableOpacity
+                      onPress={() => this.IncrementDescription(item, index)}
+                      style={{width: Bordy.width *0.5 * 0.1655 ,  backgroundColor: index == this.state.selectedIndex?'#ea6721':item.StlBgColor.trim(), justifyContent:"center",alignItems:'center',  borderRadius: 2, borderWidth:0.5, borderColor: 'white',}}>
+                        <View style={{ justifyContent:"center",alignItems:'center', height: Bordy.height * 0.1, borderRadius: 2,  borderColor: 'white',}}>
+                          <Text style={{ color: item.StlFontColor ? item.StlFontColor.trim(): '#000000', width: '100%',  textAlign: "center", fontSize: item.StlFontSize ? item.StlFontSize: H3_FONT_SIZE, }}>{item.MrqDescription}</Text>
+                        </View>
+                      </TouchableOpacity>}
+                    />
+                    <FlatList
+                      numColumns={3}
+                      data={Products2}
+                      extraData={this.state.selectedIndex}
+                      style={{width:Bordy.width *0.5/2}}
+                      renderItem={({item, index}) =>
+                      <TouchableOpacity
+                      onPress={() => this.IncrementDescription(item, index)}
+                      style={{width: Bordy.width *0.5 * 0.1655, backgroundColor: index == this.state.selectedIndex?'#ea6721':item.StlBgColor.trim(), justifyContent:"center",alignItems:'center', borderRadius: 2, borderWidth:0.5, borderColor: 'white',}}>
+                        <View style={{ justifyContent:"center",alignItems:'center', height: Bordy.height * 0.1, borderRadius: 2,  borderColor: 'white',}}>
+                          <Text style={{ color: item.StlFontColor ? item.StlFontColor.trim(): '#000000', width: '100%',  textAlign: "center", fontSize: item.StlFontSize ? item.StlFontSize: H3_FONT_SIZE, }}>{item.MrqDescription}</Text>
+                        </View>
+                      </TouchableOpacity>}
+                    />
+                  </View>
+                </ScrollView>
+            </View>
+            <View style={{height:Bordy.height*0.6*0.1,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'space-evenly',flexDirection:'row',alignItems:'center'}}>
+              <TouchableOpacity onPress={() => this.setModalNote(!modalNote)} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:'#af3037',justifyContent:'center',alignItems:'center'}}>
+                <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>Trở về</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={()=>this._Addnote()} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:'#009900',justifyContent:'center',alignItems:'center'}}>
+              <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>Xong</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+          : null}
         <TouchableOpacity
           onPress={() => CartToggleHandle(false)}
           style={{ height: Bordy.height, width: Bordy.width * 0.25 }}
@@ -496,7 +631,6 @@ export class CardDetailView extends React.Component {
                 Alert.alert(translate.Get("Notice"), translate.Get("Bạn có muốn gọi order không?"), [
                   {
                     text: translate.Get("BỎ QUA"),
-                    onPress: () => console.log('Cancel Pressed'),
                   },
                   {text: translate.Get("AlertOK"), onPress: () => onSendOrder(),}
                 ]);

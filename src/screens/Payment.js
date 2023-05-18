@@ -396,14 +396,14 @@ static getDerivedStateFromProps = (props, state) => {
           </View>
           <View style={{height: Bordy.height * 0.68, width: Bordy.width ,  flexDirection: "row",shadowOffset: {width: 0,height: 5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6}}>
           <View style={{ width: "70%", height: "100%",}}>
-            <View style={{ height: "78%", width: "100%", backgroundColor:isColor == true ? '#222222' : "FFFFFF",paddingHorizontal:'1.5%' }}>
+            <View style={{ height: "78%", width: "100%", backgroundColor:isColor == true ? '#222222' : "#FFFFFF",paddingHorizontal:'1.5%' }}>
             <FlatList
               keyExtractor={(item, Index) => Index.toString()}
               data={this.state.TicketDetail }
               renderItem={this.renderOrdered}
             /> 
             </View>
-            <View style={{ height: "22%", width: "100%",shadowColor: "#000",backgroundColor:isColor == true ? '#444444' : 'ffffff', shadowOffset: {width: 0,height: -5},shadowOpacity: 0.1,shadowRadius: 5,elevation: 6 ,paddingHorizontal:'2%',}}>
+            <View style={{ height: "22%", width: "100%",shadowColor: "#000",backgroundColor:isColor == true ? '#444444' : '#ffffff', shadowOffset: {width: 0,height: -5},shadowOpacity: 0.1,shadowRadius: 5,elevation: 6 ,paddingHorizontal:'2%',}}>
               <View style={{flexDirection:'row',justifyContent:'space-between',paddingVertical:'0.5%'}}>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between'}}>
                   <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE, }}>{this.translate.Get('Thành tiền')}:</Text>
@@ -434,7 +434,7 @@ static getDerivedStateFromProps = (props, state) => {
               </View>
             </View>
           </View> 
-          <View style={{ width: "30%", height: "100%", backgroundColor:isColor == true ? '#444444' : 'ffffff', shadowOffset: {width: -5,height: 0},shadowOpacity: 0.1,shadowRadius: 5,elevation:6}}>
+          <View style={{ width: "30%", height: "100%", backgroundColor:isColor == true ? '#444444' : '#ffffff', shadowOffset: {width: -5,height: 0},shadowOpacity: 0.1,shadowRadius: 5,elevation:6}}>
             <View style={{ height: "100%", width: "100%",}}>
               <View style={{ height: "10%", width: "100%", flexDirection: "row",justifyContent:'center',alignItems:'center'}}>
                 <Image style={{height: "60%", width: "12%",marginRight:'2%'}} resizeMode='contain' source={require("../../assets/icons/IconTIP-11.png")}/>
@@ -447,7 +447,7 @@ static getDerivedStateFromProps = (props, state) => {
                 renderItem={({ item, index }) =>
                 <TouchableOpacity 
                 onPress={()=> this.setState(item.tipOnPress)} 
-                style={{borderRadius: 8, borderWidth: 1, borderColor:"#CCCCCC", width: "46%", height: Bordy.height * 0.68 *0.19, marginHorizontal: "2%",marginVertical: "1%", backgroundColor:isColor == true ? '#444444' : 'ffffff'}}>
+                style={{borderRadius: 8, borderWidth: 1, borderColor:"#CCCCCC", width: "46%", height: Bordy.height * 0.68 *0.19, marginHorizontal: "2%",marginVertical: "1%", backgroundColor:isColor == true ? '#444444' : '#ffffff'}}>
                   <View style={{borderBottomWidth: 1, height: "35%", alignItems: "center", justifyContent: "center",borderBottomColor:"#CCCCCC",}}>
                     <Text style={{ fontSize: H4_FONT_SIZE, color:isColor == true ?'#FFDF00' : '#008800' }}>{this.translate.Get('Tổng')}: {formatCurrency(this.state.value2 = (parseFloat(this.state.PaymentAmount)) + item.tipTitle + (parseFloat(this.state.value)),"")}</Text>
                   </View>
@@ -483,9 +483,9 @@ static getDerivedStateFromProps = (props, state) => {
             </View>
           </View>
         </View>
-          <View style={{ height: Bordy.height * 0.24, width: Bordy.width, alignItems: "center", backgroundColor: isColor == true ?'#333333' : '#ffffff'}}>
+          <View style={{ height: Bordy.height * 0.24, width: Bordy.width, alignItems: "center", backgroundColor: isColor == true ?'#333333' : '#ffffff',shadowOffset: {width: 0,height: -5},shadowOpacity: 0.1,shadowRadius: 5,elevation:6}}>
           <View style={{marginTop: Bordy.height * 0.04, height: '30%',width:'20%',justifyContent:'center'}}>
-            <TouchableOpacity onPress={()=> this._HandleTip ()} style={{ backgroundColor:isColor == true ? '#DAA520' :'#333d4c',borderRadius:35,  borderWidth: 1,height: "80%", width: "100%", justifyContent: "center", alignItems: "center"}}>
+            <TouchableOpacity onPress={()=> this._HandleTip ()} style={{ backgroundColor:isColor == true ? '#DAA520' :'#009900',borderRadius:35,  borderWidth: 1,height: "80%", width: "100%", justifyContent: "center", alignItems: "center"}}>
               <Text style={{ textAlign: "center",color:isColor == true ? '#000000' :'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>{this.translate.Get('Xác nhận')}</Text>
             </TouchableOpacity>
             </View>

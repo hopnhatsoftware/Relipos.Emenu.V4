@@ -75,7 +75,7 @@ export class _TableInfo extends React.Component {
         <View style={[{ backgroundColor:this.state.isColor == true ? "#222222" : colors.white, borderWidth: 1, position: "absolute",  width: SCREEN_WIDTH*0.65,height:'60%', borderColor: backgroundColor},]}>
           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopLeftRadius: 8, borderTopRightRadius: 8, borderColor: backgroundColor,marginTop:-1,marginRight:-1,marginLeft:-1,
           backgroundColor: backgroundColor, height: pnHeaderheight,paddingTop:10,paddingBottom:10 }}> 
-            <Text style={{ height: 35, fontSize:H2FontSize, color: colors.white, textAlign: 'center', fontFamily: 'RobotoBold' }}>{translate.Get("Thông tin phiếu")}</Text>
+            <Text style={{ height: 35, fontSize:H2FontSize, color: colors.white, textAlign: 'center', fontFamily: 'RobotoBold' }}>{translate.Get("ticket_info")}</Text>
           </View>
           <ScrollView style={{ width: '100%', }}> 
             <KeyboardAvoidingView behavior='position' style={{ paddingBottom: 70 }}>

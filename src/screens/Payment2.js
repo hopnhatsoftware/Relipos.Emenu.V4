@@ -143,7 +143,7 @@ export default class Payment2 extends Component {
         }
       }
       else {
-        return;
+        this.setState({ isPostBack: true });
       }
         this.setState({Tax});
       }).catch((error) => {
@@ -166,7 +166,8 @@ export default class Payment2 extends Component {
     if(res.Status === 1){
         if(res.Data === ""){
           this.setState({ isPostBack: true });
-          Alert.alert(this.translate.Get("Thông báo"),'Mã số thuế không tồn tại')
+          Alert.alert(this.translate.Get("Thông báo"),'Mã số thuế không tồn tại',
+          )
         }
         else{
           this.setState({ isPostBack: true });
@@ -176,7 +177,7 @@ export default class Payment2 extends Component {
         }
       }
       else {
-        return;
+        this.setState({ isPostBack: true });
       }
         this.setState({Tax});
       })  }
@@ -362,6 +363,7 @@ export default class Payment2 extends Component {
             opacity: 0.5,
             bottom: 0,
             right: 0,
+            zIndex: 99,
             borderTopColor: colors.grey4,
             borderTopWidth: 1
             }}>
@@ -487,7 +489,7 @@ export default class Payment2 extends Component {
                 style={{ backgroundColor: "#DDDDDD", height: "75%", width: "22%",borderRadius:35,marginRight:'2%', justifyContent: "center", alignItems: "center"}}>
                 <Text style={{ textAlign: "center", width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2,}}>{this.translate.Get('Bỏ qua')}</Text>
               </TouchableOpacity>
-            <TouchableOpacity onPress={()=>this._FlushInvoiceInfor()} style={{ backgroundColor:isColor == true ? '#DAA520' :'#33FF33', borderWidth: 1,height: '75%',borderRadius:35,width:'22%',shadowColor: "#000", justifyContent: "center", alignItems: "center"}}>
+            <TouchableOpacity onPress={()=>this._FlushInvoiceInfor()} style={{ backgroundColor:isColor == true ? '#DAA520' :'#009900', borderWidth: 1,height: '75%',borderRadius:35,width:'22%',shadowColor: "#000", justifyContent: "center", alignItems: "center"}}>
               <Text style={{ textAlign: "center",color:isColor == true ? '#000000' :'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>{this.translate.Get('Xác nhận')}</Text>
             </TouchableOpacity>
             </View>

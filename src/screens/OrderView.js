@@ -227,8 +227,8 @@ onCallServices= async() => {
     return;
   };
   _getProductByGroup = async group => {
-    let { table, keysearch,Config,settings } = this.state;
-    await getProductByGroup(Config,settings, table.TicketID,table.AreaID, group.PrgId, keysearch).then(res => {
+    let { table, keysearch,Config,settings,language } = this.state;
+    await getProductByGroup(Config,settings, table.TicketID,table.AreaID, group.PrgId, keysearch,language).then(res => {
       if ("Table" in res.Data) {
         let Products = res.Data.Table;
         let ProductImagePrefix = res.Data1;
@@ -445,6 +445,19 @@ onCallServices= async() => {
     // Return null if the state hasn't changed
     return null;
   };
+  HandleDescription = async (item,Description) => {
+    try{
+    let { CartInfor} = this.state;
+    let {CartFilter}= this._getCartItems(item,item.Json);
+    CartInfor.items[CartFilter.FirstIndex].OrddDescription=Description;
+    this.setState({ CartInfor }, () => {
+      _storeData("APP@CART", JSON.stringify(CartInfor))
+    });
+  }catch (error) {
+    console.log('HandleDescription Error:'+error);
+    return null;
+  }
+  }
   HandleQuantity = async (item,OrddQuantity,isReplace) => {
     try {
     let { CartInfor} = this.state;
@@ -698,6 +711,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
         return {CartFilter};
       }
     });
+    
     return {CartFilter};
   };
   _showIsSetQty = item => {
@@ -1254,7 +1268,7 @@ if (ProductChoise==null) {
               </View>
               <View name='pnProductName' style={{width: '100%',paddingTop:2 }}>
                 <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H4FontSize,flexWrap:"wrap"}} numberOfLines={5}>
-                  {item.PrdName} 
+                  {item.PrdName}
                 </Text>
                 <Text style={{fontStyle:'italic',color: isColor == true ?'#FFFFFF' : "#af3037",fontFamily:'RobotoBold',marginLeft:7,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left',marginTop:3}}>
               {this.translate.Get("Giá")}:{" "}{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPrice : item.UnitPriceAfter, "")}
@@ -1265,7 +1279,7 @@ if (ProductChoise==null) {
               <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:iHeight-(H2FontSize*1.5+10)}}>
             <View name='pnProductName' style={{width: '100%',marginTop:5}}>
               <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H3FontSize,fontWeight:'bold',flexWrap:"wrap"}} numberOfLines={5}>
-                {item.PrdName} 
+                {item.PrdName}
               </Text>
               <Text style={{fontStyle:'italic',color:isColor == true ?'#FFFFFF' : "#af3037",fontFamily:'RobotoBold',marginLeft:7,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left',marginTop:3}}>
               {this.translate.Get("Giá")}:{" "}{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPrice : item.UnitPriceAfter, "")}
@@ -1481,10 +1495,12 @@ if (ProductChoise==null) {
             HandleQuantity={(item,OrddQuantity,isReplace,Json) => { this.HandleQuantity(item,OrddQuantity,isReplace) }}
             setState={(state) => this.setState(state)}
             settings={Config}
+            table={this.state.table}
             lockTable={this.state.lockTable}
             BookingsStyle={BookingsStyle}
             ProductsOrdered={ProductsOrdered}
             onPressNext={this.onPressNext}
+            HandleDescription={(item,Description) => { this.HandleDescription(item,Description) }}
             onSendOrder={() => this._sendOrder()}
             onCallServices={() => { this.onCallServices(); }}
             _addExtraRequestToItem={(item, RowIndex) => { this._addExtraRequestToItem(item, RowIndex); }}

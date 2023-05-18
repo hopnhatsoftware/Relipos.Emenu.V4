@@ -9,7 +9,7 @@ export default class t{
     
     loadLang = async()=>{
         this.lang = await _retrieveData('culture', 1);
-        this.lang = this.lang == 1? 'vi': this.lang == 2 ? 'en' : this.lang == 5 ? 'cn' :null;
+        this.lang = this.lang == 1? 'vi': this.lang == 2 ? 'en' : this.lang == 5 ? 'cn' :'vi';
         if (__DEV__) {
             this.dictionary =  await _retrieveData('dictionary');
             if(this.dictionary){

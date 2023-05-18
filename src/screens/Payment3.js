@@ -532,14 +532,14 @@ export default class Payment3 extends Component {
           </View>
           <View style={{height: Bordy.height * 0.54, width: Bordy.width ,  flexDirection: "row",shadowOffset: {width: 0,height: 5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6}}>
           <View style={{ width: "65%", height: "100%",}}>
-            <View style={{ height: "72%", width: "100%",backgroundColor:isColor == true ? '#222222' : "FFFFFF",paddingHorizontal:'1.5%'}}>
+            <View style={{ height: "72%", width: "100%",backgroundColor:isColor == true ? '#222222' : "#FFFFFF",paddingHorizontal:'1.5%'}}>
             <FlatList
               keyExtractor={(item, Index) => Index.toString()}
               data={this.state.TicketDetail }
               renderItem={this.renderOrdered}
             /> 
             </View>
-            <View style={{ height: "28%", width: "100%",shadowColor: "#000",backgroundColor:isColor == true ? '#444444' : 'ffffff', shadowOffset: {width: 0,height: -5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6 ,paddingHorizontal:'2%'}}>
+            <View style={{ height: "28%", width: "100%",shadowColor: "#000",backgroundColor:isColor == true ? '#444444' : '#ffffff', shadowOffset: {width: 0,height: -5},shadowOpacity: 0.10,shadowRadius: 5,elevation: 6 ,paddingHorizontal:'2%'}}>
               <View style={{height:'30%',flexDirection:'row',justifyContent:'space-between',paddingVertical:'0.5%',alignItems:'center'}}>
                 <View style={{width:'30%',flexDirection:'row',justifyContent:'space-between',alignItems:'center'}}>
                   <Text style={{color:isColor == true ? '#ffffff' : '000000', fontSize: H3_FONT_SIZE }}>{this.translate.Get('Thành tiền')}:</Text>
@@ -667,7 +667,7 @@ export default class Payment3 extends Component {
             : null}
           </View>
         </View>
-        <View style={{ height: Bordy.height * 0.18, width: Bordy.width, alignItems: "center",paddingHorizontal:Bordy.width*0.2,backgroundColor: isColor == true ?'#333333' : '#ffffff'}}>
+        <View style={{ height: Bordy.height * 0.18, width: Bordy.width, alignItems: "center",paddingHorizontal:Bordy.width*0.2,backgroundColor: isColor == true ?'#333333' : '#ffffff',shadowOffset: {width: 0,height: -5},shadowOpacity: 0.1,shadowRadius: 5,elevation:6}}>
           <View style={{flexDirection:'row',height:'45%',width:'100%', paddingVertical:'1%',alignItems:'center'}}>
             <View style={{width:'5%',height:'100%'}}>
             <Image style={{height: "100%", width: "100%",}} resizeMode='contain' source={require("../../assets/icons/IconThanhToan-11.png")}/>
@@ -680,7 +680,7 @@ export default class Payment3 extends Component {
                 keyExtractor={(item, Index) => Index.toString()}
                 data={Paydata}
                 renderItem={({ item, index }) => 
-                <TouchableOpacity onPress={ item.payOnpress} style={{width:Bordy.width*0.09,marginRight:Bordy.width*0.01,height:'100%',flexDirection:'column',alignItems:'center',backgroundColor:isColor == true ? '#555555' :'#fff', borderRadius:10,shadowOpacity: 0.3,shadowRadius: 4,elevation:6}}>
+                <TouchableOpacity onPress={ item.payOnpress} style={{width:Bordy.width*0.09,marginRight:Bordy.width*0.01,height:'100%',flexDirection:'column',alignItems:'center',backgroundColor:isColor == true ? '#555555' :'#fff',borderRadius:10,shadowOffset: {width: -5,height: 0},shadowOpacity: 0.1,shadowRadius: 5,elevation:6}}>
             <View style={{width:'100%',height:'70%',justifyContent:'center',alignItems:'center'}}>
             <Image style={{height: "90%", width: "90%",}} resizeMode='contain' source={item.payImg}/>
             </View>
@@ -690,7 +690,7 @@ export default class Payment3 extends Component {
           </View>
         </View>
         <View style={{ height: Bordy.height * 0.20, width: Bordy.width, alignItems: "center",backgroundColor: isColor == true ?'#333333' : '#ffffff'}}>
-            <TouchableOpacity style={{backgroundColor:isColor == true ? '#DAA520' :'#33FF33', marginTop: 15, borderWidth: 1, height: '30%',borderRadius:35,width:'30%', justifyContent: "center", alignItems: "center"}} 
+            <TouchableOpacity style={{backgroundColor:isColor == true ? '#DAA520' :'#009900', marginTop: 15, borderWidth: 1, height: '30%',borderRadius:35,width:'30%', justifyContent: "center", alignItems: "center"}} 
              onPress={()=>{this._AcceptPayment()}}
             >
               <Text style={{ textAlign: "center",color:isColor == true ? '#000000' :'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>
