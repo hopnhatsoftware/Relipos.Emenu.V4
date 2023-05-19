@@ -369,19 +369,20 @@ export class CardDetailView extends React.Component {
           //   _addExtraRequestToItem(item, RowIndex);
           //     }}
               onPress={()=>this._loadExtraRequest(item)}>
-            <Icon name='edit'  type="antdesign" size={H2FontSize}  iconStyle={{ color: colors.red,  fontFamily: "RobotoBold",height:H2FontSize}} />
+            
           </TouchableOpacity> 
             </View>
 
-          <View style={{ width: Contentcf.width* 0.555,paddingLeft:5, justifyContent:'center', }}>
+          <TouchableOpacity onPress={()=>this._loadExtraRequest(item)} style={{ width: Contentcf.width* 0.555,paddingLeft:5, justifyContent:'center', }}>
             <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", width: Contentcf.width* 0.555, fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left',paddingBottom:3 }} numberOfLines={5}>
               {item.PrdName}
             </Text> 
           
-            <View style={{flexDirection:'row',width: Contentcf.width* 0.5, borderTopWidth:0.5,borderColor:isColor ==true ? '#FFFFFF':"#000000",}}>
+            <View style={{flexDirection:'row',width: Contentcf.width* 0.5, borderTopWidth:0.5,borderColor:isColor ==true ? '#FFFFFF':"#000000",paddingVertical:3}}>
               <Text style={{ color: isColor ==true ? item.OrddDescription?'#FFFFFF':'#777777':item.OrddDescription?"#000000":'#777777', fontSize: H4_FONT_SIZE*0.8,  flexWrap: "wrap",textAlign:'left',marginLeft:3 }} numberOfLines={5}>
-              {translate.Get("Ghi chú")}: 
+              {translate.Get("Ghi chú")} 
               </Text>
+              <Icon name='edit'  type="antdesign" size={H4_FONT_SIZE}  iconStyle={{ color: colors.red,  fontFamily: "RobotoBold",height:H4_FONT_SIZE}} />
               {item.OrddDescription?
               <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H4_FONT_SIZE*0.8,  flexWrap: "wrap",textAlign:'left',marginLeft:5 }} numberOfLines={5}>
                {item.OrddDescription}
@@ -391,7 +392,7 @@ export class CardDetailView extends React.Component {
             </View>
             
            
-          </View>
+          </TouchableOpacity>
           <View style={{  justifyContent:'center',width: Contentcf.width* 0.1 ,}}>
             <Text style={{color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H3_FONT_SIZE ,textAlign:'right' }}>
             {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.UnitPrice : item.UnitPriceAfter, "")}
