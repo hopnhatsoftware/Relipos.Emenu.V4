@@ -364,13 +364,6 @@ export class CardDetailView extends React.Component {
            : null
           }
            </TouchableOpacity>
-           <TouchableOpacity style={{ width: H2FontSize,justifyContent: "center", alignItems: "center" }}  
-          //  onPress={() => { 
-          //   _addExtraRequestToItem(item, RowIndex);
-          //     }}
-              onPress={()=>this._loadExtraRequest(item)}>
-            
-          </TouchableOpacity> 
             </View>
 
           <TouchableOpacity onPress={()=>this._loadExtraRequest(item)} style={{ width: Contentcf.width* 0.555,paddingLeft:5, justifyContent:'center', }}>
@@ -378,7 +371,7 @@ export class CardDetailView extends React.Component {
               {item.PrdName}
             </Text> 
           
-            <View style={{flexDirection:'row',width: Contentcf.width* 0.5, borderTopWidth:0.5,borderColor:isColor ==true ? '#FFFFFF':"#000000",paddingVertical:3}}>
+            <View style={{flexDirection:'row',width: Contentcf.width* 0.5, borderTopWidth:0.55,borderColor:isColor ==true ? '#FFFFFF':"#000000",paddingVertical:3}}>
               <Text style={{ color: isColor ==true ? item.OrddDescription?'#FFFFFF':'#777777':item.OrddDescription?"#000000":'#777777', fontSize: H4_FONT_SIZE*0.8,  flexWrap: "wrap",textAlign:'left',marginLeft:3 }} numberOfLines={5}>
               {translate.Get("Ghi chú")} 
               </Text>
