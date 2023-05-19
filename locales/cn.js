@@ -6,6 +6,8 @@ export default en = {
     "Số lượng khách" : "客人人数",
     "Khách hàng" : "客人姓名",
     "Ghi chú" : "备注",
+    "Nhập ghi chú...":"输入备注...",
+    "Gọi thanh toán":"请按这里结账",
     "Tên khách hàng":"顾客姓名",
     "Số điện thoại":"电话号码",
     "Ngày sinh":"出生日期",

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { TouchableOpacity, Dimensions, Image, ActivityIndicator, UIManager,  KeyboardAvoidingView, StyleSheet, Platform, Animated, Text, View, TextInput,Alert} from "react-native";
+import { TouchableOpacity, Dimensions, Image, ActivityIndicator, UIManager,  KeyboardAvoidingView, StyleSheet, Platform, Modal, Text, View, TextInput,Alert} from "react-native";
 import Constants from "expo-constants";
 import { _retrieveData, _storeData, _remove } from "../services/storages";
 import { FlatList } from "react-native";
@@ -33,6 +33,7 @@ export default class Payment3 extends Component {
     this._nextIndex = null;
     this.flatListRef = null;
     this.textInput = null;
+    this.translate = new translate();
     this.state = {
       isColor:false,
       QRData:'',
@@ -63,6 +64,9 @@ export default class Payment3 extends Component {
       notification:false,
       settings: {},
       buttontext: props.defaultValue, 
+      Description:'',
+      modPayment:'',
+      ModalCallStaff: false,
       isShowBarCode: false,
       isShowBarCodeVip: false,
       isShowScanner: false,
@@ -75,7 +79,7 @@ export default class Payment3 extends Component {
       endpoint: "", 
       Config: {},
     };
-    this.translate = new translate();
+    
   }
   componentWillUnmount = async () => {
     clearInterval(this.interval);
@@ -113,7 +117,7 @@ export default class Payment3 extends Component {
     await this._setConfig();
     await this._getMasterData();
     await this._getPaymentAmount();
-    this.setState({ isPostBack: true ,isColor});
+    this.setState({ isPostBack: true ,isColor,modPayment: this.translate.Get('Tiền mặt')});
     }
     catch (ex) {
       this.setState({ isPostBack: true,});
@@ -351,16 +355,16 @@ export default class Payment3 extends Component {
   _closeScanner= async () => {
   this.setState({isShowBarCodeVip : false, isShowBarCode : false});
   }
-  _isShowBarCode = async () => {
-    this.setState({ isShowBarCode : true })
+  _isShowBarCode = async (item) => {
+    this.setState({ isShowBarCode : true ,modPayment:item})
   }
   _isShowBarCodeVip = async () => {
     this.setState({ isShowBarCodeVip : true })
   }
-  _ShowATM = async () => {
-    this.setState({ isShowCard: true ,isShowE_wallet: false ,isShowCash:false, isShowVip:false,isShowBanking:false });
+  _ShowATM = async (item) => {
+    this.setState({ isShowCard: true ,isShowE_wallet: false ,isShowCash:false, isShowVip:false,isShowBanking:false ,modPayment:item});
   }
-  _ShowVip = async () => {
+  _ShowVip = async (item) => {
     let {Money,Vip} = this.state
     if(Money.RpcNo !== undefined && Money.RpcNo !== null && Money.RpcNo !== '')
     {
@@ -381,19 +385,20 @@ export default class Payment3 extends Component {
       ]);
     });
     }
-    this.setState({ isShowCard: false ,isShowE_wallet: false ,isShowCash:false, isShowVip:true,isShowBanking:false });
+    this.setState({ isShowCard: false ,isShowE_wallet: false ,isShowCash:false, isShowVip:true,isShowBanking:false,modPayment:item });
 
   }
-  _ShowBanking = async () => {
-    this.setState({ isShowCard: false ,isShowE_wallet: false ,isShowCash:false, isShowVip:false,isShowBanking:true });
+  _ShowBanking = async (item) => {
+    this.setState({ isShowCard: false ,isShowE_wallet: false ,isShowCash:false, isShowVip:false,isShowBanking:true ,modPayment:item});
     this._getLinkQrBank();
   }
-  _ShowE_wallet = async () => {
-    this.setState({ isShowCard: false ,isShowE_wallet: true ,isShowCash:false, isShowVip:false,isShowBanking:false, });
+  _ShowE_wallet = async (item) => {
+    this.setState({ isShowCard: false ,isShowE_wallet: true ,isShowCash:false, isShowVip:false,isShowBanking:false,modPayment:item});
     this._getQrCode(this.state.NameE_wallet = 'MOMO')
   }
-  _ShowTM = async () => {
-    this.setState({ isShowCard: false ,isShowE_wallet: false ,isShowCash:true, isShowVip:false,isShowBanking:false });
+  _ShowTM = async (item) => {
+    console.log(item)
+    this.setState({ isShowCard: false ,isShowE_wallet: false ,isShowCash:true, isShowVip:false,isShowBanking:false,modPayment:item });
   }
   onPressHome = async () => {
     this.props.navigation.navigate("OrderView");
@@ -421,24 +426,49 @@ export default class Payment3 extends Component {
   /**
    * Xác nhận thanh toán in qua Services
    */
-  _AcceptPayment = async () => {
-    let{Ticket,user} = this.state;
+  _AcceptPayment = async (Description,typeView) => {
+    let{Ticket,user,ModalCallStaff} = this.state;
     // console.log('AcceptPayment ----------')
     // console.log('BranchId:',user.BranchId)
     // console.log('TicketID',Ticket.TicketID)
-    API_Print (user.BranchId, Ticket.TicketID,1 ).then(res => {
-      console.log('API_Print',res)
-      if (res.Status == 1){
-       this.onPressNext();
-      }
-    }).catch((error) => {
-      Question.alert( 'System Error',error, [
-        {
-          text: "OK", onPress: () => {
-          }
+    // console.log(typeView,Description)
+    this.setState({ isPostBack: false});
+    if(typeView == 1){
+      API_Print (user.BranchId, Ticket.TicketID,typeView, Description).then(res => {
+        this.setState({ isPostBack: true});
+        if (res.Status == 1){
+         this.onPressNext();
         }
-      ]);
-    }); 
+      }).catch((error) => {
+        Question.alert( 'System Error',error, [
+          {
+            text: "OK", onPress: () => {
+            }
+          }
+        ])
+    })}
+    else{
+      API_Print (user.BranchId, Ticket.TicketID,typeView, Description).then(res => {
+        if (res.Status == 1){
+          this.setModalCallStaff(!ModalCallStaff)
+          Alert.alert( this.translate.Get('Notice'),"Quý khách vui lòng đợi trong giây lát", [
+            {
+              text: "OK", onPress: () => {
+                this.setState({ isPostBack: true});
+              }
+            }
+          ]);
+        }
+      }).catch((error) => {
+        this.setState({ isPostBack: true,});
+        Question.alert( 'System Error',error, [
+          {
+            text: "OK", onPress: () => {
+            }
+          }
+        ]);
+      }); 
+    }
   }
   /**
    *
@@ -447,22 +477,28 @@ export default class Payment3 extends Component {
    * @param {*} type
    * @returns
    */
+
+  setModalCallStaff = (visible) => {
+    this.setState({ ModalCallStaff: visible });
+  }
+
+
   render() {
-    if (!this.state.isPostBack) {
-      return (
-        <View style={[styles.pnbody, styles.horizontal]}>
-          <ActivityIndicator
-            size="large"
-            color="#0000ff"
-            onLayout={() => {
-              this.setState({ isPostBack: false });
-            }}
-          />
-        </View>
-      );
-    }
+    // if (!this.state.isPostBack) {
+    //   return (
+    //     <View style={[styles.pnbody, styles.horizontal]}>
+    //       <ActivityIndicator
+    //         size="large"
+    //         color="#0000ff"
+    //         onLayout={() => {
+    //           this.setState({ isPostBack: false });
+    //         }}
+    //       />
+    //     </View>
+    //   );
+    // }
     const labels = [this.translate.Get("Thông tin đơn hàng"),this.translate.Get("Xuất hóa đơn"),this.translate.Get("Thanh toán")];
-    const {Money,isShowBarCode,isShowBarCodeVip,showCall,Vip,isShowE_wallet,isShowCash,isShowCard,isShowBanking,isShowVip,lockTable,isColor} = this.state;
+    const {Money,isShowBarCode,isShowBarCodeVip,showCall,Vip,isShowE_wallet,isShowCash,isShowCard,isShowBanking,isShowVip,lockTable,isColor,ModalCallStaff,modPayment} = this.state;
     const customStyles = {
       stepIndicatorSize: H4_FONT_SIZE,
       currentStepIndicatorSize:H1_FONT_SIZE*1.4,
@@ -497,6 +533,65 @@ export default class Payment3 extends Component {
     ]
     return (
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.Container}>
+        {ModalCallStaff ?
+          <Modal
+          animationType='none'
+          transparent={true}
+          visible={ModalCallStaff}>
+          <View style={{flex:1,backgroundColor: 'black',opacity: 0.7,zIndex: 1}}>
+          </View>
+          <View style={{zIndex:2,top: Bordy.height*0.25, left: Bordy.width*0.325, width: Bordy.width *0.35, height: Bordy.height*0.35,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+            <View style={{borderTopLeftRadius:10,borderTopRightRadius:10,height:Bordy.height*0.35*0.2,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
+            <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{this.translate.Get("Gọi nhân viên")}</Text>
+            </View>
+            <View style={{height:Bordy.height*0.35*0.18,width:'100%', justifyContent:'space-evenly',alignItems:'center',flexDirection:'row'}}>
+              <TouchableOpacity onPress={() => this.setState({Description: this.state.Description + this.translate.Get("Gọi nhân viên") +' '})} style={{width:'45%', height:'75%',borderRadius:10, backgroundColor:'#BBBBBB',justifyContent:'center',alignItems:'center'}}>
+                <Text style={{fontSize:H3_FONT_SIZE, color:'#000000'}}>{this.translate.Get("Gọi nhân viên")}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => this.setState({Description: this.state.Description + this.translate.Get("Gọi thanh toán") +' '})}style={{width:'45%', height:'75%',borderRadius:10,backgroundColor:'#BBBBBB',justifyContent:'center',alignItems:'center'}}>
+                <Text style={{fontSize:H3_FONT_SIZE, color:'#000000'}}>{this.translate.Get('Gọi thanh toán')}</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{height: Bordy.height*0.35*0.42,justifyContent:'center',alignItems:'center'}}>
+              <TextInput
+                  placeholder={this.translate.Get("Nhập ghi chú...")}
+                  placeholdermodPayment={isColor == true ? '#808080' : "#777777"}
+                  value={this.state.Description}
+                  onChangeText={(item) => this.setState({Description : item})}  
+                  multiline={true} 
+                  numberOfLines={10} 
+                  style={[{width:'95%',height:Bordy.height*0.35*0.38,paddingHorizontal:12,borderWidth:0.5,borderRadius:10,fontSize: H3_FONT_SIZE,color:isColor == true ? '#ffffff' : "#000000", backgroundColor: isColor == true ? '#333333':'#FFFFFF',}]}>
+              </TextInput>
+            </View>
+            <View style={{height:Bordy.height*0.35*0.195,width:'100%',borderBottomLeftRadius:10,borderBottomRightRadius:10,backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'space-evenly',flexDirection:'row',alignItems:'center'}}>
+              <TouchableOpacity onPress={() => this.setModalCallStaff(!ModalCallStaff)} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:'#af3037',justifyContent:'center',alignItems:'center'}}>
+                <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{this.translate.Get("Trở lại")}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={()=>{this._AcceptPayment(this.state.Description,2)}} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:isColor == true ? '#DAA520' :'#009900',justifyContent:'center',alignItems:'center'}}>
+              <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{this.translate.Get('Xác nhận')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+          : null}
+          {!this.state.isPostBack ?
+          <View style={{height: Bordy.height,
+            width: Bordy.width,
+            position: "absolute",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: isColor == true ? colors.white : "black",
+            opacity: 0.5,
+            bottom: 0,
+            right: 0,
+            zIndex: 99,
+            borderTopColor: colors.grey4,
+            borderTopWidth: 1
+            }}>
+            <ActivityIndicator color={isColor == true ? colors.blue : colors.primary} size="large"></ActivityIndicator>
+          </View>
+          : null}
         <View style={{ flexDirection: "row", height: Bordy.height * 0.08, width: Bordy.width, backgroundColor:isColor == true ? '#111111' :'#333d4c',alignItems:'center'}}>
         <TouchableOpacity onPress={this.onPressBack} style={{justifyContent: 'center', width:'12%',height:'100%',alignItems:'center',flexDirection:'row'}}>
                <Image style={{height: "55%", width: "30%",}} resizeMode='contain' source={require("../../assets/icons/IconBack.png")}/>
@@ -505,22 +600,13 @@ export default class Payment3 extends Component {
             <View style={{width:'62%'}}>
               <Text style={{fontSize:H1_FONT_SIZE,fontFamily: "RobotoBold", textAlign: "center", color:'#fff'}}>{this.translate.Get('Phiếu thanh toán')}</Text>
             </View>
-            <TouchableOpacity onPress={() => {this._HandleSound(); }} style={{ backgroundColor: '#fff', height: "60%", width: "19%", borderRadius: 25, }}>
-            {showCall ?
-              <View style={{backgroundColor:'#FF7E27',borderRadius: 50,height:'100%',justifyContent: "center", flexDirection: "row", alignItems: "center", }}>
-                <View style={{ width: "25%", alignItems:'center'}}>
-                <Image style={{height: "70%", width: "70%"}} resizeMode='contain' source={require("../../assets/icons/IconCall-11.png")}/>
-              </View>
-              <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: H2_FONT_SIZE }}>{this.translate.Get('Đang gọi ..')}</Text>
-              </View>
-              :
+            <TouchableOpacity onPress={() => this.setModalCallStaff(!ModalCallStaff)} style={{ backgroundColor: '#fff', height: "60%", width: "19%", borderRadius: 25, }}>
               <View style={{backgroundColor:isColor == true ? '#DAA520' :'#33FF33',height:'100%',justifyContent: "center",borderRadius: 25, flexDirection: "row", alignItems: "center", }}>
                 <View style={{ width: "25%", alignItems:'center'}}>
                 <Image style={{height: "70%", width: "70%"}} resizeMode='contain' source={require("../../assets/icons/IconCall-11.png")}/>
               </View>
               <Text style={{ color:'#333d4c',textAlign: "left", width: "75%", fontSize: H2_FONT_SIZE }}>{this.translate.Get('Gọi nhân viên')}</Text>
               </View>
-            }
             </TouchableOpacity>
             {lockTable == false?
             <TouchableOpacity
@@ -674,13 +760,13 @@ export default class Payment3 extends Component {
             </View>
             <Text style={{color:isColor == true ? '#ffffff' : '000000',fontSize:H2_FONT_SIZE,}}>{this.translate.Get('Chọn hình thức thanh toán')}</Text>
           </View>
-          <View style={{flexDirection:'row',height:'55%',width:'100%',justifyContent:'space-between'}}>
+          <View style={{flexDirection:'row',height:'55%',width:'100%',paddingVertical:5,borderRadius:10,backgroundColor:isColor == true ?'#333333' : '#ffffff'}}>
           <FlatList
             horizontal
                 keyExtractor={(item, Index) => Index.toString()}
                 data={Paydata}
                 renderItem={({ item, index }) => 
-                <TouchableOpacity onPress={ item.payOnpress} style={{width:Bordy.width*0.09,marginRight:Bordy.width*0.01,height:'100%',flexDirection:'column',alignItems:'center',backgroundColor:isColor == true ? '#555555' :'#fff',borderRadius:10,shadowOffset: {width: -5,height: 0},shadowOpacity: 0.1,shadowRadius: 5,elevation:6}}>
+                <TouchableOpacity onPress={()=> item.payOnpress(item.payTitle)} style={{width:Bordy.width*0.09,marginHorizontal:Bordy.width*0.005,height:'100%',flexDirection:'column',alignItems:'center',backgroundColor:isColor == true ? item.payTitle == modPayment ? '#DAA520' : '#555555' : item.payTitle == modPayment ?'#00CC00':'#f1f1f1',borderRadius:10,shadowOffset: {width: -3,height: 0},shadowOpacity: 0.3,shadowRadius: 2,elevation:6}}>
             <View style={{width:'100%',height:'70%',justifyContent:'center',alignItems:'center'}}>
             <Image style={{height: "90%", width: "90%",}} resizeMode='contain' source={item.payImg}/>
             </View>
@@ -691,7 +777,7 @@ export default class Payment3 extends Component {
         </View>
         <View style={{ height: Bordy.height * 0.20, width: Bordy.width, alignItems: "center",backgroundColor: isColor == true ?'#333333' : '#ffffff'}}>
             <TouchableOpacity style={{backgroundColor:isColor == true ? '#DAA520' :'#009900', marginTop: 15, borderWidth: 1, height: '30%',borderRadius:35,width:'30%', justifyContent: "center", alignItems: "center"}} 
-             onPress={()=>{this._AcceptPayment()}}
+             onPress={()=>{this._AcceptPayment(modPayment,1)}}
             >
               <Text style={{ textAlign: "center",color:isColor == true ? '#000000' :'#FFFFFF', width: "100%", fontSize: BUTTON_FONT_SIZE / 1.2}}>
                 {this.translate.Get('Xác nhận thanh toán')}</Text>

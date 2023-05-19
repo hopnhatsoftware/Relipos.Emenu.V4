@@ -271,7 +271,6 @@ export const SetMenu_getChoiceCategory = async (settings, item) => {
   const URL = '/Emenu/SetMenu_getChoiceCategory';
   return await execFetch(URL, 'GET', { PrdId: item.PrdId, BranchId: settings.I_BranchId, Culture: culture });
 }
-
 export const SetMenu_getExtraRequestFromProductId = async (PrdId) => {
   const URL = '/Emenu/SetMenu_getExtraRequestFromProductId';
   return await execFetch(URL, 'GET', { PrdId });
@@ -335,7 +334,7 @@ export const Ticket_Flush = async (settings, B_UseOrderDefault, sItemTable, grou
  * @param {*} PrintType 
  * @returns 
  */
-export const API_Print = async (OrgId,TicketId,PrintType) => {
+export const API_Print = async (OrgId,TicketId,PrintType,Description) => {
   const URL = '/Ticket/API_Print';
-  return await execFetch(URL, 'GET', { OrgId: OrgId,TicketId:TicketId,PrintType });
+  return await execFetch(URL, 'GET', { OrgId: OrgId,TicketId:TicketId, PrintType: PrintType ,Description:Description });
 }

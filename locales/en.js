@@ -7,6 +7,8 @@ export default en = {
     "Số lượng khách" : "Guest count",
     "Khách hàng" : "Customer",
     "Ghi chú" : "Note",
+    "Nhập ghi chú...":"Enter a note...",
+    "Gọi thanh toán":"Call for payment",
     "Tên khách hàng":"Customer name",
     "Số điện thoại":"Phone number",
     "Ngày sinh":"Date of birth",

@@ -1408,6 +1408,7 @@ if (ProductChoise==null) {
               state={this.state}
               backgroundColor="#333D4C"
               table={this.state.table}
+              ticketId={this.state.table.TicketID}
               onPressBack={() => { this.onPressBack(); }}
               _searchProduct={(val) => this._searchProduct(val)}
               changeLanguage={(lang,item) => this.changeLanguage(lang,item)}

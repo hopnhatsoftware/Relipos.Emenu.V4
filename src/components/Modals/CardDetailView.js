@@ -100,8 +100,11 @@ export class CardDetailView extends React.Component {
     return null;
   }
   _loadExtraRequest = async (item) =>{
-    let{modalNote,textModal,TksdNote}=this.state;
-    this.setState({textModal: item.PrdName,item:item,TksdNote:item.OrddDescription})
+    let{modalNote,TksdNote}=this.state;
+    this.setState({textModal: item.PrdName,item:item, TksdNote: item.OrddDescription})
+    if(item.OrddDescription == undefined || item.OrddDescription == ''){
+      this.setState({TksdNote: ''})
+    }
     this.setModalNote(!modalNote )
     SetMenu_getExtraRequestFromProductId(item.PrdId).then((res) => {
       if ("Table" in res.Data) {
@@ -316,7 +319,7 @@ export class CardDetailView extends React.Component {
   };
   // Đang Order
   renderOrder = ({ item, RowIndex }) => {
-    let {_addExtraRequestToItem} = this.props;
+    let {_addExtraRequestToItem,translate} = this.props;
     let{isColor,modalNote}=this.state
     const Column1=Contentcf.width* 0.17;
     const QuantityWidth=Column1-H2FontSize*3
@@ -371,15 +374,22 @@ export class CardDetailView extends React.Component {
             </View>
 
           <View style={{ width: Contentcf.width* 0.555,paddingLeft:5, justifyContent:'center', }}>
-            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", width: Contentcf.width* 0.555, fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left', }} numberOfLines={5}>
+            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", width: Contentcf.width* 0.555, fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left',paddingBottom:3 }} numberOfLines={5}>
               {item.PrdName}
             </Text> 
-            {item.OrddDescription?
-            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", width: Contentcf.width* 0.555, fontSize: H4_FONT_SIZE*0.8,  flexWrap: "wrap",textAlign:'left',marginLeft:15 }} numberOfLines={5}>
+          
+            <View style={{flexDirection:'row',width: Contentcf.width* 0.5, borderTopWidth:0.5,borderColor:isColor ==true ? '#FFFFFF':"#000000",}}>
+              <Text style={{ color: isColor ==true ? item.OrddDescription?'#FFFFFF':'#777777':item.OrddDescription?"#000000":'#777777', fontSize: H4_FONT_SIZE*0.8,  flexWrap: "wrap",textAlign:'left',marginLeft:3 }} numberOfLines={5}>
+              {translate.Get("Ghi chú")}: 
+              </Text>
+              {item.OrddDescription?
+              <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H4_FONT_SIZE*0.8,  flexWrap: "wrap",textAlign:'left',marginLeft:5 }} numberOfLines={5}>
                {item.OrddDescription}
-            </Text> 
-            :null
+              </Text> 
+              :null
             }
+            </View>
+            
            
           </View>
           <View style={{  justifyContent:'center',width: Contentcf.width* 0.1 ,}}>
@@ -461,20 +471,20 @@ export class CardDetailView extends React.Component {
           animationType='fade'
           transparent={true}
           visible={modalNote}>
-          <TouchableOpacity style={{height: Bordy.height,width: Bordy.width,backgroundColor: 'black',opacity: 0.7,zIndex: 1}}>
-          </TouchableOpacity>
-          <View style={{top: Bordy.height*0.2, left: Bordy.width*0.25, width: Bordy.width *0.5, height: Bordy.height*0.6, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
-            <View style={{height:Bordy.height*0.6*0.1,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
+          <View style={{height: Bordy.height,width: Bordy.width,backgroundColor: 'black',opacity: 0.7,zIndex: 1}}>
+          </View>
+          <View style={{top: Bordy.height*0.2, left: Bordy.width*0.25, width: Bordy.width *0.5, height: Bordy.height*0.6,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:1,borderColor:isColor==true?'#DAA520':'#000000'}}>
+            <View style={{height:Bordy.height*0.6*0.1,borderTopLeftRadius:9,borderTopRightRadius:9,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
             <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{this.state.textModal}</Text>
             </View>
             <View style={{height: Bordy.height*0.4*0.12,justifyContent:'center',alignItems:'center',marginVertical:5}}>
             <TextInput
-                  placeholder={translate.Get("Nhập ghi chú")}
+                  placeholder={translate.Get("Nhập ghi chú...")}
                   placeholderTextColor={isColor == true ? '#808080' : "#777777"}
                   value={this.state.TksdNote}
-                  iconStyle
-                  onChangeText={(number) => this.setState({TksdNote : number}) }
-                  style={[{width:'95%',height:Bordy.height*0.4*0.12,paddingLeft:12,paddingRight:Bordy.height*0.4*0.12+5,borderWidth:0.5,borderRadius:10,fontSize: H2_FONT_SIZE,color:isColor == true ? '#ffffff' : "#000000", backgroundColor: isColor == true ? '#333333':'#FFFFFF',}]}>
+                  multiline={true} 
+                  onChangeText={(number) => this.setState({TksdNote : number})}
+                  style={[{width:'95%',height:Bordy.height*0.4*0.12,paddingLeft:12,paddingRight:Bordy.height*0.4*0.12+5,borderWidth:0.5,borderRadius:10,fontSize: H3_FONT_SIZE,color:isColor == true ? '#ffffff' : "#000000", backgroundColor: isColor == true ? '#333333':'#FFFFFF',}]}>
                 </TextInput>
                 <TouchableOpacity style={{position:'absolute',width: Bordy.height*0.4*0.12, height: Bordy.height*0.4*0.12,right:15}} 
                   onPress={()=> this.setState({TksdNote : ''})} >
@@ -495,7 +505,7 @@ export class CardDetailView extends React.Component {
                 </TouchableOpacity>
             </View>
             
-            <View style={{height: Bordy.height*0.6*0.68+6}}>
+            <View style={{height: Bordy.height*0.6*0.68+7}}>
             <ScrollView  style={{flexDirection:'row', width:Bordy.width *0.5, height:'100%'}}>
                   <View  style={{flexDirection:'row', width:Bordy.width *0.5, height:'100%'}}>
                     <FlatList
@@ -529,12 +539,12 @@ export class CardDetailView extends React.Component {
                   </View>
                 </ScrollView>
             </View>
-            <View style={{height:Bordy.height*0.6*0.1,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'space-evenly',flexDirection:'row',alignItems:'center'}}>
+            <View style={{height:Bordy.height*0.6*0.1,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',borderBottomLeftRadius:10,borderBottomRightRadius:10,justifyContent:'space-evenly',flexDirection:'row',alignItems:'center'}}>
               <TouchableOpacity onPress={() => this.setModalNote(!modalNote)} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:'#af3037',justifyContent:'center',alignItems:'center'}}>
-                <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>Trở về</Text>
+              <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{translate.Get("Trở lại")}</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={()=>this._Addnote()} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:'#009900',justifyContent:'center',alignItems:'center'}}>
-              <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>Xong</Text>
+              <TouchableOpacity onPress={()=>this._Addnote()} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:isColor == true ? '#DAA520' :'#009900',justifyContent:'center',alignItems:'center'}}>
+              <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{translate.Get('Xác nhận')}</Text>
               </TouchableOpacity>
             </View>
           </View>

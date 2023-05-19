@@ -1,5 +1,5 @@
 import React from "react";
-import {Modal,ActivityIndicator,FlatList, View, TouchableOpacity, TextInput, StyleSheet, Text,Image,Dimensions} from "react-native";
+import {Modal,ActivityIndicator,FlatList, View, TouchableOpacity, TextInput, StyleSheet, Text,Image,Dimensions,Alert} from "react-native";
 import colors from "../config/colors";
 import { Button, Icon } from "react-native-elements";
 import Constants from "expo-constants";
@@ -7,6 +7,7 @@ import {ITEM_FONT_SIZE, BUTTON_FONT_SIZE,H1_FONT_SIZE,H3_FONT_SIZE ,H2_FONT_SIZE
 import { Audio } from 'expo-av';
 import translate from '../services/translate';
 import {_retrieveData, _storeData } from "../services/storages";
+import {API_Print} from "../services";
 const SCREEN_WIDTH = Dimensions.get("screen").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height; //- Constants.statusBarHeight;
 const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
@@ -17,12 +18,16 @@ export class _HeaderNew extends React.Component  {
       IsLoaded:false,
       isColor:false,
       sound:null,
-      modalVisible : false,
+      Description:'',
+      modalLanguage : false,
+      ModalCallStaff: false,
+      settings: {},
+      Config: {},
     }
     this.translate = new translate();
   }
   setModalVisible = (visible) => {
-    this.setState({ modalVisible: visible });
+    this.setState({ modalLanguage: visible });
   }
   _onPlaybackStatusUpdate = playbackStatus => {
     if (!playbackStatus.isLoaded) {
@@ -54,7 +59,15 @@ export class _HeaderNew extends React.Component  {
     let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
     isColor = JSON.parse(isColor);
     await this._LoadSound();
-    this.setState({IsLoaded:true ,isColor});
+    let settings = await _retrieveData('settings', JSON.stringify({}));
+  if (settings!='{}') 
+  settings = JSON.parse(settings);
+  let Config = await _retrieveData('APP@CONFIG', JSON.stringify({
+        'PosId':settings.PosId,
+        'I_BusinessType':1
+        }));
+  Config = JSON.parse(Config);
+    this.setState({IsLoaded:true ,isColor,settings,Config});
   };
  _LoadSound= async () => {
   try
@@ -99,10 +112,41 @@ export class _HeaderNew extends React.Component  {
    console.log('_HandleSound Error :'+ex)
   }
   }
+  _AcceptPayment = async (Description,typeView) => {
+    try{
+    let{ticketId}=this.props;
+    let{settings,ModalCallStaff} = this.state;
+    // console.log('AcceptPayment ----------')
+    // console.log('BranchId:',user.BranchId)
+    // console.log('TicketID',Ticket.TicketID)
+
+    API_Print (settings.I_BranchID, ticketId,typeView, Description).then(res => {
+      console.log('API_Print',res)
+      if (res.Status == 1){
+        this.setModalCallStaff(!ModalCallStaff)
+        Alert.alert( 'thông báo',"Quý khách vui lòng đợi trong giây lát", [
+          {
+            text: "OK", onPress: () => {
+            }
+          }
+        ]);
+      }
+    })}catch{(error) => {
+      Alert.alert( 'System Error',error, [
+        {
+          text: "OK", onPress: () => {
+          }
+        }
+      ]);
+    }}; 
+  }
+  setModalCallStaff = (visible) => {
+    this.setState({ ModalCallStaff: visible });
+  }
   render() {
    
     const { state, table, BookingsStyle, _searchProduct, onPressBack, translate, name, titleSet, setState,backgroundColor,changeLanguage,data,listLanguage,listLanguage2,languageText,languageImg} = this.props;
-    const{modalVisible,isColor}=this.state
+    const{modalLanguage,isColor,ModalCallStaff}=this.state
     if (state.showCall==undefined||state.showCall==null) {
       state.showCall=false;
     }
@@ -116,18 +160,60 @@ export class _HeaderNew extends React.Component  {
     }
     return (
       <View style={[BookingsStyle.header,{ backgroundColor: backgroundColor, width: '100%', }]}>
-        {modalVisible ?
+        {ModalCallStaff ?
+          <Modal
+          animationType='none'
+          transparent={true}
+          visible={ModalCallStaff}>
+          <View style={{flex:1,backgroundColor: 'black',opacity: 0.7,zIndex: 1}}>
+          </View>
+          <View style={{top: Bordy.height*0.25, left: Bordy.width*0.325, width: Bordy.width *0.35, height: Bordy.height*0.35,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+            <View style={{borderTopLeftRadius:10,borderTopRightRadius:10,height:Bordy.height*0.35*0.2,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
+            <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{translate.Get("Gọi nhân viên")}</Text>
+            </View>
+            <View style={{height:Bordy.height*0.35*0.18,width:'100%', justifyContent:'space-evenly',alignItems:'center',flexDirection:'row'}}>
+              <TouchableOpacity onPress={() => this.setState({Description: this.state.Description + translate.Get("Gọi nhân viên") +' '})} style={{width:'45%', height:'75%',borderRadius:10, backgroundColor:'#BBBBBB',justifyContent:'center',alignItems:'center'}}>
+                <Text style={{fontSize:H3_FONT_SIZE, color:'#000000'}}>{translate.Get("Gọi nhân viên")}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => this.setState({Description: this.state.Description + translate.Get("Gọi thanh toán") +' '})}style={{width:'45%', height:'75%',borderRadius:10,backgroundColor:'#BBBBBB',justifyContent:'center',alignItems:'center'}}>
+                <Text style={{fontSize:H3_FONT_SIZE, color:'#000000'}}>{translate.Get('Gọi thanh toán')}</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{height: Bordy.height*0.35*0.42,justifyContent:'center',alignItems:'center'}}>
+              <TextInput
+                  placeholder={translate.Get("Nhập ghi chú...")}
+                  placeholderTextColor={isColor == true ? '#808080' : "#777777"}
+                  value={this.state.Description}
+                  onChangeText={(item) => this.setState({Description : item})}  
+                  multiline={true} 
+                  numberOfLines={10} 
+                  style={[{width:'95%',height:Bordy.height*0.35*0.38,paddingHorizontal:12,borderWidth:0.5,borderRadius:10,fontSize: H3_FONT_SIZE,color:isColor == true ? '#ffffff' : "#000000", backgroundColor: isColor == true ? '#333333':'#FFFFFF',}]}>
+              </TextInput>
+            </View>
+            
+            <View style={{height:Bordy.height*0.35*0.195,width:'100%',borderBottomLeftRadius:10,borderBottomRightRadius:10,backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'space-evenly',flexDirection:'row',alignItems:'center'}}>
+              <TouchableOpacity onPress={() => this.setModalCallStaff(!ModalCallStaff)} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:'#af3037',justifyContent:'center',alignItems:'center'}}>
+                <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{translate.Get("Trở lại")}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={()=>{this._AcceptPayment(this.state.Description,2)}} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:isColor == true ? '#DAA520' :'#009900',justifyContent:'center',alignItems:'center'}}>
+              <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{translate.Get('Xác nhận')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+          : null}
+        {modalLanguage ?
           <Modal
           animationType='fade'
           transparent={true}
-          visible={modalVisible}>
-          <TouchableOpacity style={{height: Bordy.height,width: Bordy.width,backgroundColor: 'black',opacity: 0.7,zIndex: 1}} onPress={() => this.setModalVisible(!modalVisible)}>
+          visible={modalLanguage}>
+          <TouchableOpacity style={{height: Bordy.height,width: Bordy.width,backgroundColor: 'black',opacity: 0.7,zIndex: 1}} onPress={() => this.setModalVisible(!modalLanguage)}>
           </TouchableOpacity>
           <View style={{top: Bordy.height*0.3, left: Bordy.width*0.32, width: Bordy.width *0.36, height: Bordy.height*0.4, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
             <View style={{height:Bordy.height*0.4*0.15,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'space-between',flexDirection:'row',alignItems:'center'}}>
             <TouchableOpacity><Icon name="close" iconStyle={{ color: isColor==true?'#111111':'#257DBC', left:5 }} fontSize={H1_FONT_SIZE} type="antdesign"/></TouchableOpacity>
             <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold"}}>{translate.Get('language')}</Text>
-            <TouchableOpacity onPress={() => this.setModalVisible(!modalVisible)}>
+            <TouchableOpacity onPress={() => this.setModalVisible(!modalLanguage)}>
               <Icon name="close" iconStyle={{ color: isColor==true?'#DAA520':'white',  right:5 }} fontSize={H1_FONT_SIZE} type="antdesign"/>
             </TouchableOpacity>
             </View>
@@ -135,7 +221,7 @@ export class _HeaderNew extends React.Component  {
             <FlatList
             data={data}
             renderItem={({ item, index }) =>
-              <TouchableOpacity onPress={() => { changeLanguage(item.LgId, item) &&  this.setModalVisible(!modalVisible )}}
+              <TouchableOpacity onPress={() => { changeLanguage(item.LgId, item) &&  this.setModalVisible(!modalLanguage )}}
                 style={{ width: '100%',justifyContent:'center',borderBottomWidth:0.5,paddingVertical:20}}>
                 <View style={{width:'100%',flexDirection: "row",alignItems:'center'}}>
                   <Image resizeMode="contain" source={item.LgClsIco == 'icon-flagvn' ? require('../../assets/icons/icon-flagvn.png'): item.LgClsIco == 'icon-flagus' ? require('../../assets/icons/icon-flagus.png'):item.LgClsIco == 'icon-flagcn' ? require('../../assets/icons/icon-flagcn.png'): null} style={{ width: '20%',height:"100%", }}></Image>
@@ -170,8 +256,7 @@ export class _HeaderNew extends React.Component  {
           </View>
           <View style={{ flexDirection: 'column', width: '60%', justifyContent: "center", alignItems: 'center', }}>
             <TouchableOpacity style={{ width: '100%', justifyContent: "center", alignItems: 'center', }}
-              onPress={() => { 
-              this._HandleSound(); }}>
+               onPress={() => this.setModalCallStaff(!ModalCallStaff)} >
              {(state.showCall==false)?
               <View style={{ flexDirection: 'row', width: '100%', justifyContent: "center", alignItems: 'center', }}>
               <Image  resizeMode="contain" source={ require('../../assets/icons/IconCall.png') }
@@ -246,21 +331,21 @@ export class _HeaderNew extends React.Component  {
               </View>}
               {state.language == 1 ?
                 <TouchableOpacity style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
-                onPress={() => this.setModalVisible(!modalVisible )} >
+                onPress={() => this.setModalVisible(!modalLanguage )} >
                   <Image resizeMode="stretch" source={require('../../assets/icons/icon-flagvn.png')}
                     style={{ width: ITEM_FONT_SIZE * 2, height: ITEM_FONT_SIZE * 1.4, }} />
                 </TouchableOpacity>
                 :
                 state.language == 2 ?
                 <TouchableOpacity style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
-                onPress={() => this.setModalVisible(!modalVisible )} >
+                onPress={() => this.setModalVisible(!modalLanguage )} >
                   <Image resizeMode="stretch" source={require('../../assets/icons/icon-flagus.png')}
                     style={{ width: ITEM_FONT_SIZE * 2, height: ITEM_FONT_SIZE * 1.4, }} />
                 </TouchableOpacity>
                 :
                 state.language == 5 ?
                 <TouchableOpacity style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
-                onPress={() => this.setModalVisible(!modalVisible )} >
+                onPress={() => this.setModalVisible(!modalLanguage )} >
                   <Image resizeMode="stretch" source={require('../../assets/icons/icon-flagcn.png')}
                     style={{ width: ITEM_FONT_SIZE * 2, height: ITEM_FONT_SIZE * 1.4, }} />
                 </TouchableOpacity>
