@@ -7,7 +7,7 @@ const commonConfig = {
     "android",
     "web"
   ],
-    version: "2.1",
+    version: "2.2",
     orientation: "landscape",
     icon: "./assets/Customer/Logo.png",
     splash: {
