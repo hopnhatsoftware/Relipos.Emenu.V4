@@ -1,4 +1,5 @@
 export default en = {
+    "Hết hàng":"没有货",
     "Khách nam" : "男性客人",
     "Khách nữ" : "女性客人",
     "Trẻ em" : "小孩",

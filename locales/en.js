@@ -1,5 +1,6 @@
 
 export default en = {
+    "Hết hàng":"Sold Out",
     "Khách nam" : "Male customer",
     "Khách nữ" : "Female customer",
     "Trẻ em" : "Children",

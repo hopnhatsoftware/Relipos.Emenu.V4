@@ -48,7 +48,6 @@ export class CardDetailView extends React.Component {
       IsLoaded:false,
       KeyCode:'',
       showCall:false,
-      sound:null,
       showS_CodeHandleData:false,
       modalNote : false,
       TksdNote:'',
@@ -82,24 +81,8 @@ export class CardDetailView extends React.Component {
       }
     }
   };
-  _LoadSound= async () => {
-    try{
-      const { state} = this.props;
-      let { sound} = this.state;
-      if (sound==null) {
-      sound= new Audio.Sound();
-    await sound.loadAsync({uri:state.endpoint+ '/Resources/Sound/RingSton.mp3'});
-    await sound.setOnPlaybackStatusUpdate(this._onPlaybackStatusUpdate);
-    this.setState({ sound})
-    return sound;
-      }
-    }catch(ex){
-      console.log('_LoadSound Error :'+ex)
-      this.setState({ sound:null})
-    }
-    return null;
-  }
   _loadExtraRequest = async (item) =>{
+    try{
     let{modalNote,TksdNote}=this.state;
     this.setState({textModal: item.PrdName,item:item, TksdNote: item.OrddDescription})
     if(item.OrddDescription == undefined || item.OrddDescription == ''){
@@ -127,49 +110,19 @@ export class CardDetailView extends React.Component {
       )
       this.setState({isLoading: false });
     });
+  }catch (error) {
+    console.log('_loadExtraRequest Error:'+error);
+    return null;
+  } 
   }
   IncrementDescription = (item,index) => {
     let {TksdNote} = this.state;
     this.setState({TksdNote: TksdNote + item.MrqDescription +' '})
   };
-  
-    _HandleSound= async () => {
-    try{
-        let { showCall,sound } = this.state;
-        if (sound==null) 
-        sound=  await this._LoadSound();
-        const { onCallServices } = this.props; 
-      if (sound==null)
-          return;
-        if (showCall) 
-        {
-          await sound.stopAsync();
-          this.setState({ showCall: false })
-        }  
-        else {
-          onCallServices(); 
-          this.setState({ showCall: true });
-          sound.setPositionAsync(0);
-        await sound.playAsync();
-     }
-    }catch(ex){
-      this.setState({ showCall:false })
-      console.log('_HandleSound Error :'+ex)
-    }
-    }
-  componentWillUnmount= async () => 
-  {
-    let { sound} = this.state;
-    if (sound!=null) {
-      await sound.unloadAsync();
-        this.setState({ showCall: false,sound:null})
-    }
-  }
     componentDidMount= async () => {
       let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
     isColor = JSON.parse(isColor);
       this.setState({IsLoaded:true ,KeyCode:'',isColor});
-      await this._LoadSound();
       
     };
   _HandleQuantity = async (item,OrddQuantity,isReplace) => {
@@ -184,17 +137,24 @@ export class CardDetailView extends React.Component {
       return null;
     } 
   };
-  _Addnote = async (value) =>{
+  _Addnote = async () =>{
+    try{
     let {HandleDescription} = this.props;
     let { item,TksdNote,modalNote} = this.state;
     HandleDescription(item,TksdNote)
     this.setModalNote(!modalNote )
+    } catch (error) {
+      console.log('Addnote Error:'+error);
+      return null;
+    }
   }
+
   onPressNext = async () => {
     this.props.onPressNext();
   }
   
   _AcceptCode= async () => {
+    try{
     let { setState, onSendOrder, translate, settings} = this.props;
     Keyboard.dismiss();
     this.setState({ showS_CodeHandleData: false});
@@ -229,7 +189,11 @@ export class CardDetailView extends React.Component {
       return;
       }
       onSendOrder();
+    } catch (error) {
+      console.log('_AcceptCode Error:'+error);
+      return null;
     }
+  }
   // Đã Order
   
   renderOrdered= ({ item, RowIndex }) => {
@@ -366,11 +330,10 @@ export class CardDetailView extends React.Component {
            </TouchableOpacity>
             </View>
 
-          <TouchableOpacity onPress={()=>this._loadExtraRequest(item)} style={{ width: Contentcf.width* 0.555,paddingLeft:5, justifyContent:'center', }}>
+          <TouchableOpacity onPress={()=>this._loadExtraRequest(item)} style={{ width: Contentcf.width* 0.55,paddingLeft:5, justifyContent:'center', }}>
             <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", width: Contentcf.width* 0.555, fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left',paddingBottom:3 }} numberOfLines={5}>
               {item.PrdName}
             </Text> 
-          
             <View style={{flexDirection:'row',width: Contentcf.width* 0.5, borderTopWidth:0.55,borderColor:isColor ==true ? '#FFFFFF':"#000000",paddingVertical:3}}>
               <Text style={{ color: isColor ==true ? item.OrddDescription?'#FFFFFF':'#777777':item.OrddDescription?"#000000":'#777777', fontSize: H4_FONT_SIZE*0.8,  flexWrap: "wrap",textAlign:'left',marginLeft:3 }} numberOfLines={5}>
               {translate.Get("Ghi chú")} 
@@ -383,16 +346,14 @@ export class CardDetailView extends React.Component {
               :null
             }
             </View>
-            
-           
           </TouchableOpacity>
-          <View style={{  justifyContent:'center',width: Contentcf.width* 0.1 ,}}>
-            <Text style={{color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H3_FONT_SIZE ,textAlign:'right' }}>
+          <View style={{  justifyContent:'center',width: Contentcf.width* 0.14 ,}}>
+            <Text style={{color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H3_FONT_SIZE ,textAlign:'center' }}>
             {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.UnitPrice : item.UnitPriceAfter, "")}
             </Text>
           </View>
-          <View style={{  justifyContent: "center",width: Contentcf.width* 0.15 ,}}>
-            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H3_FONT_SIZE,fontWeight:'bold',textAlign:'right' }}>
+          <View style={{  justifyContent: "center",width: Contentcf.width* 0.14 ,}}>
+            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H3_FONT_SIZE,fontWeight:'bold',textAlign:'center' }}>
             {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.TkdItemAmount : item.TkdTotalAmount, "")}
             </Text>
           </View>
@@ -469,7 +430,9 @@ export class CardDetailView extends React.Component {
           </View>
           <View style={{top: Bordy.height*0.2, left: Bordy.width*0.25, width: Bordy.width *0.5, height: Bordy.height*0.6,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:1,borderColor:isColor==true?'#DAA520':'#000000'}}>
             <View style={{height:Bordy.height*0.6*0.1,borderTopLeftRadius:9,borderTopRightRadius:9,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
-            <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{this.state.textModal}</Text>
+              <ScrollView horizontal={true}>
+                <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{this.state.textModal}</Text>
+              </ScrollView>
             </View>
             <View style={{height: Bordy.height*0.4*0.12,justifyContent:'center',alignItems:'center',marginVertical:5}}>
             <TextInput
@@ -499,10 +462,9 @@ export class CardDetailView extends React.Component {
                 </TouchableOpacity>
             </View>
             
-            <View style={{height: Bordy.height*0.6*0.68+7}}>
-            <ScrollView  style={{flexDirection:'row', width:Bordy.width *0.5, height:'100%'}}>
-                  <View  style={{flexDirection:'row', width:Bordy.width *0.5, height:'100%'}}>
+            <View style={{height: Bordy.height*0.6*0.68+7,flexDirection:'row', width:Bordy.width *0.5,}}>
                     <FlatList
+                      keyExtractor={(item, RowIndex) => RowIndex.toString()}
                       numColumns={3}
                       data={Products1}
                       extraData={this.state.selectedIndex}
@@ -517,6 +479,7 @@ export class CardDetailView extends React.Component {
                       </TouchableOpacity>}
                     />
                     <FlatList
+                      keyExtractor={(item, RowIndex) => RowIndex.toString()}
                       numColumns={3}
                       data={Products2}
                       extraData={this.state.selectedIndex}
@@ -530,8 +493,6 @@ export class CardDetailView extends React.Component {
                         </View>
                       </TouchableOpacity>}
                     />
-                  </View>
-                </ScrollView>
             </View>
             <View style={{height:Bordy.height*0.6*0.1,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',borderBottomLeftRadius:10,borderBottomRightRadius:10,justifyContent:'space-evenly',flexDirection:'row',alignItems:'center'}}>
               <TouchableOpacity onPress={() => this.setModalNote(!modalNote)} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:'#af3037',justifyContent:'center',alignItems:'center'}}>

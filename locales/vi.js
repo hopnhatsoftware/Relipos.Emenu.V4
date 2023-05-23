@@ -1,5 +1,6 @@
 
 export default en={
+    "Hết hàng":"Hết hàng",
     "Khách nam" : "Khách nam",
     "Khách nữ" : "Khách nữ",
     "Trẻ em" : "Trẻ em",

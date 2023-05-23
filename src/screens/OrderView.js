@@ -9,7 +9,7 @@ import { FlatList } from "react-native";
 import { Input, Button, Icon } from "react-native-elements";
 import { setCustomText } from "react-native-global-props";
 import { ProductDetails, CardDetailView, _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor } from '../components';
-import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize,H2FontSize,H3FontSize,H4FontSize,H5FontSize,FontSize,H4_FONT_SIZE } from "../config/constants";
+import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize,H2FontSize,H3FontSize,H4FontSize,H5FontSize,FontSize,H4_FONT_SIZE, H1_FONT_SIZE } from "../config/constants";
 import translate from "../services/translate";
 import {getMasterData,GetViewGroup,GetPrdChildGroups,getProductByGroup,getTicketInfor, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getByChoiceId,CancelOrder,CallServices,getLanguage} from "../services";
 import { formatCurrency } from "../services/util";
@@ -1229,6 +1229,13 @@ if (ProductChoise==null) {
       <TouchableHighlight   style={ { borderBottomWidth: 1,borderColor: colors.grey2,width:iWith,height: iHeight,marginBottom:2 }}>
         <View style={{ flexDirection: "row", flexWrap: "wrap", width: "100%", height: '100%' }}>
           <View style={{ width: "60%", height: '100%' }}>
+            {item.isSoldout ?
+            <View style={{position:'absolute',width: "100%", height: '100%',zIndex:99,backgroundColor:'black',opacity: 0.7,justifyContent:'center' }}>
+              <View style={{transform: [{rotate: '-30deg'}],alignItems:'center'}}>
+                <Text style={{fontSize: H1_FONT_SIZE*1.5, color:'#FF0000',fontFamily: "RobotoBold",}}>{this.translate.Get("Hết hàng")}</Text>
+              </View>
+            </View>
+            : null}
             <TouchableOpacity name='dvImage' style={{ flexDirection: "row", width: '100%', height: '100%' }}
               onPress={() =>
               { 
@@ -1282,7 +1289,7 @@ if (ProductChoise==null) {
                 {item.PrdName}
               </Text>
               <Text style={{fontStyle:'italic',color:isColor == true ?'#FFFFFF' : "#af3037",fontFamily:'RobotoBold',marginLeft:7,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left',marginTop:3}}>
-              {this.translate.Get("Giá")}:{" "}{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPrice : item.UnitPriceAfter, "")}
+              {this.translate.Get("Giá")}:{" "}{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPrice : item.UnitPriceAfter, "")} 
                 </Text>
             </View>
             </View>
@@ -1342,6 +1349,12 @@ if (ProductChoise==null) {
                       :null
                      }
                   </View>
+                  {item.isSoldout ?
+                  <View style={{width:(iWith-4)*0.4*0.3,height:'100%',alignItems:'flex-end',justifyContent: 'flex-end' }}>
+                    {/* <Image resizeMode='contain' source={require('../../assets/icons/IconAdd.png')}
+                      style={{width: H2FontSize, height: H2FontSize, }} /> */}
+                  </View>
+                  : 
                   <TouchableOpacity style={{width:(iWith-4)*0.4*0.3,height:'100%',alignItems:'flex-end',justifyContent: 'flex-end' }} onPress={() => {
                      if (item.PrdIsSetMenu == true ) 
                      this.PrerenderProductModal(item,CartFilter,index);
@@ -1352,7 +1365,7 @@ if (ProductChoise==null) {
                   }}>
                     <Image resizeMode='contain' source={require('../../assets/icons/IconAdd.png')}
                       style={{width: H2FontSize, height: H2FontSize, }} />
-                  </TouchableOpacity>
+                  </TouchableOpacity>}
                 </View>
               </View>
           
