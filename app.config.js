@@ -22,7 +22,7 @@ const commonConfig = {
       "**/*"
     ],
     "ios": {
-      "buildNumber": "1",
+      "buildNumber": "2",
       "infoPlist": {
         "supportsTablet": true,
         "UIBackgroundModes": [
