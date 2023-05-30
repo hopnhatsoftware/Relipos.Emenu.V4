@@ -1,17 +1,19 @@
 /*Màn hình chọn món */
 import React, { Component } from "react";
 import {TouchableOpacity,Dimensions,Image,TouchableHighlight,ActivityIndicator, UIManager,StatusBar,ImageBackground,Keyboard,StyleSheet,Platform,Animated,Easing,Text,View,
-  TextInput} from "react-native";
+  TextInput,ScrollView} from "react-native";
 import * as Font from "expo-font";
+import Modal from "react-native-modal";
 import Constants from "expo-constants";
 import { _retrieveData, _storeData, _remove } from "../services/storages";
+import { CheckBox } from "react-native-elements";
 import { FlatList } from "react-native";
 import { Input, Button, Icon } from "react-native-elements";
 import { setCustomText } from "react-native-global-props";
 import { ProductDetails, CardDetailView, _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor } from '../components';
-import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize,H2FontSize,H3FontSize,H4FontSize,H5FontSize,FontSize,H4_FONT_SIZE, H1_FONT_SIZE } from "../config/constants";
+import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize,H2FontSize,H3FontSize,H4FontSize,H2_FONT_SIZE,H3_FONT_SIZE,FontSize,H4_FONT_SIZE, H1_FONT_SIZE } from "../config/constants";
 import translate from "../services/translate";
-import {getMasterData,GetViewGroup,GetPrdChildGroups,getProductByGroup,getTicketInfor, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getByChoiceId,CancelOrder,CallServices,getLanguage} from "../services";
+import {getMasterData,GetViewGroup,GetPrdChildGroups,getProductByGroup,getTicketInfor, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getByChoiceId,CancelOrder,CallServices,getLanguage,CheckProductManyPrice,getFromTicketInfor} from "../services";
 import { formatCurrency } from "../services/util";
 import colors from "../config/colors";
 import BookingsStyle from "../styles/bookings";
@@ -43,6 +45,10 @@ export default class OrderView extends Component {
       isRenderProduct: true,
       selectedType: null,
       isPostBack: false,
+      checked:'',
+      test:'',
+      itemChecked:{},
+      DataSize: [],
       selectedId: -1,
       listLanguage:[],
       listLanguage2:{},
@@ -62,6 +68,8 @@ export default class OrderView extends Component {
       Products: [],
       ProductsOrdered: [],
       isShowMash: false,
+      modalSize : false,
+      titleModalSize:'',
       Ticket: {},
       table: {},
       settings: {},
@@ -111,7 +119,6 @@ export default class OrderView extends Component {
     this.translate = await this.translate.loadLang();
     await  this._BindingFont();
     StatusBar.setHidden(true);
-    that = this;
     let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
     isColor = JSON.parse(isColor);
     let state = await _retrieveData("OrderView@STATE", "");
@@ -123,11 +130,11 @@ export default class OrderView extends Component {
         CartInfor = JSON.parse(CartInfor);
         else CartInfor=this.state.CartInfor;
         state.CartInfor = CartInfor;
-        state.Product = that.state.Product;
+        state.Product = this.state.Product;
         state.FullCartWidth = new Animated.Value(0);
         state.CartWidth = new Animated.Value(Bordy.width * 0.82);
       _storeData("OrderView@STATE", JSON.stringify(state), async () => {
-        that.setState({state,CartInfor,SelectedGroupIndex:-1});
+        this.setState({state,CartInfor,SelectedGroupIndex:-1});
         return false;
       });
       await this._getMasterData();
@@ -532,15 +539,13 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
  
   changeLanguage = async (lang , item) => {
     if (this.state.language != lang) {
-      let that = this;
       await _storeData("culture", lang.toString(), async () => {
-        that.translate = await this.translate.loadLang();
-        that.setState({ language: lang, languageText: item.LgName, languageImg: item.LgClsIco }, () => that.fetchData());
+        this.translate = await this.translate.loadLang();
+        this.setState({ language: lang, languageText: item.LgName, languageImg: item.LgClsIco }, () => this.fetchData());
       });
     }
     this.setState({ language: lang });
   };
-
   _GroupClick = index => {
     this.setState({  SelectedGroupIndex: index,  SelectedChildGroupIndex: -1, isShowMash: true },
       () => { this._loadChildGroups(index);  }
@@ -559,6 +564,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
       return;
     this.setState({ isShowMash: true }); 
     await sendOrder(Config, table, OrdPlatform, CartInfor.items).then(async res => {
+
       if (res.Status == 1) {
         await _remove("APP@CART", async () => {
           await this.setState({ CartInfor: {  TotalQuantity: 0, TotalAmount: 0, ItemAmount:0, items: [], } }, async () => {
@@ -626,6 +632,10 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
     let UpAmount = 0;
     if (Master.UnitPrice==undefined||Master.UnitPrice==null) 
     Master.UnitPrice=0;
+    if (Master.UnitPriceBefore==undefined||Master.UnitPriceBefore==null) 
+    Master.UnitPriceBefore=0;
+    if (Master.UnitPriceAfter==undefined||Master.UnitPriceAfter==null) 
+    Master.UnitPriceAfter=0;
     if (Master.OrddQuantity==undefined||Master.OrddQuantity==null) 
     Master.OrddQuantity=0;
     if (Master.PrdVatPercent==undefined||Master.PrdVatPercent==null) 
@@ -642,6 +652,10 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
         UpAmount += parseFloat(item.TksdQuantity) * parseFloat(item.TksdPrice);
     });
     Master.UpAmount = UpAmount;
+    if(Master.UnitPrice == 0 || Master.UnitPrice == undefined)
+    {
+    Master.UnitPrice = Master.UnitPriceBefore;
+    }
     Master.TotalChoiseAmount = parseFloat(Master.UnitPrice + Master.UpAmount);
     Master.TkdItemAmount = parseFloat(Master.TotalChoiseAmount * Master.OrddQuantity);
     Master.TkdVatAmount = parseFloat(Master.TkdItemAmount * Master.PrdVatPercent * 0.01);
@@ -664,11 +678,15 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
     CartInfor.items.forEach((item, index) => {
      let{Master}=  this._CaculatorMaster(item);
        // console.log("item.TkdTotalAmount:"+item.TkdTotalAmount);
+        // TotalAmount+=Master.UnitPriceBefore*Master.OrddQuantity ;
+        // ItemAmount+=Master.UnitPriceAfter*Master.OrddQuantity;
+        // console.log(TotalAmount,ItemAmount)
         TotalAmount+=Master.TkdTotalAmount;
         ItemAmount+=Master.TkdItemAmount;
         //console.log("CaculatorCardInfor TkdTotalAmount itembf"+result.Master.TkdTotalAmount );
         TotalQuantity+=Master.OrddQuantity
         CartInfor.items[index]=Master;
+  
     
     });
     //console.log("CaculatorCardInfor:"+TotalAmount);
@@ -1195,9 +1213,6 @@ if (ProductChoise==null) {
       let { ProductChoise,CartProductIndex,CartItemHandle,ChoisetDetails,ProductChoiseIndex } = this.state;
       if (ProductChoise == null||CartItemHandle==null) 
         return null;
-       
-
-
       return (
         <ProductDetails
           endpoint={this.state.ProductImagePrefix == '' ? 
@@ -1218,12 +1233,48 @@ if (ProductChoise==null) {
         />
       );
   };
+  setModalSize = (visible) => {
+    // this._CheckProductManyPrice(item)
+    this.setState({ modalSize: visible });
+  }
+  CheckSize = (item) =>{
+    let{CartInfor,test} = this.state;
+    this.HandleQuantity(item,1,false);
+    this.setState({checked:item.UnitName,modalSize:false,test:item.PrdId})
+    // console.log(CartInfor.findIndex(item.UnitId));
+  }
+  _CheckProductManyPrice =(item)=>{
+    let{table,DataSize,modalSize,checked}= this.state;
+    CheckProductManyPrice(item.PrdId,table.AreaID,1).then(res => {
+      if(res.Status == 1){
+        DataSize = res.Data;
+        this.setState({DataSize: DataSize,titleModalSize: item.PrdName,checked:item.UnitName,modalSize:!modalSize})
+      }
+    }).catch((error) => {
+      Question.alert( 'System Error',error, [
+        {
+          text: "OK", onPress: () => {
+          }
+        }
+      ]);
+    });
+  }
+  _getFromTicketInfor = () => {
+    let{table}=this.state;
+    getFromTicketInfor(table.TicketID).then(res => {
+    })
+  }
   renderProduct = ({ item, index }) => {
-    let { Config,isColor } = this.state;
+    let { Config,isColor,modalSize } = this.state;
     let iWith=(ProductList.width/ProductList.ColumnNum);
     let iHeight=iWith*3/6;
     let {CartFilter}= this._getCartItems(item,null);
     item.OrddQuantity=CartFilter.TotalQuantity;
+    if(item.OrddQuantity>0 && item.UnitId != CartFilter.FirstItem.UnitId){
+    item.UnitPrice = CartFilter.FirstItem.UnitPriceBefore;
+    item.UnitName = CartFilter.FirstItem.UnitName ;
+    item.UnitId = CartFilter.FirstItem.UnitId ;
+    }
     this.state.isRenderProduct=true;
     return (
       <TouchableHighlight   style={ { borderBottomWidth: 1,borderColor: colors.grey2,width:iWith,height: iHeight,marginBottom:2 }}>
@@ -1246,16 +1297,20 @@ if (ProductChoise==null) {
                   }: require("../../assets/images/NoImage_trans-04.png")
                 }
                 style={[{ width: '100%', height: '100%', backgroundColor: colors.grey1 }]} >
-                {item.SttId && item.SttId == 3 ? 
-                  <View style={{ position: "absolute", paddingTop:5,right:5,paddingRight: Platform.OS === "android" ? 13 : 26, width: '20%'}}>
-                    <Image resizeMode="stretch" source={require('../../assets/icons/v2/icon_like.png')}
-                      style={{ width: H3FontSize * 1.2, height: H3FontSize * 1.2, }} />
+                {item.ResName && item.ResName == 'HOT' ? 
+                  <View style={{ position: "absolute", paddingTop:10,right:10, width: '20%'}}>
+                    <Image resizeMode="contain" source={require('../../assets/icons/IconHot-09.png')}
+                      style={{ width: H1_FONT_SIZE*1.6, height: H1_FONT_SIZE*1.6,}} />
                   </View>
-                : null}
-                {item.SttId && item.SttId == 2 ?
-                  <View style={{  position: "absolute", paddingTop: 5, right: 5,  paddingRight: Platform.OS === "android" ? 13 : 26, width: '20%' }}>
-                    <Image resizeMode="stretch" source={require('../../assets/icons/v2/icon_new.png')}
-                      style={{ width: H3FontSize * 1.2, height: H3FontSize * 1.2, }} />
+                : item.ResName && item.ResName == 'NEW' ?
+                  <View style={{  position: "absolute", paddingTop: 10, right: 10,width: '20%' }}>
+                    <Image resizeMode="contain" source={require('../../assets/icons/IconNew-09.png')}
+                      style={{width: H1_FONT_SIZE*1.6, height: H1_FONT_SIZE*1.6, }}/>
+                  </View>
+                  : item.ResName && item.ResName == 'SALE' ?
+                  <View style={{  position: "absolute", paddingTop: 10, right: 10,width: '20%' }}>
+                    <Image resizeMode="contain" source={require('../../assets/icons/IconSale.png')}
+                      style={{width: H1_FONT_SIZE*1.6, height: H1_FONT_SIZE*1.6, }}/>
                   </View>
                   : null} 
                 {/* <View style={{ position: "absolute", paddingTop: (iHeight-36)/2, right: -15 }}>
@@ -1275,10 +1330,10 @@ if (ProductChoise==null) {
               </View>
               <View name='pnProductName' style={{width: '100%',paddingTop:2 }}>
                 <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H4FontSize,flexWrap:"wrap"}} numberOfLines={5}>
-                  {item.PrdName}
+                  {item.PrdNameUi}
                 </Text>
                 <Text style={{fontStyle:'italic',color: isColor == true ?'#FFFFFF' : "#af3037",fontFamily:'RobotoBold',marginLeft:7,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left',marginTop:3}}>
-              {this.translate.Get("Giá")}:{" "}{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPrice : item.UnitPriceAfter, "")}
+              {this.translate.Get("Giá")}:{" "}{formatCurrency(Config.B_ViewUnitPriceBefor  ? item.UnitPrice: item.UnitPriceAfter, "")} 
                 </Text>
               </View>
               </View>
@@ -1286,10 +1341,11 @@ if (ProductChoise==null) {
               <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:iHeight-(H2FontSize*1.5+10)}}>
             <View name='pnProductName' style={{width: '100%',marginTop:5}}>
               <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H3FontSize,fontWeight:'bold',flexWrap:"wrap"}} numberOfLines={5}>
-                {item.PrdName}
+                {item.PrdNameUi}
               </Text>
+              
               <Text style={{fontStyle:'italic',color:isColor == true ?'#FFFFFF' : "#af3037",fontFamily:'RobotoBold',marginLeft:7,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left',marginTop:3}}>
-              {this.translate.Get("Giá")}:{" "}{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPrice : item.UnitPriceAfter, "")} 
+              {this.translate.Get("Giá")}:{" "}{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPrice: item.UnitPriceAfter, "")}/{item.UnitName} 
                 </Text>
             </View>
             </View>
@@ -1319,7 +1375,7 @@ if (ProductChoise==null) {
                     </View>
                   }
                   <View style={{ width:(iWith-4)*0.4*0.4, height: '100%', justifyContent: 'flex-end' }}>
-                 {( (item.PrdIsSetMenu != true|| item.PrdViewSetMenuType != 1) && item.OrddQuantity>0)?
+                 {(item.OrddQuantity>0)?
                       <TextInput ref={input => this.textInput = input}
                         style={{  color:isColor == true ?'#FFFFFF' :  "#af3037",width: '100%',fontSize:H2FontSize*0.8,textAlign:"center",fontFamily: "RobotoBold", }}
                         autoFocus={false}
@@ -1355,10 +1411,18 @@ if (ProductChoise==null) {
                       style={{width: H2FontSize, height: H2FontSize, }} /> */}
                   </View>
                   : 
+                  (item.RECORD > 1 && item.OrddQuantity == 0)?
+                  <TouchableOpacity onPress={()=>{this._CheckProductManyPrice(item)}}style={{position:'absolute',right:2,backgroundColor:'#009900',borderRadius:15,width:'60%',height:'100%',alignItems:'center',justifyContent: 'center'}}>
+                    <Text style={{color:'#FFFFFF',fontSize:H3_FONT_SIZE}}>Chọn size</Text>
+                  </TouchableOpacity>
+                  :
                   <TouchableOpacity style={{width:(iWith-4)*0.4*0.3,height:'100%',alignItems:'flex-end',justifyContent: 'flex-end' }} onPress={() => {
                      if (item.PrdIsSetMenu == true ) 
                      this.PrerenderProductModal(item,CartFilter,index);
-                     else {
+                     else if(item.RECORD > 1 && item.OrddQuantity == 0){
+                      this._CheckProductManyPrice(item)
+                     }
+                     else{
                     this.HandleQuantity(item,1,false);
                     this.CaculatorCardInfor(true);
                      }
@@ -1376,6 +1440,7 @@ if (ProductChoise==null) {
       </TouchableHighlight>
     );
   };
+  
   render() {
     if (!this.state.isPostBack) {
       return (
@@ -1388,11 +1453,40 @@ if (ProductChoise==null) {
         </View>
       );
     }
-    const {ProductGroupList,endpoint,PrdChildGroups,Products,CartInfor,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config,ProductsOrdered,isColor} = this.state; 
+    const {ProductGroupList,endpoint,PrdChildGroups,checked,Products,CartInfor,itemChecked,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config,ProductsOrdered,isColor,modalSize} = this.state; 
    
     return (
       <View style={{height:Bordy.height,width:Bordy.width, backgroundColor: isColor == true ? '#333333' : "#FFFFFF"}}>
-        
+        {modalSize ?
+          <Modal
+          onBackdropPress={() => this.setState({modalSize:!modalSize})}
+          isVisible={true}
+          visible={modalSize}>
+          <View style={{top: Bordy.height*0.15, left: Bordy.width*0.275, width: Bordy.width *0.35, height: Bordy.height*0.3,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+            <View style={{borderTopLeftRadius:10,borderTopRightRadius:10,height:Bordy.height*0.3*0.25,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
+            <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{this.state.titleModalSize}</Text>
+            </View>
+            <View style={{height:Bordy.height*0.3*0.75,width:'100%',flexDirection:'row'}}>
+              <FlatList   data={this.state.DataSize}
+                renderItem={({ item, index }) =>
+                <TouchableOpacity  onPress={()=>this.CheckSize(item)}
+                  style={{width: '100%',justifyContent:'center',borderBottomWidth:0.5,paddingVertical:10,paddingHorizontal:8}}>
+                  <View style={{width:'100%',flexDirection: "row",alignItems:'center'}}>
+                    <Text style={{width:"80%",justifyContent:'center',textAlign:'left',fontSize:H3_FONT_SIZE*1.2,color: isColor==true?'#FFFFFF':'#000000'}} >{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPriceBefore : item.UnitPriceAfter, "")}/{item.UnitName}</Text>
+                    {checked == item.UnitName ?
+                    <Icon color={isColor==true?'#DAA520': '#009900'} name="check" type="entypo" style={{left: 2,fontSize: H1_FONT_SIZE*1.3,}}/>
+                    :null
+                  }
+                  </View>
+                </TouchableOpacity>}
+              />
+              {/* <CheckBox checked={checked ? true : false} onPress={()=> {this.setState({checked: !checked})}} textStyle={{fontSize:H3_FONT_SIZE,color:isColor == true ?'#ffffff' : '#000000'}} size={H2_FONT_SIZE} containerStyle={{width:'45%', backgroundColor:isColor == true ?'#333333' :'#fff'}} title={this.translate.Get('Có')}/>
+              <CheckBox checked={checked ? false : true} onPress={()=> {this.setState({checked: !checked})}} textStyle={{fontSize:H3_FONT_SIZE,color:isColor == true ?'#ffffff' : '#000000'}} size={H2_FONT_SIZE} containerStyle={{width:'45%', backgroundColor:isColor == true ?'#333333' : '#fff',}}  title={this.translate.Get('Không')}/> */}
+              
+            </View>
+          </View>
+        </Modal>
+          : null}
         <View style={{flexDirection: "row"}}>
           <View name='pbLeft' style={[{ backgroundColor: "#333D4C",width:pnLeft.width, flexDirection: "column",height: Bordy.height }]}>
             <View style={{ justifyContent: 'center', alignItems: 'center', height: Bordy.height/6, }}>
@@ -1447,7 +1541,7 @@ if (ProductChoise==null) {
         </View>
         {!this.state.isShowFormCard ? 
          //Bottonbar 
-          <Animated.View style={[styles.BottonMenu, { width:Center.width,height:Booton.height }]}>
+          <Animated.View style={[styles.BottonMenu, { width:Center.width+2,height:Booton.height }]}>
             {this.state.ShowFullCart ? 
               <View style={{ width: "100%", flexDirection: "row" }}>
                 <View style={{ flexDirection: "row",justifyContent: "center",alignItems: "center", width: (Center.width * 0.4)}}>                    
@@ -1506,6 +1600,8 @@ if (ProductChoise==null) {
             state={this.state}
             CartToggleHandle={(val) => this.CartToggleHandle(val)}
             translate={this.translate}
+            ticketId={this.state.table.TicketID}
+            BranchID={this.state.settings.I_BranchID}
             HandleQuantity={(item,OrddQuantity,isReplace,Json) => { this.HandleQuantity(item,OrddQuantity,isReplace) }}
             setState={(state) => this.setState(state)}
             settings={Config}

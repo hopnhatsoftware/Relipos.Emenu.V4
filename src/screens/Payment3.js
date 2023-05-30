@@ -1,18 +1,18 @@
 import React, { Component } from "react";
-import { TouchableOpacity, Dimensions, Image, ActivityIndicator, UIManager,  KeyboardAvoidingView, StyleSheet, Platform, Modal, Text, View, TextInput,Alert} from "react-native";
+import { TouchableOpacity, Dimensions, Image, ActivityIndicator, UIManager,  KeyboardAvoidingView, StyleSheet, Platform, Text, View, TextInput,Alert} from "react-native";
 import Constants from "expo-constants";
+import Modal from "react-native-modal";
 import { _retrieveData, _storeData, _remove } from "../services/storages";
 import { FlatList } from "react-native";
-import { Audio } from 'expo-av';
 import StepIndicator from 'react-native-step-indicator';
-import { LinearGradient } from 'expo-linear-gradient';
 import { ScannerQR, ScannerQRVip, _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor,} from "../components";
 import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, H1_FONT_SIZE,H2_FONT_SIZE,H3_FONT_SIZE,H4_FONT_SIZE,H5_FONT_SIZE} from "../config/constants";
 import translate from "../services/translate";
-import {getVipCardInfor,getQrCode,ApplyVipCard,ApplyVoucher,API_Print,getLinkQrBank,getPaymentAmount,getMasterData, CallServices} from "../services";
+import {getVipCardInfor,getQrCode,ApplyVipCard,ApplyVoucher,API_Print,getLinkQrBank,getPaymentAmount,getMasterData} from "../services";
 import { formatCurrency } from "../services/util";
 import colors from "../config/colors";
 import Question from "../components/Question";
+import { ScrollView } from "react-native";
 // Enable LayoutAnimation on Android
 UIManager.setLayoutAnimationEnabledExperimental &&
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -245,6 +245,7 @@ export default class Payment3 extends Component {
       ]);
     });  
   }
+  //Thông tin phiếu
   _getMasterData = async () => {
     try{
     let {Config,TicketDetail,Money,TicketPayment,SumVoucher,Ticket} = this.state;
@@ -276,6 +277,7 @@ export default class Payment3 extends Component {
       {text: this.translate.Get("AlertOK"), onPress: () => console.log('OK Pressed')},
     ]);
   }
+  //Danh sách món 
   renderOrdered= ({ item, Index }) => {
       return (
         <View style={{ width: '100%', flexDirection: "row"}}>
@@ -285,69 +287,6 @@ export default class Payment3 extends Component {
           </View>
       ); 
   };
-  onCallServices= async() => {
-    let { settings,table,user } = this.state;
- 
-    await CallServices(user.BranchId,table.TabId,table.TicketID,1,user.ObjId);
-  }
-  _onPlaybackStatusUpdate = playbackStatus => {
-    if (!playbackStatus.isLoaded) {
-     ;
-    } else {
-      if (playbackStatus.isPlaying) {
-        // Update your UI for the playing state
-      } else 
-      {
-        // Update your UI for the paused state
-      }
-      if (playbackStatus.isBuffering) {
-        // Update your UI for the buffering state
-      }
-      if (playbackStatus.didJustFinish) {
-        this.setState({ showCall:false })
-      }
-    }
-  };
-  _LoadSound= async () => {
-    try{
-      let { sound} = this.state;
-      if (sound==null) {
-      sound= new Audio.Sound();
-    await sound.loadAsync({uri:this.state.endpoint+ '/Resources/Sound/RingSton.mp3'});
-    await sound.setOnPlaybackStatusUpdate(this._onPlaybackStatusUpdate);
-    this.setState({ sound})
-    return sound;
-      }
-    }catch(ex){
-      console.log('_LoadSound Error :'+ex)
-      this.setState({ sound:null})
-    }
-    return null;
-  }
-  _HandleSound= async () => {
-    let { sound } = this.state;
-    try{
-      if (sound==null) 
-         sound = await this._LoadSound();
-    if (sound==null)
-         return;
-      if (this.state.showCall) 
-      {
-        await sound.stopAsync();
-        this.setState({ showCall: false });
-        return;
-      }  
-      else {
-        this.setState({ showCall: true });
-        await  sound.setPositionAsync(0);
-        await sound.playAsync();
-        await  this.onCallServices(); 
-      }
-    }catch(ex){
-    this.setState({ showCall:false })
-    console.log('_HandleSound Error :'+ex)
-    }
-  }
   onPressBack = () => {
     let {lockTable} = this.state;
     this.props.navigation.navigate('Payment2',{lockTable})
@@ -397,7 +336,6 @@ export default class Payment3 extends Component {
     this._getQrCode(this.state.NameE_wallet = 'MOMO')
   }
   _ShowTM = async (item) => {
-    console.log(item)
     this.setState({ isShowCard: false ,isShowE_wallet: false ,isShowCash:true, isShowVip:false,isShowBanking:false,modPayment:item });
   }
   onPressHome = async () => {
@@ -415,23 +353,18 @@ export default class Payment3 extends Component {
   onPressNext = async () => {
     let {lockTable,notification } = this.state;
     if (lockTable === true) {
-      notification = true
-      this.props.navigation.navigate("LogoutView", { lockTable , notification});
+      this.props.navigation.navigate("LogoutView", { lockTable , notification : true});
     }else{
-      // this.onPressHome();
-      notification = true
-      this.props.navigation.navigate("LogoutView", { lockTable , notification});
+      this.props.navigation.navigate("LogoutView", { lockTable , notification : true});
     }
   }
   /**
    * Xác nhận thanh toán in qua Services
+   * typeView == 1 (Yêu cầu thanh toán)
+   * typeView == 2 (Gọi nhân viên)
    */
   _AcceptPayment = async (Description,typeView) => {
     let{Ticket,user,ModalCallStaff} = this.state;
-    // console.log('AcceptPayment ----------')
-    // console.log('BranchId:',user.BranchId)
-    // console.log('TicketID',Ticket.TicketID)
-    // console.log(typeView,Description)
     this.setState({ isPostBack: false});
     if(typeView == 1){
       API_Print (user.BranchId, Ticket.TicketID,typeView, Description).then(res => {
@@ -484,19 +417,6 @@ export default class Payment3 extends Component {
 
 
   render() {
-    // if (!this.state.isPostBack) {
-    //   return (
-    //     <View style={[styles.pnbody, styles.horizontal]}>
-    //       <ActivityIndicator
-    //         size="large"
-    //         color="#0000ff"
-    //         onLayout={() => {
-    //           this.setState({ isPostBack: false });
-    //         }}
-    //       />
-    //     </View>
-    //   );
-    // }
     const labels = [this.translate.Get("Thông tin đơn hàng"),this.translate.Get("Xuất hóa đơn"),this.translate.Get("Thanh toán")];
     const {Money,isShowBarCode,isShowBarCodeVip,showCall,Vip,isShowE_wallet,isShowCash,isShowCard,isShowBanking,isShowVip,lockTable,isColor,ModalCallStaff,modPayment} = this.state;
     const customStyles = {
@@ -534,13 +454,12 @@ export default class Payment3 extends Component {
     return (
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.Container}>
         {ModalCallStaff ?
+        <ScrollView>
           <Modal
-          animationType='none'
-          transparent={true}
+          // onBackdropPress={() =>this.setModalCallStaff(!ModalCallStaff)}
+          isVisible={true}
           visible={ModalCallStaff}>
-          <View style={{flex:1,backgroundColor: 'black',opacity: 0.7,zIndex: 1}}>
-          </View>
-          <View style={{zIndex:2,top: Bordy.height*0.25, left: Bordy.width*0.325, width: Bordy.width *0.35, height: Bordy.height*0.35,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+          <View style={{zIndex:2,top: Bordy.height*0.15, left: Bordy.width*0.275, width: Bordy.width *0.35, height: Bordy.height*0.35,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
             <View style={{borderTopLeftRadius:10,borderTopRightRadius:10,height:Bordy.height*0.35*0.2,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
             <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{this.translate.Get("Gọi nhân viên")}</Text>
             </View>
@@ -554,8 +473,8 @@ export default class Payment3 extends Component {
             </View>
             <View style={{height: Bordy.height*0.35*0.42,justifyContent:'center',alignItems:'center'}}>
               <TextInput
-                  placeholder={this.translate.Get("Nhập ghi chú...")}
-                  placeholdermodPayment={isColor == true ? '#808080' : "#777777"}
+                  placeholder={this.translate.Get("Nhập yêu cầu...")}
+                  placeholderTextColor={isColor == true ? '#808080' : "#777777"}
                   value={this.state.Description}
                   onChangeText={(item) => this.setState({Description : item})}  
                   multiline={true} 
@@ -573,6 +492,7 @@ export default class Payment3 extends Component {
             </View>
           </View>
         </Modal>
+        </ScrollView>
           : null}
           {!this.state.isPostBack ?
           <View style={{height: Bordy.height,

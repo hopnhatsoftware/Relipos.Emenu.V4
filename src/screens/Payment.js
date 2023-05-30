@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { TouchableOpacity, Dimensions, Image, TouchableHighlight, ActivityIndicator, UIManager, ScrollView, KeyboardAvoidingView, StyleSheet, Platform, Text, View, TextInput,Alert,Modal} from "react-native";
+import { TouchableOpacity, Dimensions, Image, TouchableHighlight, ActivityIndicator, UIManager, ScrollView, KeyboardAvoidingView, StyleSheet, Platform, Text, View, TextInput,Alert} from "react-native";
 import { _retrieveData, _storeData, _remove } from "../services/storages";
+import Modal from "react-native-modal";
 import { FlatList } from "react-native";
 import { CheckBox } from "react-native-elements";
 import { AntDesign } from "@expo/vector-icons";
@@ -82,7 +83,6 @@ export default class Payment extends Component {
     this.setState({IsLoaded:true ,KeyCode:''});
     let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
     isColor = JSON.parse(isColor);
-    await this._LoadSound();
     this.setState({IsLoaded:true ,isColor});
     await this._setConfig();
     await this._getMasterData();
@@ -151,12 +151,6 @@ export default class Payment extends Component {
           </View>
       )
   };
-  onCallServices= async() => {
-    let { settings,table } = this.state;
-    let user = await _retrieveData('APP@USER', JSON.stringify({ObjId:-1}));
-      user = JSON.parse(user);
-    await CallServices(settings.I_BranchID,table.TabId,table.TicketID,1,user.ObjId);
-  }
   
 _setConfig = async () => {
   try{
@@ -189,64 +183,7 @@ static getDerivedStateFromProps = (props, state) => {
   // Return null if the state hasn't changed
   return null;
 }
-  _onPlaybackStatusUpdate = playbackStatus => {
-    if (!playbackStatus.isLoaded) {
-     ;
-    } else {
-      if (playbackStatus.isPlaying) {
-        // Update your UI for the playing state
-      } else 
-      {
-        // Update your UI for the paused state
-      }
-      if (playbackStatus.isBuffering) {
-        // Update your UI for the buffering state
-      }
-      if (playbackStatus.didJustFinish) {
-        this.setState({ showCall:false })
-      }
-    }
-  };
-  _LoadSound= async () => {
-    try{
-      let { sound} = this.state;
-      if (sound==null) {
-      sound= new Audio.Sound();
-    await sound.loadAsync({uri:this.state.endpoint+ '/Resources/Sound/RingSton.mp3'});
-    await sound.setOnPlaybackStatusUpdate(this._onPlaybackStatusUpdate);
-    this.setState({ sound})
-    return sound;
-      }
-    }catch(ex){
-      console.log('_LoadSound Error :'+ex)
-      this.setState({ sound:null})
-    }
-    return null;
-  }
-  _HandleSound= async () => {
-    let { sound } = this.state;
-    try{
-      if (sound==null) 
-         sound = await this._LoadSound();
-    if (sound==null)
-         return;
-      if (this.state.showCall) 
-      {
-        await sound.stopAsync();
-        this.setState({ showCall: false });
-        return;
-      }  
-      else {
-        this.setState({ showCall: true });
-        await  sound.setPositionAsync(0);
-        await sound.playAsync();
-        await  this.onCallServices(); 
-   }
-  }catch(ex){
-    this.setState({ showCall:false })
-   console.log('_HandleSound Error :'+ex)
-  }
-  }
+
   onPressBack = () => {
     let { lockTable } = this.state;
     if (lockTable == true) {
@@ -268,7 +205,6 @@ static getDerivedStateFromProps = (props, state) => {
     try{
     let a = Ticket;
     HandleTip( Ticket.TicketID, totalTip, Money.TkeIsInvoiceTip).then(res => {
-      console.log(res)
       if (res.Status === 1){
         _storeData('APP@BACKEND_Payment', JSON.stringify(a), () => {
           this.props.navigation.navigate('Payment2', { lockTable });
@@ -300,9 +236,6 @@ static getDerivedStateFromProps = (props, state) => {
 
   _AcceptPayment = async (Description,typeView) => {
     let{Ticket,settings,ModalCallStaff} = this.state;
-    // console.log('AcceptPayment ----------')
-    // console.log('BranchId:',user.BranchId)
-    // console.log('TicketID',Ticket.TicketID)
     API_Print (settings.I_BranchID, Ticket.TicketID,typeView, Description).then(res => {
       if (res.Status == 1){
         this.setModalCallStaff(!ModalCallStaff)
@@ -395,13 +328,12 @@ static getDerivedStateFromProps = (props, state) => {
     return (
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{height:Bordy.height,width:Bordy.width,justifyContent: "center",}}>
         {ModalCallStaff ?
+          <ScrollView>
           <Modal
-          animationType='none'
-          transparent={true}
+          // onBackdropPress={() => this.setModalCallStaff(!ModalCallStaff)}
+          isVisible={true}
           visible={ModalCallStaff}>
-          <View style={{flex:1,backgroundColor: 'black',opacity: 0.7,zIndex: 1}}>
-          </View>
-          <View style={{top: Bordy.height*0.25, left: Bordy.width*0.325, width: Bordy.width *0.35, height: Bordy.height*0.35,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+          <View style={{top: Bordy.height*0.15, left: Bordy.width*0.275, width: Bordy.width *0.35, height: Bordy.height*0.35,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
             <View style={{borderTopLeftRadius:10,borderTopRightRadius:10,height:Bordy.height*0.35*0.2,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
             <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{this.translate.Get("Gọi nhân viên")}</Text>
             </View>
@@ -415,7 +347,7 @@ static getDerivedStateFromProps = (props, state) => {
             </View>
             <View style={{height: Bordy.height*0.35*0.42,justifyContent:'center',alignItems:'center'}}>
               <TextInput
-                  placeholder={this.translate.Get("Nhập ghi chú...")}
+                  placeholder={this.translate.Get("Nhập yêu cầu...")}
                   placeholderTextColor={isColor == true ? '#808080' : "#777777"}
                   value={this.state.Description}
                   onChangeText={(item) => this.setState({Description : item})}  
@@ -434,6 +366,7 @@ static getDerivedStateFromProps = (props, state) => {
             </View>
           </View>
         </Modal>
+        </ScrollView>
           : null}
           {!this.state.isPostBack ?
           <View style={{height: Bordy.height,

@@ -1,14 +1,13 @@
 import React, { Component } from "react";
-import { TouchableOpacity, Dimensions, Image, ActivityIndicator, UIManager, ScrollView, KeyboardAvoidingView, StyleSheet, Platform, Text, View, TextInput,Alert,Modal} from "react-native";
+import { TouchableOpacity, Dimensions, Image, ActivityIndicator, UIManager, ScrollView, KeyboardAvoidingView, StyleSheet, Platform, Text, View, TextInput,Alert} from "react-native";
 import Constants from "expo-constants";
-import { Audio } from 'expo-av';
+import Modal from "react-native-modal";
 import { _retrieveData, _storeData, _remove } from "../services/storages";
 import StepIndicator from 'react-native-step-indicator';
-import { LinearGradient } from 'expo-linear-gradient';
 import { _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor,} from "../components";
 import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, H1_FONT_SIZE,H2_FONT_SIZE,H3_FONT_SIZE,H4_FONT_SIZE,H5_FONT_SIZE} from "../config/constants";
 import translate from "../services/translate";
-import {SearchTaxInfor,FlushInvoiceInfor, CallServices, getinvoiceInfor,API_Print } from "../services";
+import {SearchTaxInfor,FlushInvoiceInfor, getinvoiceInfor,API_Print } from "../services";
 import colors from "../config/colors";
 // Enable LayoutAnimation on Android
 UIManager.setLayoutAnimationEnabledExperimental &&
@@ -22,12 +21,6 @@ const Center = { width: Bordy.width - pnLeft.width, height: Bordy.height };
 const Header = { width: Center.width, height: Bordy.height * 0.085 };
 
 const Booton = { width: Center.width, height: Center.height * 0.07 };
-const ProductList = {
-  width: Center.width,
-  height: Center.height - Header.height - Booton.height,
-  ColumnNum: 2,
-  RowNum: 3,
-};
 export default class Payment2 extends Component {
   constructor(props) {
     super(props);
@@ -113,6 +106,8 @@ export default class Payment2 extends Component {
   }
     return true;
   };
+
+  //Load thông tin xuất hoá đơn (Nếu có)
   _getinvoiceInfor = async () => {
     let{Tax,Ticket} =  this.state;
     getinvoiceInfor(null, Ticket.TicketID, true).then(res => {
@@ -125,6 +120,8 @@ export default class Payment2 extends Component {
         this.setState({Tax});
       })  
   }
+
+  //Tìm thông tin theo mã số thuế (button)
   _SearchTaxInfor = async (item) => {
     let{Tax} =  this.state;
     if (Tax.TaxCode == '' || Tax.TaxCode == undefined) {
@@ -158,6 +155,7 @@ export default class Payment2 extends Component {
         ])
   })}
   }
+  //Tìm thông tin theo mã số thuế (onBlur)
   _SearchTaxInfor2 = async () => {
     let{Tax} =  this.state;
     if (Tax.TaxCode == '' || Tax.TaxCode == undefined) {
@@ -184,70 +182,7 @@ export default class Payment2 extends Component {
         this.setState({Tax});
       })  }
   }
-  onCallServices= async() => {
-    let { settings,table } = this.state;
-    let user = await _retrieveData('APP@USER', JSON.stringify({ObjId:-1}));
-      user = JSON.parse(user);
-    await CallServices(settings.I_BranchID,table.TabId,table.TicketID,1,user.ObjId);
-  }
-  _onPlaybackStatusUpdate = playbackStatus => {
-    if (!playbackStatus.isLoaded) {
-     ;
-    } else {
-      if (playbackStatus.isPlaying) {
-        // Update your UI for the playing state
-      } else 
-      {
-        // Update your UI for the paused state
-      }
-      if (playbackStatus.isBuffering) {
-        // Update your UI for the buffering state
-      }
-      if (playbackStatus.didJustFinish) {
-        this.setState({ showCall:false })
-      }
-    }
-  };
-  _LoadSound= async () => {
-    try{
-      let { sound} = this.state;
-      if (sound==null) {
-      sound= new Audio.Sound();
-    await sound.loadAsync({uri:this.state.endpoint+ '/Resources/Sound/RingSton.mp3'});
-    await sound.setOnPlaybackStatusUpdate(this._onPlaybackStatusUpdate);
-    this.setState({ sound})
-    return sound;
-      }
-    }catch(ex){
-      console.log('_LoadSound Error :'+ex)
-      this.setState({ sound:null})
-    }
-    return null;
-  }
-  _HandleSound= async () => {
-    let { sound } = this.state;
-    try{
-      if (sound==null) 
-         sound = await this._LoadSound();
-    if (sound==null)
-         return;
-      if (this.state.showCall) 
-      {
-        await sound.stopAsync();
-        this.setState({ showCall: false });
-        return;
-      }  
-      else {
-        this.setState({ showCall: true });
-        await  sound.setPositionAsync(0);
-        await sound.playAsync();
-        await  this.onCallServices(); 
-   }
-  }catch(ex){
-    this.setState({ showCall:false })
-   console.log('_HandleSound Error :'+ex)
-  }
-  }
+
   static getDerivedStateFromProps = (props, state) => {
     if (props.navigation.getParam('lockTable', state.lockTable) != state.lockTable) {
       return {
@@ -257,10 +192,12 @@ export default class Payment2 extends Component {
     // Return null if the state hasn't changed
     return null;
   }
+  
   onPressBack = () => {
     let {lockTable} = this.state;
     this.props.navigation.navigate('Payment',{lockTable})
   };
+
   onPressNext = () => {
     let { Ticket,lockTable} = this.state;
     let a = Ticket
@@ -268,6 +205,8 @@ export default class Payment2 extends Component {
         this.props.navigation.navigate('Payment3',{lockTable});
     });
   };
+
+  //Lưu thông tin hoá đơn
   _FlushInvoiceInfor = async () => {
     try{
     let{Ticket,Tax,lockTable} =  this.state;
@@ -300,11 +239,10 @@ export default class Payment2 extends Component {
   onPressHome = async () => {
     this.props.navigation.navigate("OrderView");
 };
-_AcceptPayment = async (Description,typeView) => {
+
+//Gọi nhân viên
+_AcceptCallStaff = async (Description,typeView) => {
   let{Ticket,settings,ModalCallStaff} = this.state;
-  // console.log('AcceptPayment ----------')
-  // console.log('BranchId:',user.BranchId)
-  // console.log('TicketID',Ticket.TicketID)
   API_Print (settings.I_BranchID, Ticket.TicketID,typeView, Description).then(res => {
     if (res.Status == 1){
       this.setModalCallStaff(!ModalCallStaff)
@@ -325,6 +263,7 @@ _AcceptPayment = async (Description,typeView) => {
     ]);
   }); 
 }
+//Mở modal gọi nhân viên
 setModalCallStaff = (visible) => {
   this.setState({ ModalCallStaff: visible });
 }
@@ -339,19 +278,6 @@ setModalCallStaff = (visible) => {
     if (this.state.showCall==undefined||this.state.showCall==null) {
       this.state.showCall=false;
     }
-    // if (!this.state.isPostBack) {
-    //   return (
-    //     <View style={styles.pnbody}>
-    //       <ActivityIndicator
-    //         size="large"
-    //         color="#0000ff"
-    //         onLayout={() => {
-    //           this.setState({ isPostBack: false });
-    //         }}
-    //       />
-    //     </View>
-    //   );
-    // }
     const labels = [this.translate.Get("Thông tin đơn hàng"),this.translate.Get("Xuất hóa đơn"),this.translate.Get("Thanh toán")];
     const { lockTable,isColor,ModalCallStaff} = this.state;
     const customStyles = {
@@ -383,13 +309,12 @@ setModalCallStaff = (visible) => {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={[styles.Container,{backgroundColor:isColor == true ? '#333333' : '#FFFFFF', }]}>
           {ModalCallStaff ?
+          <ScrollView>
           <Modal
-          animationType='none'
-          transparent={true}
+          // onBackdropPress={() =>this.setModalCallStaff(!ModalCallStaff)}
+          isVisible={true}
           visible={ModalCallStaff}>
-          <View style={{flex:1,backgroundColor: 'black',opacity: 0.7,zIndex: 1}}>
-          </View>
-          <View style={{top: Bordy.height*0.25, left: Bordy.width*0.325, width: Bordy.width *0.35, height: Bordy.height*0.35,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+          <View style={{top: Bordy.height*0.15, left: Bordy.width*0.275, width: Bordy.width *0.35, height: Bordy.height*0.35,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
             <View style={{borderTopLeftRadius:10,borderTopRightRadius:10,height:Bordy.height*0.35*0.2,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
             <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{this.translate.Get("Gọi nhân viên")}</Text>
             </View>
@@ -403,7 +328,7 @@ setModalCallStaff = (visible) => {
             </View>
             <View style={{height: Bordy.height*0.35*0.42,justifyContent:'center',alignItems:'center'}}>
               <TextInput
-                  placeholder={this.translate.Get("Nhập ghi chú...")}
+                  placeholder={this.translate.Get("Nhập yêu cầu...")}
                   placeholderTextColor={isColor == true ? '#808080' : "#777777"}
                   value={this.state.Description}
                   onChangeText={(item) => this.setState({Description : item})}  
@@ -416,12 +341,13 @@ setModalCallStaff = (visible) => {
               <TouchableOpacity onPress={() => this.setModalCallStaff(!ModalCallStaff)} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:'#af3037',justifyContent:'center',alignItems:'center'}}>
                 <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{this.translate.Get("Trở lại")}</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={()=>{this._AcceptPayment(this.state.Description,2)}} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:isColor == true ? '#DAA520' :'#009900',justifyContent:'center',alignItems:'center'}}>
+              <TouchableOpacity onPress={()=>{this._AcceptCallStaff(this.state.Description,2)}} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:isColor == true ? '#DAA520' :'#009900',justifyContent:'center',alignItems:'center'}}>
               <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{this.translate.Get('Xác nhận')}</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
+        </ScrollView>
           : null}
          {!this.state.isPostBack ?
           <View style={{height: Bordy.height,

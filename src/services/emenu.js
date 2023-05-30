@@ -296,7 +296,16 @@ export const Ticket_getById = async (TicketID) => {
   const URL = '/Ticket/getById';
   return await execFetch(URL, 'GET', { TicketID: TicketID });
 }
-
+export const getFromTicketInfor = async (TicketID) => {
+  const URL = '/CheckOrderView/getFromTicketInfor';
+  return await execFetch(URL, 'GET', { TicketID:TicketID});
+  
+}
+export const CheckProductManyPrice = async (PrdId,ReaId,BusinessType) => {
+  const culture = await _retrieveData('culture', 1);
+  const URL = '/OrderView/CheckProductManyPrice';
+  return await execFetch(URL, 'GET', { PrdId: PrdId, ReaId:ReaId,BusinessType:BusinessType,Culture:culture});
+}
 
 export const Ticket_Flush = async (settings, B_UseOrderDefault, sItemTable, group, users, TicketInfor) => {
   const culture = await _retrieveData('culture', 1);
@@ -328,7 +337,7 @@ export const Ticket_Flush = async (settings, B_UseOrderDefault, sItemTable, grou
   });
 }
 /**
- * Gọi hàm yêu cầu in thanh toán
+ * Gọi hàm yêu cầu in thanh toán 
  * @param {*} OrgId 
  * @param {*} TicketId 
  * @param {*} PrintType 

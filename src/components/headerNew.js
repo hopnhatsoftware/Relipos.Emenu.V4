@@ -1,6 +1,7 @@
 import React from "react";
-import {Modal,ActivityIndicator,FlatList, View, TouchableOpacity, TextInput, StyleSheet, Text,Image,Dimensions,Alert} from "react-native";
+import {ActivityIndicator,FlatList, View, TouchableOpacity, TextInput, StyleSheet, Text,Image,Dimensions,Alert} from "react-native";
 import colors from "../config/colors";
+import Modal from "react-native-modal";
 import { Button, Icon } from "react-native-elements";
 import Constants from "expo-constants";
 import {ITEM_FONT_SIZE, BUTTON_FONT_SIZE,H1_FONT_SIZE,H3_FONT_SIZE ,H2_FONT_SIZE,H4_FONT_SIZE} from "../config/constants";
@@ -8,6 +9,7 @@ import { Audio } from 'expo-av';
 import translate from '../services/translate';
 import {_retrieveData, _storeData } from "../services/storages";
 import {API_Print} from "../services";
+import { ScrollView } from "react-native-gesture-handler";
 const SCREEN_WIDTH = Dimensions.get("screen").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height; //- Constants.statusBarHeight;
 const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
@@ -42,15 +44,9 @@ export class _HeaderNew extends React.Component  {
     this.setState({IsLoaded:true ,isColor,settings,Config});
   };
   _AcceptPayment = async (Description,typeView) => {
-    try{
     let{ticketId}=this.props;
     let{settings,ModalCallStaff} = this.state;
-    // console.log('AcceptPayment ----------')
-    // console.log('BranchId:',user.BranchId)
-    // console.log('TicketID',Ticket.TicketID)
-
     API_Print (settings.I_BranchID, ticketId,typeView, Description).then(res => {
-      console.log('API_Print',res)
       if (res.Status == 1){
         this.setModalCallStaff(!ModalCallStaff)
         Alert.alert( 'thông báo',"Quý khách vui lòng đợi trong giây lát", [
@@ -60,14 +56,14 @@ export class _HeaderNew extends React.Component  {
           }
         ]);
       }
-    })}catch{(error) => {
-      Alert.alert( 'System Error',error, [
+    }).catch((error) => {
+      Question.alert( 'System Error',error, [
         {
           text: "OK", onPress: () => {
           }
         }
       ]);
-    }}; 
+    }); 
   }
   setModalCallStaff = (visible) => {
     this.setState({ ModalCallStaff: visible });
@@ -90,13 +86,12 @@ export class _HeaderNew extends React.Component  {
     return (
       <View style={[BookingsStyle.header,{ backgroundColor: backgroundColor, width: '100%', }]}>
         {ModalCallStaff ?
+        <ScrollView>
           <Modal
-          animationType='none'
-          transparent={true}
+          // onBackdropPress={() => this.setModalCallStaff(!ModalCallStaff)}
+          isVisible={true}
           visible={ModalCallStaff}>
-          <View style={{flex:1,backgroundColor: 'black',opacity: 0.7,zIndex: 1}}>
-          </View>
-          <View style={{top: Bordy.height*0.25, left: Bordy.width*0.325, width: Bordy.width *0.35, height: Bordy.height*0.35,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+          <View style={{top: Bordy.height*0.15, left: Bordy.width*0.275, width: Bordy.width *0.35, height: Bordy.height*0.35,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
             <View style={{borderTopLeftRadius:10,borderTopRightRadius:10,height:Bordy.height*0.35*0.2,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
             <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{translate.Get("Gọi nhân viên")}</Text>
             </View>
@@ -110,7 +105,7 @@ export class _HeaderNew extends React.Component  {
             </View>
             <View style={{height: Bordy.height*0.35*0.42,justifyContent:'center',alignItems:'center'}}>
               <TextInput
-                  placeholder={translate.Get("Nhập ghi chú...")}
+                  placeholder={translate.Get("Nhập yêu cầu...")}
                   placeholderTextColor={isColor == true ? '#808080' : "#777777"}
                   value={this.state.Description}
                   onChangeText={(item) => this.setState({Description : item})}  
@@ -130,15 +125,14 @@ export class _HeaderNew extends React.Component  {
             </View>
           </View>
         </Modal>
+        </ScrollView>
           : null}
         {modalLanguage ?
           <Modal
-          animationType='fade'
-          transparent={true}
+          onBackdropPress={() => this.setModalLanguage(!modalLanguage)}
+          isVisible={true}
           visible={modalLanguage}>
-          <TouchableOpacity style={{height: Bordy.height,width: Bordy.width,backgroundColor: 'black',opacity: 0.7,zIndex: 1}} onPress={() => this.setModalLanguage(!modalLanguage)}>
-          </TouchableOpacity>
-          <View style={{top: Bordy.height*0.3, left: Bordy.width*0.32, width: Bordy.width *0.36, height: Bordy.height*0.4, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+          <View style={{top: Bordy.height*0.2, left: Bordy.width*0.28, width: Bordy.width *0.36, height: Bordy.height*0.4, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
             <View style={{height:Bordy.height*0.4*0.15,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'space-between',flexDirection:'row',alignItems:'center'}}>
             <TouchableOpacity><Icon name="close" iconStyle={{ color: isColor==true?'#111111':'#257DBC', left:5 }} fontSize={H1_FONT_SIZE} type="antdesign"/></TouchableOpacity>
             <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold"}}>{translate.Get('language')}</Text>

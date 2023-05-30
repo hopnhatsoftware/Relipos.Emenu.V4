@@ -134,7 +134,7 @@ export default class SetMenuView extends Component {
       StatusBar.setHidden(true);
       let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
     isColor = JSON.parse(isColor);
-    that.setState({isColor})
+    this.setState({isColor})
       let state = await _retrieveData("SetMenuView@State", '{}');
       if (state=='{}') {
         state =this.state;
@@ -201,7 +201,7 @@ export default class SetMenuView extends Component {
         lStyle.PnCenter.ItemHeight= lStyle.PnCenter.Height/lStyle.PnCenter.RowNumer;
         state.lStyle=lStyle;
       
-      that.setState(state,);
+      this.setState(state,);
       
       await this.fetchData(); 
     } catch (ex) {
@@ -428,10 +428,9 @@ export default class SetMenuView extends Component {
   };
   changeLanguage = async lang => {
     if (this.state.language != lang) {
-      let that = this;
       await _storeData("culture", lang.toString(), async () => {
-        that.translate = await this.translate.loadLang();
-        that.setState({ language: lang }, () => that.fetchData());
+        this.translate = await this.translate.loadLang();
+        this.setState({ language: lang }, () => this.fetchData());
       });
     }
   };
@@ -489,7 +488,6 @@ export default class SetMenuView extends Component {
       CartInfor.items[CartIndex] = CartItem= await this._CaculatorMaster(ProductSet);
       let TotalAmount = 0, TotalQuantity = 0;
       CartInfor.items.forEach((Item, index) => {
-        
         TotalAmount += Item.TkdTotalAmount;
         TotalQuantity += ProductSet.OrddQuantity;
       });
@@ -561,7 +559,7 @@ export default class SetMenuView extends Component {
     });
   };
   RenderRowDetail = ({ item, index }) => {
-    let{isColor}= that.state;
+    let{isColor}= this.state;
     return (
       <View style={{ width: '100%',paddingTop:5,paddingBottom:5, flexDirection: "row", borderBottomWidth: 1, borderBottomEndRadius: 1,backgroundColor:isColor == true ? "#444444" : "#FFFFFF",borderBottomColor: colors.grey4}}>
         <View key={index} style={{ width: '10%', justifyContent: 'center', alignItems: 'center', }}>
@@ -609,7 +607,7 @@ export default class SetMenuView extends Component {
   };
   renderProduct = ({ item, index }) => {
     let { lStyle,Config } = this.state;
-    let { isColor } = that.state;
+    let { isColor } = this.state;
     let width=lStyle.PnCenter.ItemWidth;
     let LeftWidth=lStyle.PnCenter.ItemWidth*0.6;
     let RightWidth=lStyle.PnCenter.ItemWidth*0.4;
@@ -706,7 +704,7 @@ export default class SetMenuView extends Component {
   };
   render() {
     const { ProductGroupList, ChoiceSet, CategorySelectedIndex, ProductSet, IsPostBack,lStyle,language } = this.state;
-    const{isColor}= that.state;
+    const{isColor}= this.state;
     if (!IsPostBack) {
       return (
         <View style={[styles.container, styles.horizontal]}  >

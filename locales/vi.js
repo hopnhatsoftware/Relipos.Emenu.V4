@@ -9,7 +9,7 @@ export default en={
     "Khách hàng" : "Khách hàng",
     "Ghi chú" : "Ghi chú",
     "Gọi thanh toán":"Gọi thanh toán",
-    "Nhập ghi chú...":"Nhập ghi chú...",
+    "Nhập yêu cầu...":"Nhập yêu cầu...",
     "Tên khách hàng":"Tên khách hàng",
     "Số điện thoại":"Số điện thoại",
     "Ngày sinh":"Ngày sinh",

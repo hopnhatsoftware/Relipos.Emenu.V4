@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Alert,TouchableOpacity,Dimensions,Image,ActivityIndicator,KeyboardAvoidingView,StyleSheet,Text,View,StatusBar, Platform, Keyboard,Modal,FlatList,Switch} from 'react-native';
-import * as Network from 'expo-network';
+import { Alert,TouchableOpacity,Dimensions,Image,ActivityIndicator,KeyboardAvoidingView,StyleSheet,Text,View,StatusBar, Platform, Keyboard,FlatList,Switch} from 'react-native';
+import Modal from "react-native-modal";
 import { LinearGradient } from 'expo-linear-gradient'
 import { AntDesign } from '@expo/vector-icons';
 import Constants from 'expo-constants';
@@ -16,7 +16,7 @@ import { setCustomText } from 'react-native-global-props';
 import Question from '../components/Question';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
-const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
+// const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
 export default class LoginView extends Component {
 
   login_button_text = 'login';
@@ -57,7 +57,6 @@ export default class LoginView extends Component {
 
   async componentDidMount()  {
     try{
-
     let { username } = this.state;
     let settings = await _retrieveData('settings', JSON.stringify({}));
     let user = await _retrieveData('APP@USER', JSON.stringify({}));
@@ -338,27 +337,25 @@ _CombackView = () => {
   render = () => {
     const { manifest } = Constants;
     const {endpoint,  isLoading, fontLoaded,  password,  passwordValid,  username,  lockTable,  secureTextEntry,  usernameValid,listLanguage,modalVisible,languageImg,isColor } = this.state;
-let ImageWidth=Bordy.width*0.12
+let ImageWidth=SCREEN_WIDTH*0.12
 
     if (!fontLoaded) {
       return (
-        <ActivityIndicator style={{ marginTop: Bordy.height / 2 - 20 }} size="large" color="red"></ActivityIndicator>);
+        <ActivityIndicator style={{ marginTop: SCREEN_HEIGHT / 2 - 20 }} size="large" color="red"></ActivityIndicator>);
     }
     return (
       <View style={[styles.container,{backgroundColor:isColor == true ?'#0D0D0D' : '#333D4C',}]}>
          {this.state.notification ?
-            <View style={{position:'absolute', top:'5%', width: Bordy.width * 0.55, justifyContent:'center',alignItems:'center'}} >
+            <View style={{position:'absolute', top:'5%', width: SCREEN_WIDTH * 0.55, justifyContent:'center',alignItems:'center'}} >
               <Text style={{fontSize:H1_FONT_SIZE*1.2, color:'#fff',textAlign:'center'}}>{this.translate.Get("Quý khách vui lòng đợi nhân viên xác nhận thanh toán")}</Text>
             </View>
             :null}
         {modalVisible ?
           <Modal
-          animationType='fade'
-          transparent={true}
+          onBackdropPress={() => this.setModalVisible(!modalVisible)}
+          isVisible={true}
           visible={modalVisible}>
-          <TouchableOpacity style={{height: Bordy.height,width: Bordy.width,backgroundColor: 'black',opacity: 0.5,zIndex: 1}} onPress={() => this.setModalVisible(!modalVisible)}>
-          </TouchableOpacity>
-          <View style={{top: Bordy.height*0.3, left: Bordy.width*0.32, width: Bordy.width *0.36, height: Bordy.height*0.4, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+          <View style={{ Top: SCREEN_HEIGHT *0.32, left: SCREEN_WIDTH*0.25,width:SCREEN_WIDTH*0.4,height:SCREEN_HEIGHT*0.34, backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
           <View style={{height:'15%',width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',borderBottomWidth:0.5,justifyContent:'space-between',flexDirection:'row',alignItems:'center',}}>
             <TouchableOpacity><AntDesign name="close" style={{ color: isColor==true?'#111111':'#257DBC', left:5 }} size={H1_FONT_SIZE} /></TouchableOpacity>
             <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold"}}>{this.translate.Get('language')}</Text>
@@ -481,6 +478,7 @@ let ImageWidth=Bordy.width*0.12
                 </View>
                 <View style={{ flexDirection: "row", alignContent: "center", paddingTop: ITEM_FONT_SIZE / 2, paddingBottom: ITEM_FONT_SIZE / 2, }}>
                 {this.has_back_button ? 
+                !this.state.notification ?
                 <View style={{ paddingRight: ITEM_FONT_SIZE / 3 }}>
                   <Button
                     con={{name:"input", color:"white"}}
@@ -494,6 +492,7 @@ let ImageWidth=Bordy.width*0.12
                     titleStyle={[styles.buttonText,{color:isColor == true? 'black':'white'}]}
                     disabled={isLoading}
                   /></View> 
+                   : null
                    : null}
                   <View style={{}}><Button buttonStyle={[styles.button,{backgroundColor:isColor == true? '#DAA520': '#0176cd'}]}  title={this.translate.Get(this.login_button_text)}
                     onPress={() => {
@@ -524,7 +523,7 @@ let ImageWidth=Bordy.width*0.12
             }
           }
           }>
-             <Image resizeMode="contain" style={{ width: Bordy.width * 0.8, maxWidth: 442 }} 
+             <Image resizeMode="contain" style={{ width: SCREEN_WIDTH * 0.8, maxWidth: 442 }} 
             source={require('../../assets/icons/relipos_copyright_white_2x.png')}
              ></Image> 
              
@@ -544,7 +543,7 @@ let ImageWidth=Bordy.width*0.12
            <View style={{ width:'100%',alignItems:'center'}}>
              <Text style={{ color: colors.white }}>V.{manifest.version} _ {Platform.OS == 'ios' ?manifest.ios.buildNumber :manifest.android.versionCode}</Text></View>
           </View> 
-          <View position='absolute'  style={{width:Bordy.width * 0.2, alignItems:'baseline',top:5,right:0 ,flexDirection:'row', justifyContent:'center', alignItems:'center'}}>
+          <View position='absolute'  style={{width:SCREEN_WIDTH * 0.2, alignItems:'baseline',top:5,right:0 ,flexDirection:'row', justifyContent:'center', alignItems:'center'}}>
           <Text style={{fontSize:H2FontSize, color:'white',paddingRight:10}}>{this.translate.Get("Chế độ tối")}:</Text>
           <Switch
         trackColor={{false: '#767577', true: '81b0ff'}}
@@ -585,7 +584,7 @@ export const FormInput = props => {
 
 const styles = StyleSheet.create({
   container: {
-    height:Bordy.height,width:Bordy.width,
+    height:SCREEN_HEIGHT,width:SCREEN_WIDTH,
     
     alignItems: 'center',
     justifyContent: 'space-around',
@@ -611,7 +610,7 @@ const styles = StyleSheet.create({
   userTypesContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: Bordy.width,
+    width: SCREEN_WIDTH,
     alignItems: 'center',
   },
   inputContainer: {
@@ -639,7 +638,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: 'flex-end',
     // marginBottom:30,
-    width: Bordy.width
+    width: SCREEN_WIDTH
   },
   buttonText: {
     alignItems: "center",
@@ -683,7 +682,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 3,
     
     // borderBottomColor: '#0C629F',
-    width: Bordy.width * 0.55,
+    width: SCREEN_WIDTH * 0.55,
   },
   BorderFormLogin: {
     paddingBottom: ITEM_FONT_SIZE / 2,
@@ -692,8 +691,8 @@ const styles = StyleSheet.create({
     paddingTop: ITEM_FONT_SIZE,
   },
   item_view_text: {
-    height: Bordy.height + Constants.statusBarHeight,
-    width: Bordy.width,
+    height: SCREEN_HEIGHT + Constants.statusBarHeight,
+    width: SCREEN_WIDTH,
     position: 'absolute',
     flexDirection: 'column',
     alignItems: 'center',

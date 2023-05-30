@@ -81,14 +81,17 @@ export default class LogoutView extends LoginView {
       })  
   }
   static getDerivedStateFromProps = (props, state) => {
-    if (props.navigation.getParam('settings', state.settings) != state.settings || 
-    props.navigation.getParam('lockTable', state.lockTable) != state.lockTable) {
+    if (props.navigation.getParam('settings', state.settings) != state.settings) {
       return {
         settings: props.navigation.getParam('settings', state.settings),
-        lockTable: props.navigation.getParam('lockTable', state.lockTable),
-        notification: props.navigation.getParam('notification', state.notification),
         secretPassword: ''
       };
+    }
+    else{
+      return{
+        lockTable: props.navigation.getParam('lockTable', state.lockTable),
+        notification: props.navigation.getParam('notification', state.notification),
+      }
     }
     // Return null if the state hasn't changed
     return null;
