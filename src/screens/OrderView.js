@@ -163,7 +163,7 @@ export default class OrderView extends Component {
   onPressBack = async() => {
     let { lockTable,table } = this.state;
     if (lockTable == true) {
-        this.props.navigation.navigate("LogoutView", { lockTable });
+        this.props.navigation.navigate("LogoutView", { lockTable,OrderId: table.OrderId});
     }else{
     //console.log('table :'+JSON.stringify(table));
     /*Cancel Order */
@@ -334,7 +334,7 @@ onCallServices= async() => {
   };
   _BindingMeta= async () => {
     try{
-    let {  SelectedGroupIndex, ProductGroupList,OrdPlatform,table,Config} = this.state;
+    let {  SelectedGroupIndex, ProductGroupList,OrdPlatform,table,Config,} = this.state;
          if (!("TicketId" in table)) {
           table = await _retrieveData("APP@TABLE", JSON.stringify({}));
           table = JSON.parse(table);
@@ -342,27 +342,30 @@ onCallServices= async() => {
         if ("TicketID" in table && table.TicketID > 0) {
           this.setState( { isShowMash:true});
           CheckAndGetOrder(table, OrdPlatform).then(res => {
-       
-            table.OrderId = res.Data;
-            _storeData("APP@TABLE", JSON.stringify(table), () => {
-              GetViewGroup(Config, table).then(res => {
-                if (res.Data.Table.length > 0) {
-                  ProductGroupList = res.Data.Table;
-                  SelectedGroupIndex = SelectedGroupIndex < 0 ? 0 : SelectedGroupIndex;
-                  this.setState( { table,isShowMash:false,   ProductGroupList,  SelectedGroupIndex },
-                    () => {  this._loadChildGroups(SelectedGroupIndex);  }
-                  );
+       if(res.Status == 1){
+        table.OrderId = res.Data;
+        _storeData("APP@TABLE", JSON.stringify(table), () => {
+          GetViewGroup(Config, table).then(res => {
+            if (res.Data.Table.length > 0) {
+              ProductGroupList = res.Data.Table;
+              SelectedGroupIndex = SelectedGroupIndex < 0 ? 0 : SelectedGroupIndex;
+              this.setState( { table,isShowMash:false,   ProductGroupList,  SelectedGroupIndex },
+                () => {  this._loadChildGroups(SelectedGroupIndex);  }
+              );
+            }
+          }).catch(error => {
+            Question.alert('System Error', error,
+              [{
+                  text: "OK",
+                  onPress: () => {  this.setState( { isShowMash:false});  }
                 }
-              }).catch(error => {
-                Question.alert('System Error', error,
-                  [{
-                      text: "OK",
-                      onPress: () => {  this.setState( { isShowMash:false});  }
-                    }
-                  ]
-                );
-              });
-            });
+              ]
+            );
+          });
+        });
+       }else{
+        this.props.navigation.navigate('TableView')
+       }
           }).catch(error => {
             Question.alert('System Error', error,
             [{
@@ -572,6 +575,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
         await _remove("APP@CART", async () => {
           await this.setState({ CartInfor: {  TotalQuantity: 0, TotalAmount: 0, ItemAmount:0, items: [], } }, async () => {
             await CheckAndGetOrder(table, OrdPlatform).then(async res => {
+       console.log('OrderId mới:',res.Data);
               table.OrderId = res.Data;
               await _storeData("APP@TABLE", JSON.stringify(table), async () => {
                 _storeData('APP@TimeToNextBooking', JSON.stringify(new Date().getTime()), async () => {

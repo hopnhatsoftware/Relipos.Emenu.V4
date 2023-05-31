@@ -34,6 +34,7 @@ export default class LogoutView extends LoginView {
       notification :false,
       language: 1,
       settings: {},
+      OrderId:'',
       firstTouch: '',
       lockTable: false,
       isWorking: false,
@@ -91,6 +92,7 @@ export default class LogoutView extends LoginView {
       return{
         lockTable: props.navigation.getParam('lockTable', state.lockTable),
         notification: props.navigation.getParam('notification', state.notification),
+        OrderId: props.navigation.getParam('OrderId', state.OrderId),
       }
     }
     // Return null if the state hasn't changed

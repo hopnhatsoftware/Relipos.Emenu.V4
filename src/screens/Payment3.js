@@ -8,7 +8,7 @@ import StepIndicator from 'react-native-step-indicator';
 import { ScannerQR, ScannerQRVip, _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor,} from "../components";
 import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, H1_FONT_SIZE,H2_FONT_SIZE,H3_FONT_SIZE,H4_FONT_SIZE,H5_FONT_SIZE} from "../config/constants";
 import translate from "../services/translate";
-import {getVipCardInfor,getQrCode,ApplyVipCard,ApplyVoucher,API_Print,getLinkQrBank,getPaymentAmount,getMasterData} from "../services";
+import {getVipCardInfor,getQrCode,ApplyVipCard,ApplyVoucher,API_Print,getLinkQrBank,getPaymentAmount,getMasterData,CancelOrder} from "../services";
 import { formatCurrency } from "../services/util";
 import colors from "../config/colors";
 import Question from "../components/Question";
@@ -351,7 +351,8 @@ export default class Payment3 extends Component {
     return null;
   }
   onPressNext = async () => {
-    let {lockTable,notification } = this.state;
+    let {lockTable,notification,Ticket } = this.state;
+    await CancelOrder(table.OrderId);
     if (lockTable === true) {
       this.props.navigation.navigate("LogoutView", { lockTable , notification : true});
     }else{

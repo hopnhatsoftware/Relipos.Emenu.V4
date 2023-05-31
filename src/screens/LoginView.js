@@ -5,7 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { AntDesign } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import Icon from '@expo/vector-icons/Entypo'
-import { login, CheckCasherIn,getLanguage } from '../services';
+import { login, CheckCasherIn,getLanguage,CancelOrder} from '../services';
 import { _retrieveData, _storeData, _remove } from '../services/storages';
 import { cacheFonts } from "../helpers/AssetsCaching";
 import { Input, Button } from 'react-native-elements';
@@ -30,6 +30,7 @@ export default class LoginView extends Component {
       branch: '',
       username: '',
       password: '',
+      OrderId:'',
       secretPassword: '',
       isShowPassword: false,
       branchesList: [],
@@ -152,7 +153,7 @@ export default class LoginView extends Component {
     setCustomText(customTextProps)
   }
   _LoginSucess = async (user,Config,JwtToken) => { 
-  let { password, settings } = this.state;
+  let { password, settings ,OrderId} = this.state;
   user.PassWord = password;
   user.BranchId = Config.I_BranchId;
   _storeData('APP@USER', JSON.stringify(user), () => {
@@ -162,6 +163,9 @@ export default class LoginView extends Component {
         
             if (res.Status == 1) 
             {
+                if(OrderId!= ''||OrderId!=undefined){
+                CancelOrder(OrderId);
+                }
               this.setState({ isLoading: false, isWorking: false, }, () => {
                   this.props.navigation.navigate("TableView", { settings, user });
               });
