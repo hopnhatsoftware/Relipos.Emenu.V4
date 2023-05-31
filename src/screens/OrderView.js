@@ -1,6 +1,6 @@
 /*Màn hình chọn món */
 import React, { Component } from "react";
-import {TouchableOpacity,Dimensions,Image,TouchableHighlight,ActivityIndicator, UIManager,StatusBar,ImageBackground,Keyboard,StyleSheet,Platform,Animated,Easing,Text,View,
+import {TouchableOpacity,Dimensions,Image,TouchableHighlight,ActivityIndicator, UIManager,StatusBar,ImageBackground,Keyboard,StyleSheet,VirtualizedList,Platform,Animated,Easing,Text,View,
   TextInput,ScrollView} from "react-native";
 import * as Font from "expo-font";
 import Modal from "react-native-modal";
@@ -30,7 +30,7 @@ const Center={width:Bordy.width-pnLeft.width, height:Bordy.height};
 const Header={width:Center.width,height:Bordy.height* 0.085};
 
 const Booton={width:Center.width,height:Center.height* 0.07};
-const ProductList={width:Center.width,height:Center.height-Header.height-Booton.height,ColumnNum:2,RowNum:3}
+const ProductList={width:Center.width,height:Center.height-Header.height-Booton.height,ColumnNum:3,RowNum:3}
 export default class OrderView extends Component {
   constructor(props) {
     super(props);
@@ -66,6 +66,9 @@ export default class OrderView extends Component {
       PrdChildGroups: [],
       SelectedChildGroupIndex: -1,
       Products: [],
+      Products2: [{
+        PrdName:''
+      }],
       ProductsOrdered: [],
       isShowMash: false,
       modalSize : false,
@@ -146,7 +149,6 @@ export default class OrderView extends Component {
     //  this.interval = setInterval(() => {
     //    this.setState({ TimeToNextBooking: this.state.TimeToNextBooking - 1 });
     //  }, 1000);
-   // console.log(' OrderView componentDidMount CartInfor:' + JSON.stringify(state.CartInfor));
   } catch (ex) {
     this.setState({ isPostBack: true,});
     console.log('OrderView componentDidMount Error:' + ex);  
@@ -238,8 +240,9 @@ onCallServices= async() => {
     await getProductByGroup(Config,settings, table.TicketID,table.AreaID, group.PrgId, keysearch,language).then(res => {
       if ("Table" in res.Data) {
         let Products = res.Data.Table;
+        let Products2 = res.Data.Table1;
         let ProductImagePrefix = res.Data1;
-        this.setState({ Products, ProductImagePrefix, isShowMash: false });
+        this.setState({ Products,Products2, ProductImagePrefix, isShowMash: false });
       }
     });
   };
@@ -677,10 +680,6 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
    if (CartInfor.items&&CartInfor.items.length>0) 
     CartInfor.items.forEach((item, index) => {
      let{Master}=  this._CaculatorMaster(item);
-       // console.log("item.TkdTotalAmount:"+item.TkdTotalAmount);
-        // TotalAmount+=Master.UnitPriceBefore*Master.OrddQuantity ;
-        // ItemAmount+=Master.UnitPriceAfter*Master.OrddQuantity;
-        // console.log(TotalAmount,ItemAmount)
         TotalAmount+=Master.TkdTotalAmount;
         ItemAmount+=Master.TkdItemAmount;
         //console.log("CaculatorCardInfor TkdTotalAmount itembf"+result.Master.TkdTotalAmount );
@@ -716,7 +715,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
     CartInfor.items.forEach((product, index) => {
       if (!('Json' in product) )
              product.Json ='';
-      if (product.PrdId == item.PrdId&&(Json==null|| product.Json==Json)) 
+      if (product.PrdId == item.PrdId&&(product.UnitId == item.UnitId&&(Json==null|| product.Json==Json)))
       {
         if (CartFilter.FirstItem==null) {
           CartFilter.FirstItem = product;
@@ -1238,10 +1237,8 @@ if (ProductChoise==null) {
     this.setState({ modalSize: visible });
   }
   CheckSize = (item) =>{
-    let{CartInfor,test} = this.state;
     this.HandleQuantity(item,1,false);
     this.setState({checked:item.UnitName,modalSize:false,test:item.PrdId})
-    // console.log(CartInfor.findIndex(item.UnitId));
   }
   _CheckProductManyPrice =(item)=>{
     let{table,DataSize,modalSize,checked}= this.state;
@@ -1264,97 +1261,41 @@ if (ProductChoise==null) {
     getFromTicketInfor(table.TicketID).then(res => {
     })
   }
-  renderProduct = ({ item, index }) => {
-    let { Config,isColor,modalSize } = this.state;
-    let iWith=(ProductList.width/ProductList.ColumnNum);
-    let iHeight=iWith*3/6;
+  GetSize = (ProductItem) => {
+    try{
+    let {Products2}= this.state;
+    let prdPrices=[];
+    // Products2.forEach((item, index) => {
+    //   if (ProductItem.PrdId== item.PrdId){
+    //     item.PrdName=ProductItem.PrdName;
+    //   prdPrices.push(item);
+    //   }
+    // });
+    // return Products2;
+    const Products3 = Products2.filter((item) => item.PrdId == ProductItem.PrdId);
+    Products3.forEach((item, index) => {
+      item.PrdName=ProductItem.PrdName;
+      item.PrdNameUi=ProductItem.PrdNameUi;
+      prdPrices.push(item);
+    });
+    return Products3;
+    }catch{
+    }
+  }
+  renderSize = ({ item, index }) => {
+    let{isColor} = this.state;
     let {CartFilter}= this._getCartItems(item,null);
     item.OrddQuantity=CartFilter.TotalQuantity;
-    if(item.OrddQuantity>0 && item.UnitId != CartFilter.FirstItem.UnitId){
-    item.UnitPrice = CartFilter.FirstItem.UnitPriceBefore;
-    item.UnitName = CartFilter.FirstItem.UnitName ;
-    item.UnitId = CartFilter.FirstItem.UnitId ;
-    }
-    this.state.isRenderProduct=true;
     return (
-      <TouchableHighlight   style={ { borderBottomWidth: 1,borderColor: colors.grey2,width:iWith,height: iHeight,marginBottom:2 }}>
-        <View style={{ flexDirection: "row", flexWrap: "wrap", width: "100%", height: '100%' }}>
-          <View style={{ width: "60%", height: '100%' }}>
-            {item.isSoldout ?
-            <View style={{position:'absolute',width: "100%", height: '100%',zIndex:99,backgroundColor:'black',opacity: 0.7,justifyContent:'center' }}>
-              <View style={{transform: [{rotate: '-30deg'}],alignItems:'center'}}>
-                <Text style={{fontSize: H1_FONT_SIZE*1.5, color:'#FF0000',fontFamily: "RobotoBold",}}>{this.translate.Get("Hết hàng")}</Text>
-              </View>
-            </View>
-            : null}
-            <TouchableOpacity name='dvImage' style={{ flexDirection: "row", width: '100%', height: '100%' }}
-              onPress={() =>
-              { 
-                this._ShowFullImage(item,true);
-            }}> 
-              <ImageBackground  resizeMode='contain'
-                source={ item.PrdImageUrl ? {uri: this.state.endpoint + "/Resources/Images/Product/" + item.PrdImageUrl
-                  }: require("../../assets/images/NoImage_trans-04.png")
-                }
-                style={[{ width: '100%', height: '100%', backgroundColor: colors.grey1 }]} >
-                {item.ResName && item.ResName == 'HOT' ? 
-                  <View style={{ position: "absolute", paddingTop:10,right:10, width: '20%'}}>
-                    <Image resizeMode="contain" source={require('../../assets/icons/IconHot-09.png')}
-                      style={{ width: H1_FONT_SIZE*1.6, height: H1_FONT_SIZE*1.6,}} />
+      <View style={{ flexDirection: "row",height:H2FontSize,marginTop:5, width: "100%"}}  >
+                  <View style={{width: "50%",height:'100%',justifyContent: 'center'}}>
+                  <Text style={{fontStyle:'italic',color:isColor == true ?'#FFFFFF' : "#af3037",fontFamily:'RobotoBold',marginLeft:5,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left'}}>
+             {formatCurrency(item.UnitPrice, "")}/{item.UnitName} 
+                </Text>
                   </View>
-                : item.ResName && item.ResName == 'NEW' ?
-                  <View style={{  position: "absolute", paddingTop: 10, right: 10,width: '20%' }}>
-                    <Image resizeMode="contain" source={require('../../assets/icons/IconNew-09.png')}
-                      style={{width: H1_FONT_SIZE*1.6, height: H1_FONT_SIZE*1.6, }}/>
-                  </View>
-                  : item.ResName && item.ResName == 'SALE' ?
-                  <View style={{  position: "absolute", paddingTop: 10, right: 10,width: '20%' }}>
-                    <Image resizeMode="contain" source={require('../../assets/icons/IconSale.png')}
-                      style={{width: H1_FONT_SIZE*1.6, height: H1_FONT_SIZE*1.6, }}/>
-                  </View>
-                  : null} 
-                {/* <View style={{ position: "absolute", paddingTop: (iHeight-36)/2, right: -15 }}>
-                  <Icon  name="caretleft" type="antdesign" iconStyle={{ justifyContent: "space-between", color: "#EEEEEE", fontSize: 36 }} />
-                </View> */}
-              </ImageBackground>
-            </TouchableOpacity>
-          </View> 
-          <View style={{ flexDirection: "column", flexWrap: "wrap", width: "40%", height: '100%',paddingLeft:5,paddingRight:5,backgroundColor: isColor == true ? '#48515E' : "#EEEEEE" }}>
-          <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:'100%'}}>
-             {Config.B_ViewProductNo?
-               <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:iHeight-(H2FontSize*1.5+10)}}>
-              <View name='pnProductNo' style={{width: '100%',height:H3FontSize*1.5 ,marginTop:5 }}>
-                <Text style={{ color: isColor == true ? '#FFFFFF' : "#0d65cd", textAlign: 'center', width: '95%',fontSize: H3FontSize, fontFamily: "RobotoBold"}} numberOfLines={2}> 
-                  {item.PrdNo}
-                </Text>
-              </View>
-              <View name='pnProductName' style={{width: '100%',paddingTop:2 }}>
-                <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H4FontSize,flexWrap:"wrap"}} numberOfLines={5}>
-                  {item.PrdNameUi}
-                </Text>
-                <Text style={{fontStyle:'italic',color: isColor == true ?'#FFFFFF' : "#af3037",fontFamily:'RobotoBold',marginLeft:7,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left',marginTop:3}}>
-              {this.translate.Get("Giá")}:{" "}{formatCurrency(Config.B_ViewUnitPriceBefor  ? item.UnitPrice: item.UnitPriceAfter, "")} 
-                </Text>
-              </View>
-              </View>
-              :
-              <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:iHeight-(H2FontSize*1.5+10)}}>
-            <View name='pnProductName' style={{width: '100%',marginTop:5}}>
-              <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H3FontSize,fontWeight:'bold',flexWrap:"wrap"}} numberOfLines={5}>
-                {item.PrdNameUi}
-              </Text>
-              
-              <Text style={{fontStyle:'italic',color:isColor == true ?'#FFFFFF' : "#af3037",fontFamily:'RobotoBold',marginLeft:7,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left',marginTop:3}}>
-              {this.translate.Get("Giá")}:{" "}{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPrice: item.UnitPriceAfter, "")}/{item.UnitName} 
-                </Text>
-            </View>
-            </View>
-             }
-              <View style={{width: "100%", height: H2FontSize*1.7,paddingTop:5}}>
-                <View style={{ flexDirection: "row", justifyContent: 'space-evenly',  width: "100%", height: '100%'}}  >
                   {item.OrddQuantity> 0 ?
                     <TouchableOpacity
-                    style={{width:(iWith-4)*0.4*0.3,height:'100%', alignItems:'flex-start',justifyContent: 'flex-end' }}
+                    style={{width:'15%',height:'100%', alignItems:'center',justifyContent: 'center' }}
                     onPress={() => { 
                 if (item.PrdIsSetMenu == true&&item.PrdViewSetMenuType && item.PrdViewSetMenuType == 1){
                       this.setState({ showSetInCart: true,SetItemsFilter:CartFilter.items, CartItemSelected: CartFilter.FirstItem, CartProductIndex :CartFilter.FirstIndex})
@@ -1364,17 +1305,12 @@ if (ProductChoise==null) {
                         this.CaculatorCardInfor(true);
                       }
                     }} >
-                      {( item.PrdIsSetMenu == true&&item.PrdViewSetMenuType && item.PrdViewSetMenuType == 1)?
-                      <Icon name='edit'  type="antdesign" containerStyle={{ justifyContent: "center" }}
-                      size={H2FontSize}  iconStyle={{ color: colors.yellow1, fontFamily: "RobotoRegular" }}  />
-                      :
                       <Image resizeMode='contain' source={require('../../assets/icons/IconDelete.png')} style={{ width: H2FontSize, height: H2FontSize,}} />
-                      }
                     </TouchableOpacity> :
-                    <View style={{  width:H2FontSize, height: H2FontSize, justifyContent: 'center', alignItems: 'center', }}>
+                    <View style={{  width:'15%', height: '100%', justifyContent: 'center', alignItems: 'center', }}>
                     </View>
                   }
-                  <View style={{ width:(iWith-4)*0.4*0.4, height: '100%', justifyContent: 'flex-end' }}>
+                  <View style={{ width:'20%', justifyContent: 'center' }}>
                  {(item.OrddQuantity>0)?
                       <TextInput ref={input => this.textInput = input}
                         style={{  color:isColor == true ?'#FFFFFF' :  "#af3037",width: '100%',fontSize:H2FontSize*0.8,textAlign:"center",fontFamily: "RobotoBold", }}
@@ -1406,22 +1342,12 @@ if (ProductChoise==null) {
                      }
                   </View>
                   {item.isSoldout ?
-                  <View style={{width:(iWith-4)*0.4*0.3,height:'100%',alignItems:'flex-end',justifyContent: 'flex-end' }}>
-                    {/* <Image resizeMode='contain' source={require('../../assets/icons/IconAdd.png')}
-                      style={{width: H2FontSize, height: H2FontSize, }} /> */}
+                  <View style={{width:'15%',height:'100%',alignItems:'flex-start',justifyContent: 'flex-start' }}>
                   </View>
-                  : 
-                  (item.RECORD > 1 && item.OrddQuantity == 0)?
-                  <TouchableOpacity onPress={()=>{this._CheckProductManyPrice(item)}}style={{position:'absolute',right:2,backgroundColor:'#009900',borderRadius:15,width:'60%',height:'100%',alignItems:'center',justifyContent: 'center'}}>
-                    <Text style={{color:'#FFFFFF',fontSize:H3_FONT_SIZE}}>Chọn size</Text>
-                  </TouchableOpacity>
                   :
-                  <TouchableOpacity style={{width:(iWith-4)*0.4*0.3,height:'100%',alignItems:'flex-end',justifyContent: 'flex-end' }} onPress={() => {
+                  <TouchableOpacity style={{width:'15%',height:'100%',alignItems:'center',justifyContent: 'center' }} onPress={() => {
                      if (item.PrdIsSetMenu == true ) 
                      this.PrerenderProductModal(item,CartFilter,index);
-                     else if(item.RECORD > 1 && item.OrddQuantity == 0){
-                      this._CheckProductManyPrice(item)
-                     }
                      else{
                     this.HandleQuantity(item,1,false);
                     this.CaculatorCardInfor(true);
@@ -1431,6 +1357,184 @@ if (ProductChoise==null) {
                       style={{width: H2FontSize, height: H2FontSize, }} />
                   </TouchableOpacity>}
                 </View>
+    )
+  }
+  renderProduct = ({ item, index }) => {
+    let { Config,isColor } = this.state;
+    let iWith=(ProductList.width/ProductList.ColumnNum-4);
+    let iHeight=iWith*3/2.35;
+    let {CartFilter}= this._getCartItems(item,null);
+    item.OrddQuantity=CartFilter.TotalQuantity;
+    // if(item.OrddQuantity>0 && item.UnitId != CartFilter.FirstItem.UnitId){
+    // item.UnitPrice = CartFilter.FirstItem.UnitPriceBefore;
+    // item.UnitName = CartFilter.FirstItem.UnitName ;
+    // item.UnitId = CartFilter.FirstItem.UnitId ;
+    // }
+    const dataSize = this.GetSize(item)
+    this.state.isRenderProduct=true;
+    return (
+      <TouchableHighlight   style={ { borderBottomWidth:6,borderColor: isColor == true ?'#333333': '#DDDDDD',width:iWith,height: iHeight,marginRight:6}}>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", width: "100%", height: '100%'}}>
+          <View style={{ width: "100%", height: item.RECORD > 1 ? '55%':'60%' ,}}>
+            {item.PrdDescription ?
+            <View style={{position:'absolute',width: "100%", height: '15%',bottom:0,zIndex:98,backgroundColor:'black',opacity: 0.5,justifyContent:'center' }}>
+              <Text style={{fontSize:H3_FONT_SIZE,color:'white',paddingLeft:5}}>{item.PrdDescription}</Text>
+            </View>
+            :null}
+            {item.isSoldout ?
+            <View style={{position:'absolute',width: "100%", height: '100%',zIndex:99,backgroundColor:'black',opacity: 0.5,justifyContent:'center' }}>
+              <View style={{transform: [{rotate: '-30deg'}],alignItems:'center'}}>
+                <Text style={{fontSize: H1_FONT_SIZE*1.5, color:'#FF0000',fontFamily: "RobotoBold",}}>{this.translate.Get("Hết hàng")}</Text>
+              </View>
+            </View>
+            : null}
+            <TouchableOpacity name='dvImage' style={{ flexDirection: "row", width: '100%', height: '100%' }}
+              onPress={() =>
+              { 
+                this._ShowFullImage(item,true);
+            }}> 
+              <ImageBackground  resizeMode='contain'
+                source={ item.PrdImageUrl ? {uri: this.state.endpoint + "/Resources/Images/Product/" + item.PrdImageUrl
+                  }:  require("../../assets/images/NoImage_trans-04.png")
+                }
+                style={[{ width: '100%', height: '100%', backgroundColor:isColor == true ? '#454545' : "#FFFFFF" }]} >
+                {item.ResName && item.ResName == 'HOT' ? 
+                  <View style={{ position: "absolute", paddingTop:10,right:10, width: '20%'}}>
+                    <Image resizeMode="contain" source={require('../../assets/icons/IconHot-09.png')}
+                      style={{ width: H1_FONT_SIZE*1.6, height: H1_FONT_SIZE*1.6,}} />
+                  </View>
+                : item.ResName && item.ResName == 'NEW' ?
+                  <View style={{  position: "absolute", paddingTop: 10, right: 10,width: '20%' }}>
+                    <Image resizeMode="contain" source={require('../../assets/icons/IconNew-09.png')}
+                      style={{width: H1_FONT_SIZE*1.6, height: H1_FONT_SIZE*1.6, }}/>
+                  </View>
+                  : item.ResName && item.ResName == 'SALE' ?
+                  <View style={{  position: "absolute", paddingTop: 10, right: 10,width: '20%' }}>
+                    <Image resizeMode="contain" source={require('../../assets/icons/IconSale.png')}
+                      style={{width: H1_FONT_SIZE*1.6, height: H1_FONT_SIZE*1.6, }}/>
+                  </View>
+                  : null} 
+                {/* <View style={{ position: "absolute", paddingTop: (iHeight-36)/2, right: -15 }}>
+                  <Icon  name="caretleft" type="antdesign" iconStyle={{ justifyContent: "space-between", color: "#EEEEEE", fontSize: 36 }} />
+                </View> */}
+              </ImageBackground>
+            </TouchableOpacity>
+          </View> 
+          <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%", height:item.RECORD > 1 ?'45%' : '40%',paddingLeft:5,backgroundColor: isColor == true ? '#454545' : "#FFFFFF" }}>
+          <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:'100%'}}>
+             {Config.B_ViewProductNo?
+               <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:'60%'}}>
+              <View name='pnProductNo' style={{width: '100%',height:H3FontSize*1.5 ,marginTop:5 }}>
+                <Text style={{ color: isColor == true ? '#FFFFFF' : "#0d65cd", textAlign: 'center', width: '95%',fontSize: H3FontSize, fontFamily: "RobotoBold"}} numberOfLines={2}> 
+                  {item.PrdNo}
+                </Text>
+              </View>
+              <View name='pnProductName' style={{width: '100%',paddingTop:2 }}>
+                <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H4FontSize,flexWrap:"wrap"}} numberOfLines={5}>
+                  {item.PrdNameUi}
+                </Text>
+              </View>
+              </View>
+              :
+              <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",justifyContent:'space-between',paddingVertical: 5,height:'60%'}}>
+            <View name='pnProductName' style={{width: '100%',marginTop:5}}>
+              <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H3FontSize,fontWeight:'bold',flexWrap:"wrap"}} numberOfLines={5}>
+                {item.PrdNameUi}
+              </Text>
+              
+            </View>
+            </View>
+             }
+              <View style={{width: "100%", height: '40%',paddingTop:5}}>
+                {item.RECORD > 1 ?
+                <ScrollView>
+                <FlatList
+                data={dataSize}
+                renderItem={this.renderSize}
+                />
+                </ScrollView>
+                :
+                <View style={{ flexDirection: "row", width: "100%"}}  >
+                  <View style={{width: "50%",height:'100%',justifyContent: 'center'}}>
+                  <Text style={{fontStyle:'italic',color:isColor == true ?'#FFFFFF' : "#af3037",fontFamily:'RobotoBold',marginLeft:5,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left'}}>
+             {formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPrice: item.UnitPriceAfter, "")}/{item.UnitName} 
+                </Text>
+                  </View>
+                  {item.OrddQuantity> 0 ?
+                    <TouchableOpacity
+                    style={{width:'15%',height:'100%', alignItems:'center',justifyContent: 'center' }}
+                    onPress={() => { 
+                if (item.PrdIsSetMenu == true&&item.PrdViewSetMenuType && item.PrdViewSetMenuType == 1){
+                      this.setState({ showSetInCart: true,SetItemsFilter:CartFilter.items, CartItemSelected: CartFilter.FirstItem, CartProductIndex :CartFilter.FirstIndex})
+                      }
+                      else {
+                      this.HandleQuantity(item,-1,false);
+                        this.CaculatorCardInfor(true);
+                      }
+                    }} >
+                      {( item.PrdIsSetMenu == true&&item.PrdViewSetMenuType && item.PrdViewSetMenuType == 1)?
+                      <Icon name='edit'  type="antdesign" containerStyle={{ justifyContent: "center" }}
+                      size={H2FontSize}  iconStyle={{ color: colors.yellow1, fontFamily: "RobotoRegular" }}  />
+                      :
+                      <Image resizeMode='contain' source={require('../../assets/icons/IconDelete.png')} style={{ width: H2FontSize, height: H2FontSize,}} />
+                      }
+                    </TouchableOpacity> :
+                    <View style={{  width:'15%', height: '100%', justifyContent: 'center', alignItems: 'center', }}>
+                    </View>
+                  }
+                  <View style={{ width:'20%', justifyContent: 'center' }}>
+                 {(item.OrddQuantity>0)?
+                      <TextInput ref={input => this.textInput = input}
+                        style={{  color:isColor == true ?'#FFFFFF' :  "#af3037",width: '100%',fontSize:H2FontSize*0.8,textAlign:"center",fontFamily: "RobotoBold", }}
+                        autoFocus={false}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        keyboardAppearance="dark"
+                        keyboardType='numeric'
+                        autoCompleteType='off'
+                        returnKeyType='done'
+                        blurOnSubmit={true}
+                        defaultValue={item.OrddQuantity ? item.OrddQuantity.toString() : ''}
+                        Value={item.OrddQuantity>0 ? item.OrddQuantity.toString() : '' }
+                        onBlur={()=>{
+                          this.CaculatorCardInfor(true);
+                        }}
+                        onChangeText={(textInput) => {
+                         item.OrddQuantity = parseFloat(textInput);
+                        }}
+                        onSubmitEditing={() => {
+                          Keyboard.dismiss();
+                          if(parseFloat(item.OrddQuantity)<0 )
+                          item.OrddQuantity=0;
+                         this.HandleQuantity(item,item.OrddQuantity,true);
+                        
+                        }}
+                      />
+                      :null
+                     }
+                  </View>
+                  {item.isSoldout ?
+                  <View style={{width:'15%',height:'100%',alignItems:'flex-start',justifyContent: 'flex-start' }}>
+                  </View>
+                  : 
+                  // (item.RECORD > 1 && item.OrddQuantity == 0)?
+                  // <TouchableOpacity onPress={()=>{this._CheckProductManyPrice(item)}}style={{position:'absolute',right:2,backgroundColor:'#009900',borderRadius:15,width:'40%',height:'100%',alignItems:'center',justifyContent: 'center'}}>
+                  //   <Text style={{color:'#FFFFFF',fontSize:H3_FONT_SIZE}}>Chọn size</Text>
+                  // </TouchableOpacity>
+                  // :
+                  <TouchableOpacity style={{width:'15%',height:'100%',alignItems:'center',justifyContent: 'center' }} onPress={() => {
+                     if (item.PrdIsSetMenu == true ) 
+                     this.PrerenderProductModal(item,CartFilter,index);
+                     else{
+                    this.HandleQuantity(item,1,false);
+                    this.CaculatorCardInfor(true);
+                     }
+                  }}>
+                    <Image resizeMode='contain' source={require('../../assets/icons/IconAdd.png')}
+                      style={{width: H2FontSize, height: H2FontSize, }} />
+                  </TouchableOpacity>}
+                </View>
+                }
               </View>
           
             </View>
@@ -1456,8 +1560,8 @@ if (ProductChoise==null) {
     const {ProductGroupList,endpoint,PrdChildGroups,checked,Products,CartInfor,itemChecked,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config,ProductsOrdered,isColor,modalSize} = this.state; 
    
     return (
-      <View style={{height:Bordy.height,width:Bordy.width, backgroundColor: isColor == true ? '#333333' : "#FFFFFF"}}>
-        {modalSize ?
+      <View style={{height:Bordy.height,width:Bordy.width, backgroundColor: isColor == true ? '#333333' : "#DDDDDD"}}>
+        {/* {modalSize ?
           <Modal
           onBackdropPress={() => this.setState({modalSize:!modalSize})}
           isVisible={true}
@@ -1472,21 +1576,21 @@ if (ProductChoise==null) {
                 <TouchableOpacity  onPress={()=>this.CheckSize(item)}
                   style={{width: '100%',justifyContent:'center',borderBottomWidth:0.5,paddingVertical:10,paddingHorizontal:8}}>
                   <View style={{width:'100%',flexDirection: "row",alignItems:'center'}}>
-                    <Text style={{width:"80%",justifyContent:'center',textAlign:'left',fontSize:H3_FONT_SIZE*1.2,color: isColor==true?'#FFFFFF':'#000000'}} >{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPriceBefore : item.UnitPriceAfter, "")}/{item.UnitName}</Text>
-                    {checked == item.UnitName ?
-                    <Icon color={isColor==true?'#DAA520': '#009900'} name="check" type="entypo" style={{left: 2,fontSize: H1_FONT_SIZE*1.3,}}/>
-                    :null
+                  {checked == item.UnitName ?
+                    <Icon color={isColor==true?'#DAA520': '#009900'} name="check" type="entypo" style={{left: 2,fontSize: H1_FONT_SIZE*2,}}/>
+                    :<View>
+
+                    </View>
                   }
+                    <Text style={{width:"80%",justifyContent:'center',textAlign:'left',fontSize:H3_FONT_SIZE*1.2,color: isColor==true?'#FFFFFF':'#000000'}} >{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPriceBefore : item.UnitPriceAfter, "")}/{item.UnitName}</Text>
+                    
                   </View>
                 </TouchableOpacity>}
               />
-              {/* <CheckBox checked={checked ? true : false} onPress={()=> {this.setState({checked: !checked})}} textStyle={{fontSize:H3_FONT_SIZE,color:isColor == true ?'#ffffff' : '#000000'}} size={H2_FONT_SIZE} containerStyle={{width:'45%', backgroundColor:isColor == true ?'#333333' :'#fff'}} title={this.translate.Get('Có')}/>
-              <CheckBox checked={checked ? false : true} onPress={()=> {this.setState({checked: !checked})}} textStyle={{fontSize:H3_FONT_SIZE,color:isColor == true ?'#ffffff' : '#000000'}} size={H2_FONT_SIZE} containerStyle={{width:'45%', backgroundColor:isColor == true ?'#333333' : '#fff',}}  title={this.translate.Get('Không')}/> */}
-              
             </View>
           </View>
         </Modal>
-          : null}
+          : null} */}
         <View style={{flexDirection: "row"}}>
           <View name='pbLeft' style={[{ backgroundColor: "#333D4C",width:pnLeft.width, flexDirection: "column",height: Bordy.height }]}>
             <View style={{ justifyContent: 'center', alignItems: 'center', height: Bordy.height/6, }}>
