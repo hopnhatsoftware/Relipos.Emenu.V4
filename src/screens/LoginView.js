@@ -195,6 +195,7 @@ export default class LoginView extends Component {
     });
   });
 }
+
   toggleSwitch = async() => {
     let{isColor} = this.state
     this.setState({ isColor : !isColor  })
@@ -481,8 +482,7 @@ let ImageWidth=SCREEN_WIDTH*0.12
                   </TouchableOpacity>
                 </View>
                 <View style={{ flexDirection: "row", alignContent: "center", paddingTop: ITEM_FONT_SIZE / 2, paddingBottom: ITEM_FONT_SIZE / 2, }}>
-                {this.has_back_button ? 
-                !this.state.notification ?
+                {this.has_back_button ?
                 <View style={{ paddingRight: ITEM_FONT_SIZE / 3 }}>
                   <Button
                     con={{name:"input", color:"white"}}
@@ -496,7 +496,6 @@ let ImageWidth=SCREEN_WIDTH*0.12
                     titleStyle={[styles.buttonText,{color:isColor == true? 'black':'white'}]}
                     disabled={isLoading}
                   /></View> 
-                   : null
                    : null}
                   <View style={{}}><Button buttonStyle={[styles.button,{backgroundColor:isColor == true? '#DAA520': '#0176cd'}]}  title={this.translate.Get(this.login_button_text)}
                     onPress={() => {

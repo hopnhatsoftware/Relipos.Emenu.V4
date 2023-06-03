@@ -575,7 +575,6 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
         await _remove("APP@CART", async () => {
           await this.setState({ CartInfor: {  TotalQuantity: 0, TotalAmount: 0, ItemAmount:0, items: [], } }, async () => {
             await CheckAndGetOrder(table, OrdPlatform).then(async res => {
-       console.log('OrderId mới:',res.Data);
               table.OrderId = res.Data;
               await _storeData("APP@TABLE", JSON.stringify(table), async () => {
                 _storeData('APP@TimeToNextBooking', JSON.stringify(new Date().getTime()), async () => {
@@ -781,7 +780,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
     }
     Animated.timing(this.state.FullCartWidth, {
       toValue: endWidth,
-      duration: 1000,
+      duration: 400,
       easing: Easing.linear,
       useNativeDriver: false
     }).start(() => this.setState({ isShowFormCard: isShow }));
@@ -1366,7 +1365,7 @@ if (ProductChoise==null) {
   renderProduct = ({ item, index }) => {
     let { Config,isColor } = this.state;
     let iWith=(ProductList.width/ProductList.ColumnNum-4);
-    let iHeight=iWith*3/2.35;
+    let iHeight=iWith*3/2.4;
     let {CartFilter}= this._getCartItems(item,null);
     item.OrddQuantity=CartFilter.TotalQuantity;
     // if(item.OrddQuantity>0 && item.UnitId != CartFilter.FirstItem.UnitId){
@@ -1379,7 +1378,7 @@ if (ProductChoise==null) {
     return (
       <TouchableHighlight   style={ { borderBottomWidth:6,borderColor: isColor == true ?'#333333': '#DDDDDD',width:iWith,height: iHeight,marginRight:6}}>
         <View style={{ flexDirection: "row", flexWrap: "wrap", width: "100%", height: '100%'}}>
-          <View style={{ width: "100%", height: item.RECORD > 1 ? '55%':'60%' ,}}>
+          <View style={{ width: "100%", height:'60%' ,}}>
             {item.PrdDescription ?
             <View style={{position:'absolute',width: "100%", height: '15%',bottom:0,zIndex:98,backgroundColor:'black',opacity: 0.5,justifyContent:'center' }}>
               <Text style={{fontSize:H3_FONT_SIZE,color:'white',paddingLeft:5}}>{item.PrdDescription}</Text>
@@ -1424,7 +1423,7 @@ if (ProductChoise==null) {
               </ImageBackground>
             </TouchableOpacity>
           </View> 
-          <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%", height:item.RECORD > 1 ?'45%' : '40%',paddingLeft:5,backgroundColor: isColor == true ? '#454545' : "#FFFFFF" }}>
+          <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%", height:'40%',paddingLeft:5,backgroundColor: isColor == true ? '#454545' : "#FFFFFF" }}>
           <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:'100%'}}>
              {Config.B_ViewProductNo?
                <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:'60%'}}>
@@ -1440,7 +1439,7 @@ if (ProductChoise==null) {
               </View>
               </View>
               :
-              <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",justifyContent:'space-between',paddingVertical: 5,height:'60%'}}>
+              <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",justifyContent:'space-between',paddingVertical: 5,height:'50%'}}>
             <View name='pnProductName' style={{width: '100%',marginTop:5}}>
               <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H3FontSize,fontWeight:'bold',flexWrap:"wrap"}} numberOfLines={5}>
                 {item.PrdNameUi}
@@ -1449,7 +1448,7 @@ if (ProductChoise==null) {
             </View>
             </View>
              }
-              <View style={{width: "100%", height: '40%',paddingTop:5}}>
+              <View style={{width: "100%", height: '50%',paddingTop:5}}>
                 {item.RECORD > 1 ?
                 <ScrollView>
                 <FlatList
@@ -1458,7 +1457,7 @@ if (ProductChoise==null) {
                 />
                 </ScrollView>
                 :
-                <View style={{ flexDirection: "row", width: "100%"}}  >
+                <View style={{ flexDirection: "row", width: "100%",}}  >
                   <View style={{width: "50%",height:'100%',justifyContent: 'center'}}>
                   <Text style={{fontStyle:'italic',color:isColor == true ?'#FFFFFF' : "#af3037",fontFamily:'RobotoBold',marginLeft:5,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left'}}>
              {formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPrice: item.UnitPriceAfter, "")}/{item.UnitName} 

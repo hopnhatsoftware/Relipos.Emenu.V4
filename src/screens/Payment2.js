@@ -255,9 +255,10 @@ _AcceptCallStaff = async (Description,typeView) => {
       ]);
     }
   }).catch((error) => {
-    Question.alert( 'System Error',error, [
+    QAlert.alert( this.translate.Get('Notice'),"Máy in lỗi,KHÔNG THỂ in thông báo tự động đến quầy", [
       {
         text: "OK", onPress: () => {
+          this.setState({ isPostBack: true});
         }
       }
     ]);

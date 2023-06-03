@@ -435,6 +435,8 @@ export default class SetMenuView extends Component {
     }
   };
   _ChoiceCategorySelect = (item, index) => {
+    console.log('item',item)
+    console.log('index',index)
     this.setState({ CategorySelectedIndex: index}, () => {
       this._getAllItembyChoiceId(item);
     });
@@ -606,7 +608,7 @@ export default class SetMenuView extends Component {
     return { prd, ind };
   };
   renderProduct = ({ item, index }) => {
-    let { lStyle,Config } = this.state;
+    let { lStyle,Config,ProductGroupList,CategorySelectedIndex } = this.state;
     let { isColor } = this.state;
     let width=lStyle.PnCenter.ItemWidth;
     let LeftWidth=lStyle.PnCenter.ItemWidth*0.6;
@@ -706,16 +708,45 @@ export default class SetMenuView extends Component {
     const { ProductGroupList, ChoiceSet, CategorySelectedIndex, ProductSet, IsPostBack,lStyle,language } = this.state;
     const{isColor}= this.state;
     if (!IsPostBack) {
-      return (
-        <View style={[styles.container, styles.horizontal]}  >
-        </View>
-      )
-    }  
+      return(
+      <View style={{height: SCREEN_HEIGHT,
+        width: SCREEN_WIDTH,
+        position: "absolute",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: isColor == true ? colors.white : "black",
+        opacity: 0.5,
+        bottom: 0,
+        right: 0,
+        zIndex: 99,
+        }}>
+        <ActivityIndicator color={isColor == true ? colors.blue : colors.primary} size="large"></ActivityIndicator>
+      </View>
+      );}
     let GridHeight=SCREEN_HEIGHT-Header.height;
   //  console.log('Header.state:'+JSON.stringify(this.state));
     return (
       <View style={styles.container}>
         <StatusBar hidden={true} />
+        {/* {!IsPostBack ?
+          <View style={{height: SCREEN_HEIGHT,
+            width: SCREEN_WIDTH,
+            position: "absolute",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: isColor == true ? colors.white : "black",
+            opacity: 0.5,
+            bottom: 0,
+            right: 0,
+            zIndex: 99,
+            borderTopColor: colors.grey4,
+            borderTopWidth: 1
+            }}>
+            <ActivityIndicator color={isColor == true ? colors.blue : colors.primary} size="large"></ActivityIndicator>
+          </View>
+          : null} */}
         <_Header name={'SetMenuView'} state={this.state} table={this.state.table}
           translate={this.translate} titleSet={ProductSet} setState={(state) => this.setState(state)}
           BookingsStyle={BookingsStyle} islockTable={false} backgroundColor="#333D4C"
@@ -851,7 +882,7 @@ export default class SetMenuView extends Component {
         }
         {this.state.isShowMash ?
           <View style={styles.item_view_text}>
-            <ActivityIndicator color={colors.primary} size="large"></ActivityIndicator>
+            <ActivityIndicator color={colors.red} size="large"></ActivityIndicator>
           </View>
           : null}
       </View>

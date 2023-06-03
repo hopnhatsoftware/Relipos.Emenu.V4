@@ -351,7 +351,7 @@ export default class Payment3 extends Component {
     return null;
   }
   onPressNext = async () => {
-    let {lockTable,notification,Ticket } = this.state;
+    let {lockTable,table } = this.state;
     await CancelOrder(table.OrderId);
     if (lockTable === true) {
       this.props.navigation.navigate("LogoutView", { lockTable , notification : true});
@@ -374,12 +374,14 @@ export default class Payment3 extends Component {
          this.onPressNext();
         }
       }).catch((error) => {
-        Question.alert( 'System Error',error, [
+        this.setState({ isPostBack: true});
+        Alert.alert( this.translate.Get('Notice'),"Máy in lỗi,KHÔNG THỂ in thông báo tự động đến quầy", [
           {
             text: "OK", onPress: () => {
+              this.setState({ isPostBack: true});
             }
           }
-        ])
+        ]);
     })}
     else{
       API_Print (user.BranchId, Ticket.TicketID,typeView, Description).then(res => {
@@ -395,9 +397,10 @@ export default class Payment3 extends Component {
         }
       }).catch((error) => {
         this.setState({ isPostBack: true,});
-        Question.alert( 'System Error',error, [
+        Alert.alert( this.translate.Get('Notice'),"Máy in lỗi,KHÔNG THỂ in thông báo tự động đến quầy", [
           {
             text: "OK", onPress: () => {
+              this.setState({ isPostBack: true});
             }
           }
         ]);
