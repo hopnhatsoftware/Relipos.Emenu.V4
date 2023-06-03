@@ -693,7 +693,7 @@ export default class SetMenuView extends Component {
                     {this._showQty(item)} 
                   </Text>
                 </View> 
-                <TouchableOpacity style={{}} onPress={() => this._HandleQuantityDetail(item, 1, false)}>
+                <TouchableOpacity style={{}} onPress={() => this._HandleQuantityDetail(item, 1, false) && this._ChoiceCategorySelect(ProductGroupList[CategorySelectedIndex+1],+1)}>
                   <Image resizeMode="stretch" source={require('../../assets/icons/IconAdd.png')}
                     style={{ width: H2FontSize, height: H2FontSize }} />
                 </TouchableOpacity>
