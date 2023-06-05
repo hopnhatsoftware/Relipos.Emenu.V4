@@ -1,5 +1,5 @@
 import React from "react";
-import {ActivityIndicator,FlatList, View, TouchableOpacity, TextInput, StyleSheet, Text,Image,Dimensions,Alert} from "react-native";
+import {AppState,ActivityIndicator,FlatList, View, TouchableOpacity, TextInput, StyleSheet, Text,Image,Dimensions,Alert} from "react-native";
 import colors from "../config/colors";
 import Modal from "react-native-modal";
 import { Button, Icon } from "react-native-elements";
@@ -8,7 +8,7 @@ import {ITEM_FONT_SIZE, BUTTON_FONT_SIZE,H1_FONT_SIZE,H3_FONT_SIZE ,H2_FONT_SIZE
 import { Audio } from 'expo-av';
 import translate from '../services/translate';
 import {_retrieveData, _storeData } from "../services/storages";
-import {API_Print} from "../services";
+import {API_Print,CancelOrder} from "../services";
 import { ScrollView } from "react-native-gesture-handler";
 const SCREEN_WIDTH = Dimensions.get("screen").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height; //- Constants.statusBarHeight;
@@ -17,6 +17,7 @@ export class _HeaderNew extends React.Component  {
   constructor(props) {
     super(props);
     this.state = {
+      appState: AppState.currentState,
       IsLoaded:false,
       isColor:false,
       Description:'',
@@ -30,7 +31,20 @@ export class _HeaderNew extends React.Component  {
   setModalLanguage = (visible) => {
     this.setState({ modalLanguage: visible });
   }
+  componentWillUnmount = async () => {
+    this.appStateSubscription.remove();
+  };
   componentDidMount= async () => {
+    this.appStateSubscription = AppState.addEventListener(
+      'change',
+      nextAppState => {
+        if ( this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+          console.log('App has come to the foreground!');
+        }
+        this.setState({appState: nextAppState});
+        this._CancelOrder();
+      },
+    );
     let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
     isColor = JSON.parse(isColor);
     let settings = await _retrieveData('settings', JSON.stringify({}));
@@ -43,6 +57,14 @@ export class _HeaderNew extends React.Component  {
   Config = JSON.parse(Config);
     this.setState({IsLoaded:true ,isColor,settings,Config});
   };
+  _CancelOrder = async() => {
+    let{appState}= this.state;
+    let{table}=this.props;
+    if(appState == 'background'){
+      console.log(table.OrderId)
+      await CancelOrder(table.OrderId);
+    }
+  }
   _AcceptPayment = async (Description,typeView) => {
     let{ticketId}=this.props;
     let{settings,ModalCallStaff} = this.state;

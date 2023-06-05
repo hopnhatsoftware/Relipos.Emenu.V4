@@ -1,6 +1,6 @@
 import React from "react";
 import {
-  View, Text, TextInput, TouchableOpacity, StyleSheet, Image,
+  AppState,View, Text, TextInput, TouchableOpacity, StyleSheet, Image,
   Animated, Platform, FlatList, ActivityIndicator, KeyboardAvoidingView, Keyboard,
   Dimensions,Alert
 } from "react-native";
@@ -9,7 +9,7 @@ import colors from "../../config/colors";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Icon } from "react-native-elements";
 import { _retrieveData, _storeData, _remove } from "../../services/storages";
-import {SetMenu_getExtraRequestFromProductId,API_Print} from '../../services';
+import {SetMenu_getExtraRequestFromProductId,API_Print,CancelOrder} from '../../services';
 import { H1FontSize,H2FontSize,H3FontSize,H4FontSize,H3_FONT_SIZE,H1_FONT_SIZE,H2_FONT_SIZE ,H4_FONT_SIZE} from "../../config/constants";
 import { formatCurrency, formatNumber } from "../../services/util";
 import Question from '../Question';
@@ -43,6 +43,7 @@ export class CardDetailView extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      appState: AppState.currentState,
       isColor:false,
       ModalCallStaff: false,
       IsLoaded:false,
@@ -58,13 +59,32 @@ export class CardDetailView extends React.Component {
       item:{}
     }
   }
+  componentWillUnmount = async () => {
+    this.appStateSubscription.remove();
+  };
   componentDidMount= async () => {
+    this.appStateSubscription = AppState.addEventListener(
+      'change',
+      nextAppState => {
+        if ( this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+          console.log('App has come to the foreground!');
+        }
+        this.setState({appState: nextAppState});
+        this._CancelOrder();
+      },
+    );
     let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
     isColor = JSON.parse(isColor);
     this.setState({IsLoaded:true ,KeyCode:'',isColor});
     
   };
-
+  _CancelOrder = async() => {
+    let{appState}= this.state;
+    let{table}=this.props;
+    if(appState == 'background'){
+      await CancelOrder(table.OrderId);
+    }
+  }
   //danh sách yêu cầu thêm
   _loadExtraRequest = async (item) =>{
     try{

@@ -1,6 +1,6 @@
 /*Màn hình chọn món */
 import React, { Component } from "react";
-import {TouchableOpacity,Dimensions,Image,TouchableHighlight,ActivityIndicator, UIManager,StatusBar,ImageBackground,Keyboard,StyleSheet,VirtualizedList,Platform,Animated,Easing,Text,View,
+import {AppState,TouchableOpacity,Dimensions,Image,TouchableHighlight,ActivityIndicator, UIManager,StatusBar,ImageBackground,Keyboard,StyleSheet,VirtualizedList,Platform,Animated,Easing,Text,View,
   TextInput,ScrollView} from "react-native";
 import * as Font from "expo-font";
 import Modal from "react-native-modal";
@@ -41,6 +41,7 @@ export default class OrderView extends Component {
     this.flatListRef = null;
     this.textInput = null;
     this.state = {
+      appState: AppState.currentState,
       showCall:false,
       isRenderProduct: true,
       selectedType: null,
@@ -115,10 +116,21 @@ export default class OrderView extends Component {
     this.translate = new translate();
   }
   componentWillUnmount= async () => {
+    this.appStateSubscription.remove();
     clearInterval(this.interval);
   }
   componentDidMount = async () => {
     try{
+    this.appStateSubscription = AppState.addEventListener(
+      'change',
+      nextAppState => {
+        if ( this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+          console.log('App has come to the foreground!');
+        }
+        this.setState({appState: nextAppState});
+        this._CancelOrder();
+      },
+    );
     this.translate = await this.translate.loadLang();
     await  this._BindingFont();
     StatusBar.setHidden(true);
@@ -159,6 +171,12 @@ export default class OrderView extends Component {
     table = await _retrieveData('APP@BACKEND_Payment', JSON.stringify({}))
     table=JSON.parse(table);
     this.setState({table})
+  }
+  _CancelOrder = async() => {
+    let{appState,table}= this.state;
+    if(appState == 'background'){
+      await CancelOrder(table.OrderId);
+    }
   }
   onPressBack = async() => {
     let { lockTable,table } = this.state;
@@ -344,6 +362,7 @@ onCallServices= async() => {
           CheckAndGetOrder(table, OrdPlatform).then(res => {
        if(res.Status == 1){
         table.OrderId = res.Data;
+        console.log('OrderId',table.OrderId)
         _storeData("APP@TABLE", JSON.stringify(table), () => {
           GetViewGroup(Config, table).then(res => {
             if (res.Data.Table.length > 0) {
@@ -566,11 +585,11 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
   _sendOrder = async () => {
     try{
     let { table, CartInfor, OrdPlatform,Config } = this.state;
-    if (CartInfor.TotalQuantity<=0) 
+    console.log('order',table.OrderId)
+    if (CartInfor.TotalQuantity<=0)
       return;
     this.setState({ isShowMash: true }); 
     await sendOrder(Config, table, OrdPlatform, CartInfor.items).then(async res => {
-
       if (res.Status == 1) {
         await _remove("APP@CART", async () => {
           await this.setState({ CartInfor: {  TotalQuantity: 0, TotalAmount: 0, ItemAmount:0, items: [], } }, async () => {
@@ -1426,14 +1445,14 @@ if (ProductChoise==null) {
           <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%", height:'40%',paddingLeft:5,backgroundColor: isColor == true ? '#454545' : "#FFFFFF" }}>
           <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:'100%'}}>
              {Config.B_ViewProductNo?
-               <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:'60%'}}>
-              <View name='pnProductNo' style={{width: '100%',height:H3FontSize*1.5 ,marginTop:5 }}>
+               <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:'50%'}}>
+              <View name='pnProductNo' style={{width: '100%',height:H3FontSize*1.5 ,paddingTop:5,height:'50%' }}>
                 <Text style={{ color: isColor == true ? '#FFFFFF' : "#0d65cd", textAlign: 'center', width: '95%',fontSize: H3FontSize, fontFamily: "RobotoBold"}} numberOfLines={2}> 
                   {item.PrdNo}
                 </Text>
               </View>
-              <View name='pnProductName' style={{width: '100%',paddingTop:2 }}>
-                <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H4FontSize,flexWrap:"wrap"}} numberOfLines={5}>
+              <View name='pnProductName' style={{width: '100%',paddingTop:2,height:'50%' }}>
+                <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H4FontSize,}} numberOfLines={5}>
                   {item.PrdNameUi}
                 </Text>
               </View>

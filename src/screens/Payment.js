@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { TouchableOpacity, Dimensions, Image, TouchableHighlight, ActivityIndicator, UIManager, ScrollView, KeyboardAvoidingView, StyleSheet, Platform, Text, View, TextInput,Alert} from "react-native";
+import { AppState,TouchableOpacity, Dimensions, Image, TouchableHighlight, ActivityIndicator, UIManager, ScrollView, KeyboardAvoidingView, StyleSheet, Platform, Text, View, TextInput,Alert} from "react-native";
 import { _retrieveData, _storeData, _remove } from "../services/storages";
 import Modal from "react-native-modal";
 import { FlatList } from "react-native";
@@ -11,7 +11,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor,} from "../components";
 import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1_FONT_SIZE,H2_FONT_SIZE,H3_FONT_SIZE,H4_FONT_SIZE,H5_FONT_SIZE} from "../config/constants";
 import translate from "../services/translate";
-import {HandleTip, getPaymentAmount, getMasterData, CallServices,API_Print} from "../services";
+import {HandleTip, getPaymentAmount, getMasterData, CancelOrder,API_Print} from "../services";
 import { formatCurrency } from "../services/util";
 import colors from "../config/colors";
 import BookingsStyle from "../styles/bookings";
@@ -39,6 +39,7 @@ export default class Payment extends Component {
     this.textInput = null;
     this.translate = new translate();
     this.state = {
+      appState: AppState.currentState,
       isColor:false,
       mod : 0,
       PaymentAmount:0,
@@ -72,6 +73,7 @@ export default class Payment extends Component {
   componentWillUnmount= async () => 
   {
     let { sound} = this.state;
+    this.appStateSubscription.remove();
     if (sound!=null) {
       await sound.unloadAsync();
         this.setState({sound:null})
@@ -79,6 +81,16 @@ export default class Payment extends Component {
   }
   componentDidMount = async () => {
     try{
+      this.appStateSubscription = AppState.addEventListener(
+        'change',
+        nextAppState => {
+          if ( this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+            console.log('App has come to the foreground!');
+          }
+          this.setState({appState: nextAppState});
+          this._CancelOrder();
+        },
+      );
     this.translate = await this.translate.loadLang();
     this.setState({IsLoaded:true ,KeyCode:''});
     let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
@@ -92,6 +104,12 @@ export default class Payment extends Component {
     catch (ex) {
       this.setState({ isPostBack: true,});
       console.log('Payment componentDidMount Error:' + ex);
+    }
+  }
+  _CancelOrder = async() => {
+    let{appState,Ticket}= this.state;
+    if(appState == 'background'){
+      await CancelOrder(Ticket.OrderId);
     }
   }
   _getMasterData = async () => {

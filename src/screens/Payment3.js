@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { TouchableOpacity, Dimensions, Image, ActivityIndicator, UIManager,  KeyboardAvoidingView, StyleSheet, Platform, Text, View, TextInput,Alert} from "react-native";
+import { AppState,TouchableOpacity, Dimensions, Image, ActivityIndicator, UIManager,  KeyboardAvoidingView, StyleSheet, Platform, Text, View, TextInput,Alert} from "react-native";
 import Constants from "expo-constants";
 import Modal from "react-native-modal";
 import { _retrieveData, _storeData, _remove } from "../services/storages";
@@ -35,6 +35,7 @@ export default class Payment3 extends Component {
     this.textInput = null;
     this.translate = new translate();
     this.state = {
+      appState: AppState.currentState,
       isColor:false,
       QRData:'',
       NameE_wallet:'',
@@ -82,6 +83,7 @@ export default class Payment3 extends Component {
     
   }
   componentWillUnmount = async () => {
+    this.appStateSubscription.remove();
     clearInterval(this.interval);
   };
   _setConfig = async () => {
@@ -111,6 +113,16 @@ export default class Payment3 extends Component {
   };
   componentDidMount = async () => {
     try{
+      this.appStateSubscription = AppState.addEventListener(
+        'change',
+        nextAppState => {
+          if ( this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+            console.log('App has come to the foreground!');
+          }
+          this.setState({appState: nextAppState});
+          this._CancelOrder();
+        },
+      );
     this.translate = await this.translate.loadLang();
     let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
     isColor = JSON.parse(isColor);
@@ -124,6 +136,12 @@ export default class Payment3 extends Component {
       console.log('Payment3 componentDidMount Error:' + ex);
     }
   };
+  _CancelOrder = async() => {
+    let{appState,Ticket}= this.state;
+    if(appState == 'background'){
+      await CancelOrder(Ticket.OrderId);
+    }
+  }
   _getPaymentAmount= async () => {
     let {PaymentAmount,Ticket} = this.state;
     getPaymentAmount( Ticket.TicketID , '').then(res => {
@@ -351,8 +369,8 @@ export default class Payment3 extends Component {
     return null;
   }
   onPressNext = async () => {
-    let {lockTable,table } = this.state;
-    await CancelOrder(table.OrderId);
+    let {lockTable,Ticket } = this.state;
+    await CancelOrder(Ticket.OrderId);
     if (lockTable === true) {
       this.props.navigation.navigate("LogoutView", { lockTable , notification : true});
     }else{
