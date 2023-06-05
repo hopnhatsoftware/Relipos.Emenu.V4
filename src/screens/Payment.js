@@ -239,6 +239,7 @@ static getDerivedStateFromProps = (props, state) => {
     API_Print (settings.I_BranchID, Ticket.TicketID,typeView, Description).then(res => {
       if (res.Status == 1){
         this.setModalCallStaff(!ModalCallStaff)
+        this.setState({ isPostBack: true});
         Alert.alert( this.translate.Get('Notice'),"Quý khách vui lòng đợi trong giây lát", [
           {
             text: "OK", onPress: () => {
@@ -248,6 +249,7 @@ static getDerivedStateFromProps = (props, state) => {
         ]);
       }
     }).catch((error) => {
+      this.setState({ isPostBack: true});
       Alert.alert( this.translate.Get('Notice'),"Máy in lỗi,KHÔNG THỂ in thông báo tự động đến quầy", [
         {
           text: "OK", onPress: () => {

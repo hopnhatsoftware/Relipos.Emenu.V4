@@ -246,6 +246,7 @@ _AcceptCallStaff = async (Description,typeView) => {
   API_Print (settings.I_BranchID, Ticket.TicketID,typeView, Description).then(res => {
     if (res.Status == 1){
       this.setModalCallStaff(!ModalCallStaff)
+      this.setState({ isPostBack: true});
       Alert.alert( this.translate.Get('Notice'),"Quý khách vui lòng đợi trong giây lát", [
         {
           text: "OK", onPress: () => {
@@ -255,6 +256,7 @@ _AcceptCallStaff = async (Description,typeView) => {
       ]);
     }
   }).catch((error) => {
+    this.setState({ isPostBack: true});
     QAlert.alert( this.translate.Get('Notice'),"Máy in lỗi,KHÔNG THỂ in thông báo tự động đến quầy", [
       {
         text: "OK", onPress: () => {

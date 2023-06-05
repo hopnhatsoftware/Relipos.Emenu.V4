@@ -49,9 +49,10 @@ export class _HeaderNew extends React.Component  {
     API_Print (settings.I_BranchID, ticketId,typeView, Description).then(res => {
       if (res.Status == 1){
         this.setModalCallStaff(!ModalCallStaff)
+        this.setState({ isPostBack: true});
         Alert.alert( 'thông báo',"Quý khách vui lòng đợi trong giây lát", [
           {
-            text: "OK", onPress: () => {
+            text: "OK", onPress: () => {this.setState({ isPostBack: true});
             }
           }
         ]);
