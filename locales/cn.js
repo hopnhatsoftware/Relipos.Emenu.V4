@@ -199,5 +199,17 @@ export default en = {
     'Vui lòng liên hệ thu ngân để biết chính xác số tiền phải thanh toán.': '联系收銀人員確認客人要付金額.',
     'Không thể kết nối đến máy chủ, vui lòng xoá dữ liệu tạm và thử lại!': '不可連接主机, 請先除消暫時資料再重試!',
     'Xoá dữ liệu tạm': '删除暫時資料',
-    'Bạn có chắc chắn muốn xoá?': '您已確定要删除否?'
+    'Bạn có chắc chắn muốn xoá?': '您已確定要删除否?',
+    "Lịch sử gọi món":"点菜的记录",
+    "Trạng thái bếp":"厨房状态",
+    "Nhân viên":"员工",
+    "Giờ order":"下单时间",
+    "Bắt đầu làm":"开始",
+    "Làm xong":"完成",
+    "Thao tác":"操作",
+    "Tổng TG làm":"时间煮",
+    // "Limited OrddQuantity!": ,
+    // "Your quantity is limited, Please check in!": ,
+    // "Limited Products!": ,
+    // "Your products number is limited, Please check in!": ,
 }

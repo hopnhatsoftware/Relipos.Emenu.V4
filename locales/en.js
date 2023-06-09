@@ -204,5 +204,19 @@ export default en = {
     'Vui lòng liên hệ thu ngân để biết chính xác số tiền phải thanh toán.': 'Please contact cashiers for the final amount.',
     'Không thể kết nối đến máy chủ, vui lòng xoá dữ liệu tạm và thử lại!': 'Cannot connect to server, please clear cache then try again!',
     'Xoá dữ liệu tạm': 'Clear cache',
-    'Bạn có chắc chắn muốn xoá?': 'Are you sure to delete?'
+    'Bạn có chắc chắn muốn xoá?': 'Are you sure to delete?',
+    "Lịch sử gọi món":"Order history",
+    "Trạng thái bếp":"Kitchen Status",
+    "Nhân viên":"staff",
+    "Giờ order":"Order time",
+    "Bắt đầu làm":"Start doing",
+    "Làm xong":"Done",
+    "Tổng TG làm":"Cooking time",
+    "Thao tác":"Actions",
+    "Limited OrddQuantity!": "Limited OrddQuantity!",
+    "The total quantity of ordered items must not exceed ": "The total quantity of ordered items must not exceed " ,
+    ". Please reduce the quantity of items to continue the operation":". Please reduce the quantity of items to continue the operation",
+    "Limited Products!": "Limited Products!",
+    "The total quantity of ordered items should not exceed ":"The total quantity of ordered items should not exceed ",
+    ".Please reduce the quantity of items to continue the operation": ".Please reduce the quantity of items to continue the operation"
 }

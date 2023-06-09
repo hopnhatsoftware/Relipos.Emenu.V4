@@ -225,8 +225,29 @@ export const getTicketInfor = async (settings, item) => {
     PosId: settings.PosId ? settings.PosId : 1, Culture: culture, IsGroupView: 1
   });
 }
-
-
+export const getTicketInforOnTable = async (settings, item) => {
+  const culture = await _retrieveData('culture', 1);
+  const URL = '/Ticket/getTicketInforOnTable';
+  return await execFetch(URL, 'GET', {
+    TicketID: item.TicketID, BranchId: settings.I_BranchId,  Culture: culture,
+    PosId: settings.PosId ? settings.PosId : 1, isGroup: 1
+  });
+}
+export const UpdateStatus_TicketDetail = async (item, TkdStatus, table,) => {
+  const culture = await _retrieveData('culture', 1);
+  const URL = '/Ticket/UpdateStatus_TicketDetail';
+  return await execFetch(URL, 'GET', {
+    TkdId:item.TkdId,
+    TicketID: table.TicketID,
+    TkdStatus: TkdStatus,
+    PrdId: item.PrdId,
+    TkdUnitId: item.TkdUnitId,
+    PrdNo: item.PrdNo,
+    PrdName: item.PrdName,
+    TksdId: null,
+    AtdId: null,
+  });
+}
 
 //SetMenu
 export const LoadChoiceByProduct = async (settings, item) => {
@@ -307,7 +328,7 @@ export const CheckProductManyPrice = async (PrdId,ReaId,BusinessType) => {
   return await execFetch(URL, 'GET', { PrdId: PrdId, ReaId:ReaId,BusinessType:BusinessType,Culture:culture});
 }
 
-export const Ticket_Flush = async (settings, B_UseOrderDefault, sItemTable, group, users, TicketInfor) => {
+export const Ticket_Flush = async (settings,TicketId, B_UseOrderDefault, sItemTable, group, users, TicketInfor) => {
   const culture = await _retrieveData('culture', 1);
   const URL = '/Ticket/Flush';
   return await execFetch(URL, 'GET', {
@@ -316,7 +337,7 @@ export const Ticket_Flush = async (settings, B_UseOrderDefault, sItemTable, grou
     I_Counter: settings.I_Counter,
     PosId: settings.PosId,
     B_UseOrderDefault: B_UseOrderDefault,
-    TicketId: 0,
+    TicketId: TicketId,
     ButId: 1,
     AreId: sItemTable.AreaID,
     TabId: sItemTable.TabId,
@@ -326,13 +347,13 @@ export const Ticket_Flush = async (settings, B_UseOrderDefault, sItemTable, grou
     ObjWaiter: group.ObjWaiter != null ? group.ObjWaiter : '',
     ObjWaiterName: group.ObjWaiterName != null ? group.ObjWaiterName : '',
     CustomerId: TicketInfor.CustomerId != null ? TicketInfor.CustomerId : '',
-    Customquantity: TicketInfor.Customquantity != null ? TicketInfor.Customquantity : 1,
+    Customquantity: TicketInfor.TkCustomerQuantity != null ? TicketInfor.TkCustomerQuantity : 1,
     DeviceName: TicketInfor.DeviceName != null ? TicketInfor.DeviceName : '',
     Description: TicketInfor.Description != null ? TicketInfor.Description : '',
-    MaleQuantity: TicketInfor.MaleQuantity != null ? TicketInfor.MaleQuantity : 0,
-    FemaleQuantity: TicketInfor.FemaleQuantity != null ? TicketInfor.FemaleQuantity : 0,
-    ChildrenQuantity: TicketInfor.ChildrenQuantity != null ? TicketInfor.ChildrenQuantity : 0,
-    ForeignQuantity: TicketInfor.ForeignQuantity != null ? TicketInfor.ForeignQuantity : 0,
+    MaleQuantity: TicketInfor.TkMaleQuantity != null ? TicketInfor.TkMaleQuantity : 0,
+    FemaleQuantity: TicketInfor.TkFemaleQuantity != null ? TicketInfor.TkFemaleQuantity : 0,
+    ChildrenQuantity: TicketInfor.TkChildrenQuantity != null ? TicketInfor.TkChildrenQuantity : 0,
+    ForeignQuantity: TicketInfor.TkForeignQuantity != null ? TicketInfor.TkForeignQuantity : 0,
     CustomerName: TicketInfor.CustomerName != null ? TicketInfor.CustomerName : '',
   });
 }

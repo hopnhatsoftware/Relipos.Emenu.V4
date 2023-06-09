@@ -1,5 +1,5 @@
 import React from "react";
-import {AppState,ActivityIndicator,FlatList, View, TouchableOpacity, TextInput, StyleSheet, Text,Image,Dimensions,Alert} from "react-native";
+import {AppState,ActivityIndicator,FlatList, View, TouchableOpacity, TextInput, StyleSheet, Text,Image,Dimensions,Alert,KeyboardAvoidingView,TouchableWithoutFeedback} from "react-native";
 import colors from "../config/colors";
 import Modal from "react-native-modal";
 import { Button, Icon } from "react-native-elements";
@@ -8,8 +8,10 @@ import {ITEM_FONT_SIZE, BUTTON_FONT_SIZE,H1_FONT_SIZE,H3_FONT_SIZE ,H2_FONT_SIZE
 import { Audio } from 'expo-av';
 import translate from '../services/translate';
 import {_retrieveData, _storeData } from "../services/storages";
-import {API_Print,CancelOrder} from "../services";
+import { _TableInfo } from '../components';
+import {API_Print,CancelOrder,Ticket_Flush,Ticket_getById} from "../services";
 import { ScrollView } from "react-native-gesture-handler";
+import tableInfo from "./tableInfo";
 const SCREEN_WIDTH = Dimensions.get("screen").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height; //- Constants.statusBarHeight;
 const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
@@ -20,11 +22,20 @@ export class _HeaderNew extends React.Component  {
       appState: AppState.currentState,
       IsLoaded:false,
       isColor:false,
+      B_UseOrderDefault: true,
+      OrdPlatform: 1,
+      group: {
+        OGroupId: '',
+        ObjWaiter: '',
+        ObjWaiterName: '',
+      },
+      showCustomer: false,
       Description:'',
       modalLanguage : false,
       ModalCallStaff: false,
       settings: {},
       Config: {},
+      isShowTicketInfor:false
     }
     this.translate = new translate();
   }
@@ -61,9 +72,41 @@ export class _HeaderNew extends React.Component  {
     let{appState}= this.state;
     let{table}=this.props;
     if(appState == 'background'){
-      console.log(table.OrderId)
       await CancelOrder(table.OrderId);
     }
+  }
+  _handleChangeButton = async () => {
+    try{
+      let{ticketId,table,Ticket}=this.props;
+      let user = await _retrieveData('APP@USER', JSON.stringify({ObjId:-1}));
+    user = JSON.parse(user);
+    let {settings,Config, B_UseOrderDefault, group, } = this.state;
+    Config.PosId = settings && settings.PosId ? settings.PosId : 1;
+    Config.I_BusinessType = 1;
+    Ticket_Flush(Config,ticketId, B_UseOrderDefault, table, group, user, Ticket).then((res) => {
+      if (res.Status == 1) {
+        this.setState({ isShowTicketInfor: false })
+      }
+      else {
+        Alert.alert(  this.translate.Get('Notice'),"Cập nhật không thành công", [
+          {
+            text: "OK", onPress: () => {this.setState({ isPostBack: true});
+            }
+          }
+        ]);
+      }
+    })}
+    catch{((error) => {
+      Question.alert('System Error',error, [
+        {
+          text: "OK", onPress: () => {
+            this.setState({ isWorking: false, });
+          }
+        }
+      ]
+      )
+      this.setState({ isWorking: false, });
+    })};
   }
   _AcceptPayment = async (Description,typeView) => {
     let{ticketId}=this.props;
@@ -72,7 +115,7 @@ export class _HeaderNew extends React.Component  {
       if (res.Status == 1){
         this.setModalCallStaff(!ModalCallStaff)
         this.setState({ isPostBack: true});
-        Alert.alert( 'thông báo',"Quý khách vui lòng đợi trong giây lát", [
+        Alert.alert(  this.translate.Get('Notice'),"Quý khách vui lòng đợi trong giây lát", [
           {
             text: "OK", onPress: () => {this.setState({ isPostBack: true});
             }
@@ -92,10 +135,32 @@ export class _HeaderNew extends React.Component  {
   setModalCallStaff = (visible) => {
     this.setState({ ModalCallStaff: visible });
   }
+  setshowCustomer = (visible) => {
+    this.setState({ showCustomer: visible });
+  }
+  _setItemCustomer = async (item, index) => {
+    let { Ticket } = this.props;
+    Ticket.CustomerId = item.ObjId;
+    Ticket.CustomerName = item.ObjName;
+    this.setState({ sCustomerItem: item, sCustomerIndex: index, showCustomer: false,Ticket });
+  }
+  renderCustomer = (item, index) => {
+    return (
+      <TouchableOpacity onPress={() => { this._setItemCustomer(item, index); }}
+        style={{ justifyContent: 'space-between', width: '95%', paddingLeft: 5, paddingRight: 5, backgroundColor: colors.white, borderBottomWidth: 1, borderBottomColor: colors.grey5, }}  >
+        <View style={{ paddingBottom: 5, paddingTop: 5, width: '100%' }}>
+          <View style={{ paddingLeft: '5%', paddingRight: '5%', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+            <Text style={[styles.colorText, { width: '30%' }]} numberOfLines={2} >{item.ObjNo}</Text>
+            <Text style={[styles.colorText, { width: '70%' }]} numberOfLines={2} >{item.ObjName}</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
+  };
   render() {
    
-    const { state, table, BookingsStyle, _searchProduct, onPressBack, translate, name, titleSet, setState,backgroundColor,changeLanguage,data,listLanguage,listLanguage2,languageText,languageImg} = this.props;
-    const{modalLanguage,isColor,ModalCallStaff}=this.state
+    const { state, table, BookingsStyle, _searchProduct, onPressBack, translate, name, titleSet, setState,backgroundColor,changeLanguage,data,CustomerList,Ticket} = this.props;
+    const{modalLanguage,isColor,ModalCallStaff,isShowTicketInfor,showCustomer}=this.state
     if (state.showCall==undefined||state.showCall==null) {
       state.showCall=false;
     }
@@ -109,6 +174,178 @@ export class _HeaderNew extends React.Component  {
     }
     return (
       <View style={[BookingsStyle.header,{ backgroundColor: backgroundColor, width: '100%', }]}>
+        {isShowTicketInfor ?
+        <ScrollView>
+        <Modal
+        onBackdropPress={() => this.setState({ isShowTicketInfor: false })}
+        isVisible={true}
+        visible={isShowTicketInfor}>
+        <View style={{top: Bordy.height*0.07, left: Bordy.width*0.15, width: Bordy.width *0.6, height: Bordy.height*0.65,borderRadius:10, zIndex: 100, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+          <View style={{borderTopLeftRadius:10,borderTopRightRadius:10,height:  Bordy.height*0.65*0.1,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
+          <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white', textAlign: 'center', fontFamily: 'RobotoBold' }}>{translate.Get("ticket_info")}</Text>
+          </View>
+          <View style={{ backgroundColor: this.state.isColor == true ? "#222222" :'white', height:  Bordy.height*0.65*0.75,flexDirection:'column'}}>
+                  <View style={{flexDirection:'row',width: '100%', height:  Bordy.height*0.65*0.16, justifyContent:'space-evenly'}}>
+                  <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
+                      <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
+                        <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Khách nam')}</Text>                      
+                      </View>
+                      <TextInput
+                        style={{height:'60%',width:'90%',borderWidth:0.5,borderRadius:8,paddingHorizontal:5, borderColor:isColor == true ? '#FFFFFF': '#000000',color:isColor == true ? '#FFFFFF': '#000000'}}
+                        value={Ticket.TkMaleQuantity ? Ticket.TkMaleQuantity.toString() : ''}
+                        placeholder={translate.Get('Số lượng khách nam')}
+                        placeholderTextColor={isColor == true ? '#B9B0B0': '#B9B0B0'}
+                        keyboardType="numeric" 
+                        onChangeText={(textInput) => { Ticket.TkMaleQuantity= textInput; this.setState({ Ticket }) }}>
+                      </TextInput>
+                    </View>
+                    <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
+                      <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
+                        <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Khách nữ')}</Text>                      
+                      </View>
+                      <TextInput
+                        style={{height:'60%',width:'90%',borderWidth:0.5,borderRadius:8,paddingHorizontal:5, borderColor:isColor == true ? '#FFFFFF': '#000000',color:isColor == true ? '#FFFFFF': '#000000'}}
+                        value={Ticket.TkFemaleQuantity ? Ticket.TkFemaleQuantity.toString() : ''}
+                        placeholderTextColor={isColor == true ? '#B9B0B0': '#B9B0B0'}
+                        keyboardType="number-pad" 
+                        placeholder={translate.Get('Số lượng khách nữ')}
+                        onChangeText={(textInput) => {Ticket.TkFemaleQuantity = textInput; this.setState({ Ticket }) }}>
+                      </TextInput>
+                    </View>
+                  </View>
+                  <View style={{flexDirection:'row',width: '100%', height:  Bordy.height*0.65*0.16, justifyContent:'space-evenly'}}>
+                  <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
+                      <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
+                        <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Trẻ em')}</Text>                      
+                      </View>
+                      <TextInput
+                        style={{height:'60%',width:'90%',borderWidth:0.5,borderRadius:8,paddingHorizontal:5, borderColor:isColor == true ? '#FFFFFF': '#000000',color:isColor == true ? '#FFFFFF': '#000000'}}
+                        value={Ticket.TkChildrenQuantity ? Ticket.TkChildrenQuantity.toString() : ''}
+                        placeholderTextColor={isColor == true ? '#B9B0B0': '#B9B0B0'}
+                        keyboardType="number-pad" 
+                        placeholder={translate.Get('Số lượng trẻ em')}
+                        onChangeText={(textInput) => { Ticket.TkChildrenQuantity= textInput; this.setState({ Ticket }) }}>
+                      </TextInput>
+                    </View>
+                    <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
+                      <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
+                        <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Khách nước ngoài')}</Text>                      
+                      </View>
+                      <TextInput
+                        style={{height:'60%',width:'90%',borderWidth:0.5,borderRadius:8,paddingHorizontal:5, borderColor:isColor == true ? '#FFFFFF': '#000000',color:isColor == true ? '#FFFFFF': '#000000'}}
+                        value={Ticket.TkForeignQuantity ? Ticket.TkForeignQuantity.toString() : ''}
+                        placeholderTextColor={isColor == true ? '#B9B0B0': '#B9B0B0'}
+                        keyboardType="number-pad" 
+                        placeholder={translate.Get('SL khách nước ngoài')}
+                        onChangeText={(textInput) => {Ticket.TkForeignQuantity = textInput; this.setState({ Ticket }) }}>
+                      </TextInput>
+                    </View>
+                  </View>
+                  <View style={{flexDirection:'row',width: '100%', height:  Bordy.height*0.65*0.16, justifyContent:'space-evenly'}}>
+                  <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
+                      <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
+                        <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Số lượng khách')}</Text>                      
+                      </View>
+                      <TextInput
+                        style={{height:'60%',width:'90%',borderWidth:0.5,borderRadius:8,paddingHorizontal:5, borderColor:isColor == true ? '#FFFFFF': '#000000',color:isColor == true ? '#FFFFFF': '#000000'}}
+                        value={Ticket.TkCustomerQuantity ? Ticket.TkCustomerQuantity.toString() : ''}
+                        placeholderTextColor={isColor == true ? '#B9B0B0': '#B9B0B0'}
+                        keyboardType="number-pad" 
+                        placeholder={translate.Get('Số lượng khách')}
+                        onChangeText={(textInput) => { Ticket.TkCustomerQuantity= textInput; this.setState({ Ticket }) }}>
+                      </TextInput>
+                    </View>
+                    <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
+                      <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
+                        <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Khách hàng')}</Text>                      
+                      </View>
+                      <TextInput
+                        style={{height:'60%',width:'90%',borderWidth:0.5,borderRadius:8,paddingHorizontal:5, borderColor:isColor == true ? '#FFFFFF': '#000000',color:isColor == true ? '#FFFFFF': '#000000'}}
+                        value={Ticket.CustomerName}
+                        placeholderTextColor={isColor == true ? '#B9B0B0': '#B9B0B0'}
+                        placeholder={translate.Get('Dạng khách')}
+                        onChangeText={(textInput) => {Ticket.CustomerName = textInput; this.setState({ Ticket }) }}>
+                      </TextInput>
+                    </View>
+                  </View>
+                  {/* <View style={{ position: 'absolute', right: '4%', top: '49%', }}>
+                          <TouchableOpacity onPress={() => this.setshowCustomer(true)}>
+                            <Icon name="contacts" type="antdesign" color={this.state.isColor == true ? "#FFFFFF" : '#000000'} size={H1_FONT_SIZE} />
+                          </TouchableOpacity>
+                        </View> */}
+                 <View style={{ backgroundColor: this.state.isColor == true ? "#222222" :'white', height:  Bordy.height*0.65*0.28, justifyContent:'center',alignItems:'center'}}>
+                    <View style={{position:'absolute',top:'0%',left:'5%',zIndex:101}} >
+                        <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Ghi chú')}</Text>                      
+                      </View>
+                      <TextInput
+                        style={{height:'80%',width:'94%',borderWidth:0.5,borderRadius:8,paddingHorizontal:8, borderColor:isColor == true ? '#FFFFFF': '#000000',color:isColor == true ? '#FFFFFF': '#000000'}}
+                        value={Ticket.Description}
+                        multiline={true} 
+                        placeholderTextColor={isColor == true ? '#B9B0B0': '#B9B0B0'}
+                        numberOfLines={10} 
+                        placeholder={translate.Get('Diễn giải thông tin khách hàng')}
+                        onChangeText={(textInput) => {Ticket.Description = textInput; this.setState({ Ticket })}}>
+                      </TextInput>
+                 </View>
+                </View>
+          <View style={{height:  Bordy.height*0.65*0.147,width:'100%',borderBottomLeftRadius:10,borderBottomRightRadius:10,backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'space-evenly',flexDirection:'row',alignItems:'center'}}>
+            <TouchableOpacity onPress={() => this.setState({ isShowTicketInfor: false })} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:'#af3037',justifyContent:'center',alignItems:'center'}}>
+              <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{translate.Get("Trở lại")}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={()=>{this._handleChangeButton()}} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:isColor == true ? '#DAA520' :'#009900',justifyContent:'center',alignItems:'center'}}>
+            <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{translate.Get('Xác nhận')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      </ScrollView>
+        : null}
+        {this.state.showCustomer == true ?
+          <Modal
+          onBackdropPress={() => this.setshowCustomer( !showCustomer )}
+          isVisible={true}
+          visible={showCustomer}>
+          <View style={{top: Bordy.height*0.05, left: Bordy.width*0.15, width: Bordy.width *0.7, height: Bordy.height*0.65,borderRadius:10, zIndex: 300, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,}}>
+                <View style={{
+                  flexDirection: 'row', justifyContent: 'center', alignItems: 'center', width: '100%', height: Bordy.height*0.65*0.1,
+                  borderTopLeftRadius: 10, borderTopRightRadius: 10, backgroundColor: '#0176cd'
+                }}>
+                  <Text style={{ fontSize: H2_FONT_SIZE, color: colors.white, textAlign: 'center' }}>{this.translate.Get("Danh sách khách hàng")}</Text>
+                </View>
+                <View style={{ backgroundColor: colors.white, justifyContent: 'center', borderColor: "#EEEEEE", borderWidth: 1, height:Bordy.height*0.65*0.2}}>
+                  <TextInput
+                    ref={input => this.Search = input}
+                    style={[{
+                      fontSize: 15, paddingHorizontal: 10, paddingVertical: 10, marginLeft: 0,
+                      backgroundColor: 'white', textAlign: 'left', paddingLeft: 5,
+                      borderColor: '#EEEEEE', borderWidth: 1, borderRadius: 4,
+                    }]}
+                    autoFocus={false}
+                    autoCapitalize="none"
+                    placeholder={this.translate.Get("Tìm kiếm ...")}
+                    keyboardAppearance="dark"
+                    keyboardType="default"
+                    returnKeyType='next'
+                    autoCorrect={false}
+                    blurOnSubmit={false}
+                    onChangeText={(KeySearch) => { this.setState({ KeySearch }) }}
+                    onSubmitEditing={() => this.GetListCustomer()}
+                    value={this.state.KeySearch}
+                    placeholderTextColor="#7384B4"
+                  />
+                </View>
+                <View style={{ height:Bordy.height*0.65*0.7}}>
+                  <FlatList
+                    keyExtractor={(item, index) => index.toString()}
+                    data={CustomerList}
+                    extraData={this.state}
+                    renderItem={({ item, index }) => this.renderCustomer(item, index)}
+                    contentContainerStyle={{ backgroundColor: colors.white }}
+                  />
+                </View>
+              </View>
+            </Modal>
+          : null}
         {ModalCallStaff ?
         <ScrollView>
           <Modal
@@ -187,7 +424,7 @@ export class _HeaderNew extends React.Component  {
           </View>
         </Modal>
           : null}
-        <View style={{ paddingTop: 1, width: "20%", flexDirection: 'row', justifyContent: "space-between" }}>
+        <View style={{ paddingTop: 1, width: "35%", flexDirection: 'row', justifyContent: "space-between" }}>
           <TouchableOpacity
             onPress={() => { onPressBack.apply(null, []); }}
             style={{ width: '14%', justifyContent: 'center', alignItems: 'center' }}>
@@ -196,12 +433,12 @@ export class _HeaderNew extends React.Component  {
               ]}
             />
           </TouchableOpacity>
-          <View style={{ flexDirection: 'column', width: '60%', justifyContent: "center", alignItems: 'center', }}>
-            <View style={{ flexDirection: 'column', width: '100%', justifyContent: "center", alignItems: 'center', }}>
-              <Text style={[{ color: "#FFFFFF", textAlign: 'center', fontFamily: "RobotoBold", fontSize: ITEM_FONT_SIZE }]}> {table.TbNo} </Text>
-            </View>
+          <View style={{ flexDirection: 'column', width: '50%', justifyContent: "center", alignItems: 'center', }}>
+            <TouchableOpacity onPress={()=>state.lockTable == true ? null :  this.setState({ isShowTicketInfor: true })} style={{ flexDirection: 'column', width: '100%', justifyContent: "center", alignItems: 'left', }}>
+              <Text style={[{ color: "#FFFFFF", textAlign: 'left', fontFamily: "RobotoBold", fontSize: H3_FONT_SIZE*0.9 }]}> {table.TbNo} </Text>
+            </TouchableOpacity>
           </View>
-          <View style={{ flexDirection: 'column', width: '60%', justifyContent: "center", alignItems: 'center', }}>
+          <View style={{ flexDirection: 'column', width: '36%', justifyContent: "center", alignItems: 'center', }}>
             <TouchableOpacity style={{ width: '100%', justifyContent: "center", alignItems: 'center', }}
                onPress={() => this.setModalCallStaff(!ModalCallStaff)} >
              {(state.showCall==false)?
@@ -236,7 +473,7 @@ export class _HeaderNew extends React.Component  {
              </TouchableOpacity>
             </View>
             </View>
-        <View style={{ width: "68%", flexDirection: "row", justifyContent: "center", alignItems: 'center', }}>
+        <View style={{ width: "65%", flexDirection: "row", justifyContent: "center", alignItems: 'center', }}>
           <View style={[BookingsStyle.header_search, { flexDirection: "row" }]}>
             {name == 'OrderView' ?
               <TextInput

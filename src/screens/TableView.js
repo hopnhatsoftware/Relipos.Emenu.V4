@@ -223,7 +223,7 @@ export default class TableView extends Component {
     this.setState({ tableStatus: status }, () => { this.loadTables(this.state.selectedAreaIndex) });
   }
   _onPressTable = async (item, index) => {
-    const { user, AreasList, OrdPlatform, selectedAreaIndex,settings } = this.state;
+    const { user, AreasList, OrdPlatform, selectedAreaIndex,settings,sItemTable,CustomerList } = this.state;
     if (item == null || item.TicketID <= 0) {
       this.setState({
         sItemTable: item, sIndexTable: index, isShowTicketInfor: true, isWorking: false
@@ -238,7 +238,7 @@ export default class TableView extends Component {
         this.setState({ isLoading: false });
         _storeData('APP@TABLE', JSON.stringify(item),
           () => {
-            this.props.navigation.navigate("OrderView", { settings, user, table: item });
+            this.props.navigation.navigate("OrderView", { settings, user, table: item ,AreasList, selectedAreaIndex,sItemTable,CustomerList});
           });
       })}
       catch{((error) => {
@@ -256,15 +256,14 @@ export default class TableView extends Component {
 
   _handleChangeButton = async () => {
     try{
-    let {user,settings,Config, TicketInfor, sItemTable, B_UseOrderDefault, OrdPlatform, group, AreasList, selectedAreaIndex } = this.state;
-  
+    let {user,settings,Config, sItemTable, B_UseOrderDefault,TicketInfor, OrdPlatform, group, AreasList, selectedAreaIndex } = this.state;
     Config.PosId = settings && settings.PosId ? settings.PosId : 1;
     Config.I_BusinessType = 1;
     sItemTable.AreaID = AreasList[selectedAreaIndex].AreID;
     this.setState({ isWorking: true, });
     TicketInfor.TkPcName = Constants.deviceName ? Constants.deviceName : 'simulator';
     TicketInfor.DeviceName = Constants.deviceName ? Constants.deviceName : 'simulator';
-    Ticket_Flush(Config, B_UseOrderDefault, sItemTable, group, user, TicketInfor).then((res) => {
+    Ticket_Flush(Config,0, B_UseOrderDefault, sItemTable, group, user, TicketInfor).then((res) => {
       if (res.Status == 1) {
         let CurrentData = res.Data;
         sItemTable.TicketID = CurrentData.TicketID;
@@ -315,7 +314,7 @@ export default class TableView extends Component {
     let { TicketInfor } = this.state;
     TicketInfor.CustomerId = item.ObjId;
     TicketInfor.CustomerName = item.ObjName;
-    this.setState({ sCustomerItem: item, sCustomerIndex: index, showCustomer: false, });
+    this.setState({ sCustomerItem: item, sCustomerIndex: index, showCustomer: false,TicketInfor });
   }
   renderCustomer = (item, index) => {
     return (
@@ -407,7 +406,7 @@ export default class TableView extends Component {
           HeaderHeight={pnHeaderheight}
             TicketInfor={TicketInfor}
             onClose={() => this.setState({ isShowTicketInfor: false })}
-            onPress={() => this._handleChangeButton()}
+            onPressAc={() => this._handleChangeButton()}
             onPressShow={() => this.setState({ showCustomer: true })}
             translate={this.translate}/> : null
         }

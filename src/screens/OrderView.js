@@ -1,6 +1,6 @@
 /*Màn hình chọn món */
 import React, { Component } from "react";
-import {AppState,TouchableOpacity,Dimensions,Image,TouchableHighlight,ActivityIndicator, UIManager,StatusBar,ImageBackground,Keyboard,StyleSheet,VirtualizedList,Platform,Animated,Easing,Text,View,
+import {AppState,TouchableOpacity,Dimensions,Image,TouchableHighlight,ActivityIndicator, UIManager,StatusBar,ImageBackground,Keyboard,StyleSheet,Alert,Platform,Animated,Easing,Text,View,
   TextInput,ScrollView} from "react-native";
 import * as Font from "expo-font";
 import Modal from "react-native-modal";
@@ -42,6 +42,7 @@ export default class OrderView extends Component {
     this.textInput = null;
     this.state = {
       appState: AppState.currentState,
+      isHavingOrder: 1,
       showCall:false,
       isRenderProduct: true,
       selectedType: null,
@@ -49,6 +50,10 @@ export default class OrderView extends Component {
       checked:'',
       test:'',
       itemChecked:{},
+      AreasList: [],
+      selectedAreaIndex: -1,
+      CustomerList: [],
+      dataCheck: [{PrdId:''}],
       DataSize: [],
       selectedId: -1,
       listLanguage:[],
@@ -362,7 +367,6 @@ onCallServices= async() => {
           CheckAndGetOrder(table, OrdPlatform).then(res => {
        if(res.Status == 1){
         table.OrderId = res.Data;
-        console.log('OrderId',table.OrderId)
         _storeData("APP@TABLE", JSON.stringify(table), () => {
           GetViewGroup(Config, table).then(res => {
             if (res.Data.Table.length > 0) {
@@ -420,7 +424,6 @@ onCallServices= async() => {
     if ("TicketID" in table && table.TicketID > 0) {
       getTicketInfor(Config, table).then(res => {
         if (!("Table" in res.Data) || res.Data.Table.length == 0) {
-          
         }
         if ("Table2" in res.Data) {
           ProductsOrdered = res.Data.Table2;
@@ -460,7 +463,10 @@ onCallServices= async() => {
       return {
         settings: props.navigation.getParam("settings", state.settings),
         lockTable: props.navigation.getParam("lockTable", state.lockTable),
-        table: props.navigation.getParam("table", state.table)
+        table: props.navigation.getParam("table", state.table),
+        CustomerList: props.navigation.getParam("CustomerList", state.CustomerList),
+        AreasList: props.navigation.getParam("AreasList", state.AreasList),
+        selectedAreaIndex: props.navigation.getParam("selectedAreaIndex", state.selectedAreaIndex),
       };
     }
     if (
@@ -492,45 +498,63 @@ onCallServices= async() => {
   }
   HandleQuantity = async (item,OrddQuantity,isReplace) => {
     try {
-    let { CartInfor} = this.state;
-    let iQuantity=parseFloat(OrddQuantity);
-    if (!('Json' in item) || item.Json == '')
-    item.Json = '';
-    let {CartFilter}= this._getCartItems(item,item.Json);
-    let DataCurrent = CartFilter.FirstItem;
-    let RowIndex=CartFilter.FirstIndex
-    if(DataCurrent!=null)
-    {
-      if(isReplace)
-      DataCurrent.OrddQuantity=0;
-      iQuantity=iQuantity+DataCurrent.OrddQuantity;
-    }
-  /*
-let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
-    Config = JSON.parse(Config);
-    let QuantityCheck=CartInfor.OrddQuantity+OrddQuantity,TypeNumCheck=CartInfor.items.length ;
-        if(!isExits)
-            TypeNumCheck++;
-            if (Config.I_LimitQuntityBooking > 0) {
-              if (QuantityCheck>= Config.I_LimitQuntityBooking) {
-                Question.alert(
-                  this.translate.Get("Limited OrddQuantity!"),
-                  this.translate.Get("Your quantity is limited, Please check in!")
-                );
-                return;
-              }
-            }
-              if (Config.I_LimitTypeBooking > 0) 
-                if (TypeNumCheck>= Config.I_LimitTypeBooking) {
-                  Question.alert(
-                    this.translate.Get("Limited Products!"),
-                    this.translate.Get("Your products number is limited, Please check in!")
-                  );
-                  return;
+      let { CartInfor} = this.state;
+      let iQuantity=parseFloat(OrddQuantity);
+      if (!('Json' in item) || item.Json == '')
+      item.Json = '';
+      let {CartFilter}= this._getCartItems(item,item.Json);
+      let DataCurrent = CartFilter.FirstItem;
+      let RowIndex=CartFilter.FirstIndex
+      if(DataCurrent!=null)
+      {
+        if(isReplace)
+        DataCurrent.OrddQuantity=0;
+        iQuantity=iQuantity+DataCurrent.OrddQuantity;
+      }
+      let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
+      Config = JSON.parse(Config);
+      let QuantityCheck=CartInfor.TotalQuantity,TypeNumCheck=CartInfor.items.length,total = OrddQuantity + CartInfor.TotalQuantity ;
+        if(iQuantity>0 ){
+          if (Config.I_LimitTypeBooking > 0) 
+              if (TypeNumCheck>= Config.I_LimitTypeBooking  && OrddQuantity > 0) {
+                if (Config.I_LimitQuntityBooking > 0) {
+                  if (QuantityCheck>= Config.I_LimitQuntityBooking && total > Config.I_LimitQuntityBooking) {
+                    let a = Config.I_LimitQuntityBooking
+                    Alert.alert(
+                      this.translate.Get("Limited OrddQuantity!"),
+                      this.translate.Get("The total quantity of ordered items must not exceed ") + Config.I_LimitQuntityBooking +
+                      this.translate.Get(". Please reduce the quantity of items to continue the operation")
+                    );
+                    return;
+                  }
                 }
+                 if(TypeNumCheck>= Config.I_LimitTypeBooking && DataCurrent == null){
+                  Alert.alert(
+                        this.translate.Get("Limited Products!"),
+                        this.translate.Get("The total quantity of ordered items should not exceed ") + Config.I_LimitTypeBooking + this.translate.Get(".Please reduce the quantity of items to continue the operation")
+                      );
+                      return;
+                }
+              }
+          if (Config.I_LimitQuntityBooking > 0 && OrddQuantity > 0) {
+            if (QuantityCheck>= Config.I_LimitQuntityBooking && total > Config.I_LimitQuntityBooking) {
+              Alert.alert(
+                this.translate.Get("Limited OrddQuantity!"),
+                this.translate.Get("The total quantity of ordered items must not exceed ") + Config.I_LimitQuntityBooking +
+                this.translate.Get(". Please reduce the quantity of items to continue the operation")
+              );
+              return;
+            }
+            if ( total > Config.I_LimitQuntityBooking) {
+              Alert.alert(
+                this.translate.Get("Limited OrddQuantity!"),
+                this.translate.Get("The total quantity of ordered items must not exceed ") + Config.I_LimitQuntityBooking +
+                this.translate.Get(". Please reduce the quantity of items to continue the operation")
                 
-        */
-        if(iQuantity>0){
+              );
+              return;
+            }
+          }
           if(DataCurrent!=null)
           DataCurrent.OrddQuantity = iQuantity;
         if(DataCurrent==null)
@@ -585,7 +609,6 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
   _sendOrder = async () => {
     try{
     let { table, CartInfor, OrdPlatform,Config } = this.state;
-    console.log('order',table.OrderId)
     if (CartInfor.TotalQuantity<=0)
       return;
     this.setState({ isShowMash: true }); 
@@ -802,7 +825,7 @@ let Config = await _retrieveData('APP@CONFIG', JSON.stringify({}));
       duration: 400,
       easing: Easing.linear,
       useNativeDriver: false
-    }).start(() => this.setState({ isShowFormCard: isShow }));
+    }).start(() => this.setState({ isShowFormCard: isShow ,isHavingOrder : 1}));
   }
   _buy = item => {
     this.setState({ CartItemSelected: null, CartProductIndex: -1 }, () =>
@@ -1420,20 +1443,23 @@ if (ProductChoise==null) {
                   }:  require("../../assets/images/NoImage_trans-04.png")
                 }
                 style={[{ width: '100%', height: '100%', backgroundColor:isColor == true ? '#454545' : "#FFFFFF" }]} >
-                {item.ResName && item.ResName == 'HOT' ? 
+                {item.ResName && item.SttName == 'HOT' ? 
                   <View style={{ position: "absolute", paddingTop:10,right:10, width: '20%'}}>
                     <Image resizeMode="contain" source={require('../../assets/icons/IconHot-09.png')}
                       style={{ width: H1_FONT_SIZE*1.6, height: H1_FONT_SIZE*1.6,}} />
                   </View>
-                : item.ResName && item.ResName == 'NEW' ?
+                : item.ResName && item.SttName == 'NEW' ?
                   <View style={{  position: "absolute", paddingTop: 10, right: 10,width: '20%' }}>
                     <Image resizeMode="contain" source={require('../../assets/icons/IconNew-09.png')}
                       style={{width: H1_FONT_SIZE*1.6, height: H1_FONT_SIZE*1.6, }}/>
                   </View>
-                  : item.ResName && item.ResName == 'SALE' ?
-                  <View style={{  position: "absolute", paddingTop: 10, right: 10,width: '20%' }}>
+                  : item.ResName && item.SttName == 'SALE' ?
+                  <View style={{  position: "absolute", paddingTop: 0, right: 5}}>
+                    <View style={{position: "absolute",zIndex:1000,width: H1_FONT_SIZE*4.2, height: H1_FONT_SIZE*1.3,justifyContent:'center',alignItems:'center',paddingHorizontal:5}}>
+                    <Text style={{fontSize:H4_FONT_SIZE,color:'#FFFFFF'}}>{item.ResName}</Text>
+                    </View>
                     <Image resizeMode="contain" source={require('../../assets/icons/IconSale.png')}
-                      style={{width: H1_FONT_SIZE*1.6, height: H1_FONT_SIZE*1.6, }}/>
+                      style={{width: H1_FONT_SIZE*4.2, height: H1_FONT_SIZE*1.6, }}/>
                   </View>
                   : null} 
                 {/* <View style={{ position: "absolute", paddingTop: (iHeight-36)/2, right: -15 }}>
@@ -1539,11 +1565,6 @@ if (ProductChoise==null) {
                   <View style={{width:'15%',height:'100%',alignItems:'flex-start',justifyContent: 'flex-start' }}>
                   </View>
                   : 
-                  // (item.RECORD > 1 && item.OrddQuantity == 0)?
-                  // <TouchableOpacity onPress={()=>{this._CheckProductManyPrice(item)}}style={{position:'absolute',right:2,backgroundColor:'#009900',borderRadius:15,width:'40%',height:'100%',alignItems:'center',justifyContent: 'center'}}>
-                  //   <Text style={{color:'#FFFFFF',fontSize:H3_FONT_SIZE}}>Chọn size</Text>
-                  // </TouchableOpacity>
-                  // :
                   <TouchableOpacity style={{width:'15%',height:'100%',alignItems:'center',justifyContent: 'center' }} onPress={() => {
                      if (item.PrdIsSetMenu == true ) 
                      this.PrerenderProductModal(item,CartFilter,index);
@@ -1579,8 +1600,7 @@ if (ProductChoise==null) {
         </View>
       );
     }
-    const {ProductGroupList,endpoint,PrdChildGroups,checked,Products,CartInfor,itemChecked,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config,ProductsOrdered,isColor,modalSize} = this.state; 
-   
+    const {ProductGroupList,endpoint,PrdChildGroups,checked,Products,CartInfor,itemChecked,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config,ProductsOrdered,isColor} = this.state; 
     return (
       <View style={{height:Bordy.height,width:Bordy.width, backgroundColor: isColor == true ? '#333333' : "#DDDDDD"}}>
         {/* {modalSize ?
@@ -1639,8 +1659,12 @@ if (ProductChoise==null) {
           <View style={{width:Center.width,height:Center.height, flexDirection: "column"}}>
             <_HeaderNew
               state={this.state}
+              Ticket={this.state.Ticket}
+              CustomerList={this.state.CustomerList}
               backgroundColor="#333D4C"
               table={this.state.table}
+              AreasList={this.state.AreasList}
+              selectedAreaIndex={this.state.selectedAreaIndex}
               ticketId={this.state.table.TicketID}
               onPressBack={() => { this.onPressBack(); }}
               _searchProduct={(val) => this._searchProduct(val)}

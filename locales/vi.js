@@ -171,5 +171,19 @@ export default en={
     'Support platform:': 'Nền tảng hỗ trợ:',
     'This amount does not include tax, discount, services and other fees.' : 'Số tiền này chưa bao gồm thuế VAT, giảm giá và các chi phí khác.',
     'Contact cashiers for the final amount.' : 'Vui lòng liên hệ thu ngân để biết thêm chi tiết.',
-    'SystemError.' : 'Lỗi Hệ thống.'
+    'SystemError.' : 'Lỗi Hệ thống.',
+    "Lịch sử gọi món":"Lịch sử gọi món",
+    "Trạng thái bếp":"Trạng thái bếp",
+    "Nhân viên":"Nhân viên",
+    "Giờ order":"Giờ order",
+    "Bắt đầu làm":"Bắt đầu làm",
+    "Làm xong":"Làm xong",
+    "Tổng TG làm":"Tổng TG làm",
+    "Thao tác":"Thao tác",
+    "Limited OrddQuantity!": "Số lượng order có hạn!",
+    "The total quantity of ordered items must not exceed ": "Tổng số lượng món đặt không được quá " ,
+    ". Please reduce the quantity of items to continue the operation":". Vui lòng giảm số lượng món để tiếp tục thao tác",
+    "Limited Products!": "Số lượng order có hạn!",
+    "The total quantity of ordered items should not exceed ":"Tổng số lượng loại món đặt không được quá ",
+    ".Please reduce the quantity of items to continue the operation": ". Vui lòng giảm số lượng loại món để tiếp tục thao tác"
 }

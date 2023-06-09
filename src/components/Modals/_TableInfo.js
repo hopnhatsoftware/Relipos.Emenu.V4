@@ -21,7 +21,7 @@ import colors from '../../config/colors';
 import { _retrieveData, _storeData } from '../../services/storages';
 import { FormInputText, Button } from '../../components';
 import { Icon } from "react-native-elements";
-import { LOGIN_INPUT_FONT_SIZE, ITEM_FONT_SIZE, BACKGROUND_COLOR, H2FontSize ,H3FontSize,H4FontSize,H3_FONT_SIZE, H2_FONT_SIZE} from '../../config/constants';
+import { LOGIN_INPUT_FONT_SIZE, ITEM_FONT_SIZE, BACKGROUND_COLOR, H2FontSize ,H3FontSize,H4_FONT_SIZE,H3_FONT_SIZE, H2_FONT_SIZE, H1_FONT_SIZE} from '../../config/constants';
 import styles from '../../styles/general'
 import Question from '../../components/Question';
 const SCREEN_WIDTH = Dimensions.get('window').width;
@@ -39,8 +39,6 @@ export class _TableInfo extends React.Component {
   textInputCustomerName = null;
   state = {
     keysearch: '',
-  }
-  state = {
       isColor:false,
       top: 0,
   };
@@ -69,214 +67,131 @@ export class _TableInfo extends React.Component {
   }
 
   render() {
-    const { onClose, onPress, onPressShow, TicketInfor, translate, isLoading,backgroundColor,pnHeaderheight } = this.props;
+    const { onClose, onPressAc, onPressShow, translate, isLoading,backgroundColor,TicketInfor } = this.props;
+    let {isColor}=this.state;
     return (
-      <View style={{ backgroundColor: "rgba(98,98,98,0.6)", position: "absolute", width: SCREEN_WIDTH, justifyContent: 'center', alignItems: 'center', height: SCREEN_HEIGHT + Constants.statusBarHeight }}>
-        <View style={[{ backgroundColor:this.state.isColor == true ? "#222222" : colors.white, borderWidth: 1, position: "absolute",  width: SCREEN_WIDTH*0.65,height:'60%', borderColor: backgroundColor},]}>
-          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopLeftRadius: 8, borderTopRightRadius: 8, borderColor: backgroundColor,marginTop:-1,marginRight:-1,marginLeft:-1,
-          backgroundColor: backgroundColor, height: pnHeaderheight,paddingTop:10,paddingBottom:10 }}> 
+      <View style={{backgroundColor: "rgba(98,98,98,0.6)", position: "absolute", width: SCREEN_WIDTH, justifyContent: 'center', alignItems: 'center', height: SCREEN_HEIGHT}}>
+        <View style={[{backgroundColor:this.state.isColor == true ? "#222222" : colors.white, borderWidth: 1, position: "absolute",  width: SCREEN_WIDTH*0.65,height:SCREEN_HEIGHT*0.6, borderColor: backgroundColor},]}>
+            <KeyboardAvoidingView behavior='position'>
+            <ScrollView style={{ width: '100%', }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopLeftRadius: 8, borderTopRightRadius: 8, borderColor: backgroundColor,marginTop:-1,marginRight:-1,marginLeft:-1,
+          backgroundColor: backgroundColor, height: SCREEN_HEIGHT*0.6*0.1,paddingTop:10,paddingBottom:10 }}> 
             <Text style={{ height: 35, fontSize:H2FontSize, color: colors.white, textAlign: 'center', fontFamily: 'RobotoBold' }}>{translate.Get("ticket_info")}</Text>
           </View>
-          <ScrollView style={{ width: '100%', }}> 
-            <KeyboardAvoidingView behavior='position' style={{ paddingBottom: 70 }}>
-                <View style={{ backgroundColor: this.state.isColor == true ? "#222222" :'white',borderRadius: 8, }}>
-                  <View style={{ flexDirection: 'row', paddingTop: 10, paddingLeft: 10, paddingRight: 10, width: '100%' }}>
-                  </View>
-                  <View style={{ flexDirection: 'row', paddingTop: 10, paddingLeft: 10, paddingRight: 10, width: '100%' }}>
-                    <View style={{ flexDirection: 'row', width: '50%', paddingRight: 5, }}>
-                      <View style={[{ width: '100%', paddingTop: 10, }]}>
-                        <FormInputText
-                          nameText={translate.Get('Khách nam')}
-                          keyboardAppearance='light'
-                          autoFocus={false}
-                          autoCapitalize='none'
-                          keyboardType="numeric"
-                          autoCorrect={false}
-                          color={this.state.isColor == true ? "#FFFFFF" :'#000'}
-                          returnKeyType='next'
-                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', }}
-                          icon='user'
-                          inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
-                          textStyle={{backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', color:this.state.isColor == true ? "#FFFFFF" : '#000000' }}
-                          placeholder={translate.Get('Số lượng khách nam')}
-                          placeholderTextColor="#bdc6cf"
-                          refInput={input => this.textInputMaleQuantity = input}
-                          onChangeText={(textInputMaleQuantity) => { TicketInfor.TkMaleQuantity = textInputMaleQuantity; this.setState({ TicketInfor }) }}
-                          value={TicketInfor.TkMaleQuantity ? TicketInfor.TkMaleQuantity.toString() : ''}
-                          onSubmitEditing={() => {
-                            setTimeout(() => this.textInputFemaleQuantity.focus(), 100)
-                          }} />
+                <View style={{ backgroundColor: this.state.isColor == true ? "#222222" :'white', height:SCREEN_HEIGHT*0.6*0.7,flexDirection:'column'}}>
+                  <View style={{flexDirection:'row',width: '100%', height:SCREEN_HEIGHT*0.6*0.15, justifyContent:'space-evenly'}}>
+                  <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
+                      <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
+                        <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Khách nam')}</Text>                      
                       </View>
+                      <TextInput
+                        style={{height:'60%',width:'90%',borderWidth:0.5,borderRadius:8,paddingHorizontal:5, borderColor:isColor == true ? '#FFFFFF': '#000000',color:isColor == true ? '#FFFFFF': '#000000'}}
+                        value={TicketInfor.TkMaleQuantity ? TicketInfor.TkMaleQuantity.toString() : ''}
+                        placeholder={translate.Get('Số lượng khách nam')}
+                        placeholderTextColor={isColor == true ? '#B9B0B0': '#B9B0B0'}
+                        keyboardType="numeric" 
+                        onChangeText={(textInput) => { TicketInfor.TkMaleQuantity= textInput; this.setState({ TicketInfor }) }}>
+                      </TextInput>
                     </View>
-                    <View style={{ flexDirection: 'row', width: '50%', paddingRight: 5, }}>
-                      <View style={[{ width: '100%', paddingTop: 10, }]}>
-                        <FormInputText
-                          nameText={translate.Get('Khách nữ')}
-                          keyboardAppearance='light'
-                          autoFocus={false}
-                          autoCapitalize='none'
-                          keyboardType="numeric"
-                          autoCorrect={false}
-                          color={this.state.isColor == true ? "#FFFFFF" :'#000'}
-                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', }}
-                          returnKeyType='next'
-                          inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
-                          textStyle={{backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', color:this.state.isColor == true ? "#FFFFFF" : '#000000' }}
-                          placeholder={translate.Get('Số lượng khách nữ')}
-                          placeholderTextColor="#bdc6cf"
-                          refInput={input => this.textInputFemaleQuantity = input}
-                          onChangeText={(textInputFemaleQuantity) => { TicketInfor.TkFemaleQuantity = textInputFemaleQuantity; this.setState({ TicketInfor }) }}
-                          value={TicketInfor.TkFemaleQuantity ? TicketInfor.TkFemaleQuantity.toString() : ''}
-                          onSubmitEditing={() => {
-                            setTimeout(() => this.textInputChildrenQuantity.focus(), 100)
-                          }} />
+                    <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
+                      <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
+                        <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Khách nữ')}</Text>                      
                       </View>
+                      <TextInput
+                        style={{height:'60%',width:'90%',borderWidth:0.5,borderRadius:8,paddingHorizontal:5, borderColor:isColor == true ? '#FFFFFF': '#000000',color:isColor == true ? '#FFFFFF': '#000000'}}
+                        value={TicketInfor.TkFemaleQuantity ? TicketInfor.TkFemaleQuantity.toString() : ''}
+                        placeholderTextColor={isColor == true ? '#B9B0B0': '#B9B0B0'}
+                        keyboardType="number-pad" 
+                        placeholder={translate.Get('Số lượng khách nữ')}
+                        onChangeText={(textInput) => {TicketInfor.TkFemaleQuantity = textInput; this.setState({ TicketInfor }) }}>
+                      </TextInput>
                     </View>
                   </View>
-
-                  <View style={{ flexDirection: 'row', paddingTop: 10, paddingLeft: 10, paddingRight: 10, width: '100%' }}>
-                    <View style={{ flexDirection: 'row', width: '50%', paddingRight: 5, }}>
-                      <View style={[{ width: '100%', paddingTop: 10, }]}>
-                        <FormInputText
-                          nameText={translate.Get('Trẻ em')}
-                          keyboardAppearance='light'
-                          autoFocus={false}
-                          autoCapitalize='none'
-                          autoCorrect={false}
-                          keyboardType="numeric"
-                          color={this.state.isColor == true ? "#FFFFFF" :'#000'}
-                          returnKeyType='next'
-                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', }}
-                          inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
-                          textStyle={{backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', color:this.state.isColor == true ? "#FFFFFF" : '#000000' }}
-                          placeholder={translate.Get('Số lượng trẻ em')}
-                          placeholderTextColor="#bdc6cf"
-                          refInput={input => this.textInputChildrenQuantity = input}
-                          onChangeText={(textInputChildrenQuantity) => { TicketInfor.TkChildrenQuantity = textInputChildrenQuantity; this.setState({ TicketInfor }) }}
-                          value={TicketInfor.TkChildrenQuantity ? TicketInfor.TkChildrenQuantity.toString() : ''}
-                          onSubmitEditing={() => {
-                            setTimeout(() => this.textInputForeignQuantity.focus(), 100)
-                          }} />
+                  <View style={{flexDirection:'row',width: '100%', height:SCREEN_HEIGHT*0.6*0.15, justifyContent:'space-evenly'}}>
+                  <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
+                      <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
+                        <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Trẻ em')}</Text>                      
                       </View>
+                      <TextInput
+                        style={{height:'60%',width:'90%',borderWidth:0.5,borderRadius:8,paddingHorizontal:5, borderColor:isColor == true ? '#FFFFFF': '#000000',color:isColor == true ? '#FFFFFF': '#000000'}}
+                        value={TicketInfor.TkChildrenQuantity ? TicketInfor.TkChildrenQuantity.toString() : ''}
+                        placeholderTextColor={isColor == true ? '#B9B0B0': '#B9B0B0'}
+                        keyboardType="number-pad" 
+                        placeholder={translate.Get('Số lượng trẻ em')}
+                        onChangeText={(textInput) => { TicketInfor.TkChildrenQuantity= textInput; this.setState({ TicketInfor }) }}>
+                      </TextInput>
                     </View>
-                    <View style={{ flexDirection: 'row', width: '50%', paddingRight: 5, }}>
-                      <View style={[{ width: '100%', paddingTop: 10, }]}>
-                        <FormInputText
-                          value={TicketInfor.TkForeignQuantity ? TicketInfor.TkForeignQuantity.toString() : ''}
-                          nameText={translate.Get('Khách nước ngoài')}
-                          keyboardAppearance='light'
-                          autoFocus={false}
-                          autoCapitalize='none'
-                          autoCorrect={false}
-                          keyboardType="numeric"
-                          color={this.state.isColor == true ? "#FFFFFF" :'#000'}
-                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', }}
-                          returnKeyType='next'
-                          inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
-                          textStyle={{backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', color:this.state.isColor == true ? "#FFFFFF" : '#000000' }}
-                          placeholder={translate.Get('SL khách nước ngoài')}
-                          placeholderTextColor="#bdc6cf"
-                          refInput={input => this.textInputForeignQuantity = input}
-                          onChangeText={(textInputForeignQuantity) => { TicketInfor.TkForeignQuantity = textInputForeignQuantity; this.setState({ TicketInfor }) }}
-                          onSubmitEditing={() => {
-                            setTimeout(() => this.textInputCustomquantity.focus(), 100)
-                          }} />
+                    <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
+                      <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
+                        <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Khách nước ngoài')}</Text>                      
                       </View>
+                      <TextInput
+                        style={{height:'60%',width:'90%',borderWidth:0.5,borderRadius:8,paddingHorizontal:5, borderColor:isColor == true ? '#FFFFFF': '#000000',color:isColor == true ? '#FFFFFF': '#000000'}}
+                        value={TicketInfor.TkForeignQuantity ? TicketInfor.TkForeignQuantity.toString() : ''}
+                        placeholderTextColor={isColor == true ? '#B9B0B0': '#B9B0B0'}
+                        keyboardType="number-pad" 
+                        placeholder={translate.Get('SL khách nước ngoài')}
+                        onChangeText={(textInput) => {TicketInfor.TkForeignQuantity = textInput; this.setState({ TicketInfor }) }}>
+                      </TextInput>
                     </View>
                   </View>
-
-                  <View style={{ flexDirection: 'row', paddingTop: 10, paddingLeft: 10, paddingRight: 10, width: '100%' }}>
-                    <View style={{ flexDirection: 'row', width: '50%', paddingRight: 5, }}>
-                      <View style={[{ width: '100%', paddingTop: 10, }]}>
-                        <FormInputText
-                          value={TicketInfor.TkCustomerQuantity ? TicketInfor.TkCustomerQuantity.toString() : '1'}
-                          nameText={translate.Get('Số lượng khách')}
-                          keyboardAppearance='light'
-                          autoFocus={false}
-                          keyboardType="numeric"
-                          autoCapitalize='none'
-                          autoCorrect={false}
-                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', }}
-                          color={this.state.isColor == true ? "#FFFFFF" :'#000'}
-                          returnKeyType='next'
-                          inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
-                          textStyle={{backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', color:this.state.isColor == true ? "#FFFFFF" : '#000000' }}
-                          placeholder={translate.Get('Số lượng khách')}
-                          placeholderTextColor="#bdc6cf"
-                          refInput={input => this.textInputCustomquantity = input}
-                          onChangeText={(textInputCustomquantity) => { TicketInfor.TkCustomerQuantity = textInputCustomquantity; this.setState({ TicketInfor }); }}
-                          onSubmitEditing={() => {
-                            setTimeout(() => this.textInputCustomerName.focus(), 100);
-                          }} />
+                  <View style={{flexDirection:'row',width: '100%', height:SCREEN_HEIGHT*0.6*0.15, justifyContent:'space-evenly'}}>
+                  <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
+                      <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
+                        <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Số lượng khách')}</Text>                      
                       </View>
+                      <TextInput
+                        style={{height:'60%',width:'90%',borderWidth:0.5,borderRadius:8,paddingHorizontal:5, borderColor:isColor == true ? '#FFFFFF': '#000000',color:isColor == true ? '#FFFFFF': '#000000'}}
+                        value={TicketInfor.TkCustomerQuantity ? TicketInfor.TkCustomerQuantity.toString() : ''}
+                        placeholderTextColor={isColor == true ? '#B9B0B0': '#B9B0B0'}
+                        autoFocus={true}
+                        keyboardType="number-pad" 
+                        placeholder={translate.Get('Số lượng khách')}
+                        onChangeText={(textInput) => { TicketInfor.TkCustomerQuantity= textInput; this.setState({ TicketInfor }) }}>
+                      </TextInput>
                     </View>
-                    <View style={{ flexDirection: 'row', width: '50%', paddingRight: 5, }}>
-                      <View style={[{ width: '100%', paddingTop: 10, }]}>
-                        <FormInputText
-                          value={TicketInfor.CustomerName ? TicketInfor.CustomerName : ''}
-                          nameText={translate.Get('Khách hàng')}
-                          keyboardAppearance='light'
-                          autoFocus={false}
-                          autoCapitalize='none'
-                          autoCorrect={false}
-                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', }}
-                          color={this.state.isColor == true ? "#FFFFFF" :'#000'}
-                          onFocus={() => { Keyboard.dismiss(); onPressShow.apply(null, []); }}
-                          returnKeyType='next'
-                          inputStyle={{ height: LOGIN_INPUT_FONT_SIZE * 2, paddingLeft: 10 }}
-                          textStyle={{backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', color:this.state.isColor == true ? "#FFFFFF" : '#000000' }}
-                          placeholder={translate.Get('Dạng khách')}
-                          placeholderTextColor="#bdc6cf"
-                          refInput={input => this.textInputCustomerName = input} />
-                        <View style={{ position: 'absolute', right: '4%', top: '40%' }}>
+                    <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
+                      <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
+                        <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Khách hàng')}</Text>                      
+                      </View>
+                      <TextInput
+                        style={{height:'60%',width:'90%',borderWidth:0.5,borderRadius:8,paddingHorizontal:5, borderColor:isColor == true ? '#FFFFFF': '#000000',color:isColor == true ? '#FFFFFF': '#000000'}}
+                        value={TicketInfor.CustomerName}
+                        placeholderTextColor={isColor == true ? '#B9B0B0': '#B9B0B0'}
+                        placeholder={translate.Get('Dạng khách')}
+                        onChangeText={(textInput) => {TicketInfor.CustomerName = textInput; this.setState({ TicketInfor }) }}>
+                      </TextInput>
+                    </View>
+                  </View>
+                  <View style={{ position: 'absolute', right: '4%', top: '48%', }}>
                           <TouchableOpacity onPress={() => { Keyboard.dismiss(); onPressShow.apply(null, []); }}>
-                            <Icon name="caretdown" type="antdesign" size={ITEM_FONT_SIZE} />
+                            <Icon name="contacts" type="antdesign" color={this.state.isColor == true ? "#FFFFFF" : '#000000'} size={H1_FONT_SIZE} />
                           </TouchableOpacity>
                         </View>
+                 <View style={{ backgroundColor: this.state.isColor == true ? "#222222" :'white', height:SCREEN_HEIGHT*0.6*0.25, justifyContent:'center',alignItems:'center'}}>
+                    <View style={{position:'absolute',top:'0%',left:'5%',zIndex:101}} >
+                        <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Ghi chú')}</Text>                      
                       </View>
-                    </View>
-                  </View>
-
-                  <View style={{ flexDirection: 'row', paddingTop: 10, paddingLeft: 10, paddingRight: 10, width: '100%' }}>
-                    <View style={{ flexDirection: 'row', width: '100%' }}>
-                      <View style={[{ width: '100%', paddingTop: 10, }]}>
-                        <FormInputText
-                          value={TicketInfor.Description ? TicketInfor.Description.toString() : ''}
-                          nameText={translate.Get('Ghi chú')}
-                          keyboardAppearance='light'
-                          autoFocus={false}
-                          autoCapitalize='none'
-                          autoCorrect={false}
-                          color={this.state.isColor == true ? "#FFFFFF" : '#000'}
-                          inputContainerStyle={{ borderRadius: 4, borderColor: '#DEDEDE', backgroundColor: this.state.isColor == true ? "#222222" :'#FFFFFF', }}
-                          returnKeyType='next' 
-                          inputStyle={{ height: H3FontSize * 5, paddingLeft: 10 }}
-                          textStyle={{backgroundColor:this.state.isColor == true ? "#222222" : '#FFFFFF', color:this.state.isColor == true ? "#FFFFFF" : '#000000' }}
-                          placeholder={translate.Get('Diễn giải thông tin khách hàng')}
-                          placeholderTextColor="#bdc6cf"
-                          refInput={input => this.textInputDescription = input}
-                          onChangeText={(textInputDescription) => { TicketInfor.Description = textInputDescription; this.setState({ TicketInfor }); }}
-                          onSubmitEditing={() => {
-                            Keyboard.dismiss();
-                            this.setState({ TicketInfor });
-                          }} />
-                      </View>
-                    </View>
-                  </View>
+                      <TextInput
+                        style={{height:'80%',width:'94%',borderWidth:0.5,borderRadius:8,paddingHorizontal:8, borderColor:isColor == true ? '#FFFFFF': '#000000',color:isColor == true ? '#FFFFFF': '#000000'}}
+                        value={TicketInfor.Description}
+                        multiline={true} 
+                        placeholderTextColor={isColor == true ? '#B9B0B0': '#B9B0B0'}
+                        numberOfLines={10} 
+                        placeholder={translate.Get('Diễn giải thông tin khách hàng')}
+                        onChangeText={(textInput) => {TicketInfor.Description = textInput; this.setState({ TicketInfor }) }}>
+                      </TextInput>
+                 </View>
                 </View>
-                <View style={{ width: '100%', justifyContent:'center'}}>
+                <View style={{ width: '100%', justifyContent:'center',height:SCREEN_HEIGHT*0.6*0.08}}> 
             <Text style={{color: this.state.isColor == true ? "#FFFFFF" : "red",textAlign:'center' ,fontSize:H2_FONT_SIZE*0.9}}>Sau khi vào bàn, bạn hãy khóa bàn trước khi giao cho khách</Text>
             </View>
-            </KeyboardAvoidingView>
-            
-          </ScrollView>
-          
-          <View style={{
-            width: '100%', flexDirection: 'row',  position: 'absolute', bottom: 0, justifyContent: 'space-evenly', alignItems: 'center', height: pnHeaderheight,marginBottom:-1
+            <View style={{
+            width: '100%', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', height: SCREEN_HEIGHT*0.6*0.12,
           }}>
               <Button
                 containerStyle={{ backgroundColor: colors.red, justifyContent: 'center', alignItems: 'center', 
-                width: '50%',borderBottomLeftRadius: 6,marginLeft:-1 }}
+                width: '48%',borderBottomLeftRadius: 6,height:'85%',}}
                 title={translate.Get('Bỏ qua')} 
                 titleStyle={{ color: colors.white, fontSize: H3FontSize }}
                 onPress={() => onClose.apply(null, [])}
@@ -284,12 +199,15 @@ export class _TableInfo extends React.Component {
              
               <Button
                 containerStyle={{ backgroundColor: BACKGROUND_COLOR, justifyContent: 'center',
-                 alignItems: 'center', width: '50%', borderBottomRightRadius: 6,marginRight:-1 }}
+                 alignItems: 'center', width: '48%',height:'85%', borderBottomRightRadius: 6,}}
                 title={translate.Get('Chấp nhận')}
                 titleStyle={{ color: colors.white, fontSize: H3FontSize, }}
-                onPress={() => { onPress.apply(null, []); }}
+                onPress={() => onPressAc.apply(null, [])}
                 disabled={isLoading} />
             </View>
+            </ScrollView>
+            </KeyboardAvoidingView>
+          
         </View>
       </View>
     );
