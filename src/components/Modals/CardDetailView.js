@@ -9,7 +9,7 @@ import colors from "../../config/colors";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Icon } from "react-native-elements";
 import { _retrieveData, _storeData, _remove } from "../../services/storages";
-import {SetMenu_getExtraRequestFromProductId,API_Print,CancelOrder,getTicketInforOnTable,UpdateStatus_TicketDetail} from '../../services';
+import {SetMenu_getExtraRequestFromProductId,API_Print,CancelOrder,getTicketInforOnTable,UpdateStatus_TicketDetail,UpdateNote_TicketDetail} from '../../services';
 import { H1FontSize,H2FontSize,H3FontSize,H4FontSize,H3_FONT_SIZE,H1_FONT_SIZE,H2_FONT_SIZE ,H4_FONT_SIZE} from "../../config/constants";
 import { formatCurrency, formatNumber,formatTime } from "../../services/util";
 import Question from '../Question';
@@ -55,6 +55,7 @@ export class CardDetailView extends React.Component {
       modalNote : false,
       TksdNote:'',
       Description:'',
+      DescriptionUp:'',
       Products:[],
       Products1:[],
       Products2:[],
@@ -214,7 +215,8 @@ export class CardDetailView extends React.Component {
       if("Table2" in res.Data) {
         TicketHitory = res.Data.Table2;
         let CheckKitData = res.Data.Table4;
-        if(CheckKitData != null || CheckKitData != ''){
+        if(CheckKitData != '' ){
+          console.log('-------')
           CheckKitType = true;
           this.setState({CheckKitType})
         }
@@ -226,6 +228,34 @@ export class CardDetailView extends React.Component {
   _UpdateStatus_TicketDetail = async(item,TkdStatus) => {
     let {table}= this.props;
     UpdateStatus_TicketDetail(item,TkdStatus,table).then(res => {
+      if(res.Status == 1)
+      this._getTicketInforOnTable();
+    })
+  }
+  _NoticeHT = async() => {
+    const { translate } = this.props;
+    Alert.alert(translate.Get("Thông báo"),translate.Get("Note: cooking"), [
+      {
+        text: "OK", onPress: () => {}
+      }
+    ]);
+  }
+  
+  _UpdateNote_TicketDetail = async(item) => {
+    let{DescriptionUp} = this.state;
+    let{ticketId,translate}=this.props;
+    const a = '(Lên món)'
+    if(item.TkdNote.includes(a)){
+      Alert.alert(translate.Get("Thông báo"),translate.Get("Món đã được nhắc"), [
+        {
+          text: "OK", onPress: () => { }
+        }
+      ]);
+      return;
+    }
+    console.log('--------')
+    DescriptionUp = '(Lên món)' + item.TkdNote 
+    UpdateNote_TicketDetail(item,ticketId,DescriptionUp).then(res => {
       if(res.Status == 1)
       this._getTicketInforOnTable();
     })
@@ -461,7 +491,7 @@ export class CardDetailView extends React.Component {
       {Name: translate.Get("ĐVT"),widthTitle:Bordy.width * 0.75*0.1},
       {Name: translate.Get("SL"),widthTitle:Bordy.width * 0.75*0.1},
       {Name: translate.Get("Trạng thái bếp"),widthTitle:Bordy.width * 0.75*0.2},
-      !state.lockTable ?{Name: translate.Get("Thao tác"),widthTitle:Bordy.width * 0.75*0.3}:null,
+      {Name: translate.Get("Thao tác"),widthTitle:Bordy.width * 0.75*0.3},
       {Name: translate.Get("Ghi chú"),widthTitle:Bordy.width * 0.75*0.25},
       {Name: translate.Get("Giờ order"),widthTitle:Bordy.width * 0.75*0.15},
       {Name: translate.Get("Bắt đầu làm"),widthTitle:Bordy.width * 0.75*0.15},
@@ -477,7 +507,7 @@ export class CardDetailView extends React.Component {
           justifyContent: "space-between",width: Bordy.width, height: Bordy.height*2,
           backgroundColor: "rgba(0, 0, 0, 0.6)"
         }}
-      > 
+      >
       {ModalCallStaff ?
         <ScrollView>
           <Modal
@@ -653,8 +683,8 @@ export class CardDetailView extends React.Component {
             }}>
             {state.isHavingOrder == 3 ?
             <ScrollView horizontal={true}>
-              <View style={{flexDirection:'column',height:HeightHistory,width:!state.lockTable ? Bordy.width * 0.75*2.38 : Bordy.width * 0.75*2.08 }}>
-              <View style={{flexDirection:'row',height:HeightHistory*0.05,width:!state.lockTable ? Bordy.width * 0.75*2.38 : Bordy.width * 0.75*2.08 }}>
+              <View style={{flexDirection:'column',height:HeightHistory,width:Bordy.width * 0.75*2.38 }}>
+              <View style={{flexDirection:'row',height:HeightHistory*0.05,width:Bordy.width * 0.75*2.38 }}>
                 <FlatList
                 numColumns={13}
                 data={titleHitory}
@@ -666,7 +696,7 @@ export class CardDetailView extends React.Component {
                 }
                 />
                 </View>
-                <View style={{flexDirection:'row',height:HeightHistory*0.95,width:!state.lockTable ? Bordy.width * 0.75*2.38 : Bordy.width * 0.75*2.08 }}>
+                <View style={{flexDirection:'row',height:HeightHistory*0.95,width:Bordy.width * 0.75*2.38}}>
                 <FlatList
                 refreshing={this.state.refreshing}
                 onRefresh={this._getTicketInforOnTable}
@@ -687,19 +717,16 @@ export class CardDetailView extends React.Component {
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdQuantity}</Text>
                   </View>
                   <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.2,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',backgroundColor:item.Color}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdStatusName}</Text>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdStatusName ? item.TkdStatusName : ''}</Text>
                   </View>
-                  {!state.lockTable ?
                   <View style={{width:Bordy.width * 0.75*0.3,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingVertical:5,flexDirection:'row'}}>
-                    <TouchableOpacity onPress={()=>{item.TkdStatus == 6 ? null : this._UpdateStatus_TicketDetail(item,8)}} style={{backgroundColor:item.TkdStatus != 6 && item.TkdStatus !=8 ?'#66ccff': '#dddddd',borderRadius:3,borderWidth:0.5, height:H1_FONT_SIZE,paddingHorizontal:8,justifyContent:'center', marginHorizontal:5,width:Bordy.width * 0.75*0.3*0.38}}>
-                      <Text style={{fontSize:H3_FONT_SIZE,color: item.TkdStatus == 6 && item.TkdStatus != 8 ? "#808080" : '#000000',textAlign:'center'}}>Lên món</Text>
+                    <TouchableOpacity onPress={()=>{item.TkdStatus != 6? this._UpdateNote_TicketDetail(item) : null}} style={{backgroundColor:item.TkdStatus != 6 && item.TkdStatus !=8 ?'#66ccff': '#dddddd',borderRadius:3,borderWidth:0.5, height:H1_FONT_SIZE,paddingHorizontal:8,justifyContent:'center', marginHorizontal:5,width:Bordy.width * 0.75*0.3*0.38}}>
+                      <Text style={{fontSize:H3_FONT_SIZE,color: item.TkdStatus == 6 && item.TkdStatus != 8 ? "#808080" : '#000000',textAlign:'center'}}>{translate.Get("Lên món")}</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>{CheckKitType == true ? (item.TkdStatus == 2 ? this._UpdateStatus_TicketDetail(item,6) :null ):item.TkdStatus == 6 ? null : this._UpdateStatus_TicketDetail(item,6)}} style={{backgroundColor:CheckKitType == true ? (item.TkdStatus == 2 ? '#009900' :'#dddddd' ): item.TkdStatus == 6 ? '#dddddd' :'#009900',borderRadius:3,borderWidth:0.5, height:H1_FONT_SIZE,paddingHorizontal:8,justifyContent:'center',width:Bordy.width * 0.75*0.3*0.55}}>
-                      <Text style={{fontSize:H3_FONT_SIZE,color:item.TkdStatus == 6? "#808080" : '#000000',textAlign:'center'}}>Hoàn thành</Text>
+                    <TouchableOpacity onPress={()=>{CheckKitType == true ? (item.TkdStatus == 2 ? this._UpdateStatus_TicketDetail(item,6) : this._NoticeHT() ):item.TkdStatus == 6 ? null : this._UpdateStatus_TicketDetail(item,6)}} style={{backgroundColor:CheckKitType == true ? (item.TkdStatus == 2 ? '#009900' :'#dddddd' ): item.TkdStatus == 6 ? '#dddddd' :'#009900',borderRadius:3,borderWidth:0.5, height:H1_FONT_SIZE,paddingHorizontal:8,justifyContent:'center',width:Bordy.width * 0.75*0.3*0.55}}>
+                      <Text style={{fontSize:H3_FONT_SIZE,color:item.TkdStatus == 6? "#808080" : '#000000',textAlign:'center'}}>{translate.Get("Hoàn thành")}</Text>
                     </TouchableOpacity>
                   </View>
-                  :null
-                  }
                   <View style={{ justifyContent:'center',width:Bordy.width * 0.75*0.25,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:8}}>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',textAlign:'left'}}>{item.TkdNote}</Text>
                   </View>

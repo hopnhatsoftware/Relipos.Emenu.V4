@@ -180,10 +180,12 @@ export default en={
     "Làm xong":"Làm xong",
     "Tổng TG làm":"Tổng TG làm",
     "Thao tác":"Thao tác",
+    "Lên món":"Lên món",
+    "Hoàn thành":"Hoàn thành",
+    "Note: cooking":"Cần bếp bấm 'Xong' trên màn hình Bếp mới có thể hoàn thành",
     "Limited OrddQuantity!": "Số lượng order có hạn!",
     "The total quantity of ordered items must not exceed ": "Tổng số lượng món đặt không được quá " ,
-    ". Please reduce the quantity of items to continue the operation":". Vui lòng giảm số lượng món để tiếp tục thao tác",
     "Limited Products!": "Số lượng order có hạn!",
-    "The total quantity of ordered items should not exceed ":"Tổng số lượng loại món đặt không được quá ",
-    ".Please reduce the quantity of items to continue the operation": ". Vui lòng giảm số lượng loại món để tiếp tục thao tác"
+    "The total quantity of ordered items should not exceed ":" và tổng số lượng loại món đặt không được quá ",
+    ".Please double-check to avoid incorrect or excessive food orders.": ". Vui lòng kiểm tra tránh order nhầm và dư thừa thức ăn"
 }

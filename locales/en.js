@@ -213,10 +213,12 @@ export default en = {
     "Làm xong":"Done",
     "Tổng TG làm":"Cooking time",
     "Thao tác":"Actions",
+    "Lên món":"Lên món",
+    "Hoàn thành":"Completed",
+    "Note: cooking":"Note: cooking",
     "Limited OrddQuantity!": "Limited OrddQuantity!",
     "The total quantity of ordered items must not exceed ": "The total quantity of ordered items must not exceed " ,
-    ". Please reduce the quantity of items to continue the operation":". Please reduce the quantity of items to continue the operation",
     "Limited Products!": "Limited Products!",
-    "The total quantity of ordered items should not exceed ":"The total quantity of ordered items should not exceed ",
-    ".Please reduce the quantity of items to continue the operation": ".Please reduce the quantity of items to continue the operation"
+    "The total quantity of ordered items should not exceed ":" and the total quantity of ordered items should not exceed ",
+    ".Please double-check to avoid incorrect or excessive food orders.": ".Please double-check to avoid incorrect or excessive food orders."
 }

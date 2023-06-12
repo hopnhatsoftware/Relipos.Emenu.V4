@@ -233,6 +233,29 @@ export const getTicketInforOnTable = async (settings, item) => {
     PosId: settings.PosId ? settings.PosId : 1, isGroup: 1
   });
 }
+
+export const UpdateNote_TicketDetail = async (item,ticketId, DescriptionUp ) => {
+  const culture = await _retrieveData('culture', 1);
+  const URL = '/Ticket/UpdateNote_TicketDetail';
+  return await execFetch(URL, 'GET', {
+    TkdId: item.TkdId,
+    PrdId: item.PrdId,
+    PrdNo: item.PrdNo,
+    PrdName: item.PrdName,
+    TkdBasePrice: item.TkdPrice,
+    TkdUpAmount: item.TkdUpAmount,
+    TkdUnitId: item.TkdUnitId,
+    TkdDiscountItemPer: item.TkdDiscountItemAmount,
+    TkdVatPercent: item.TkdVatPercent,
+    TkdNote: item.TkdNote,
+    AtdId: null,
+    TkdisPromotion: item.TkdisPromotion,
+    TkdOrderNo: '',
+    TicketID:ticketId,
+    Note: DescriptionUp
+  });
+}
+
 export const UpdateStatus_TicketDetail = async (item, TkdStatus, table,) => {
   const culture = await _retrieveData('culture', 1);
   const URL = '/Ticket/UpdateStatus_TicketDetail';

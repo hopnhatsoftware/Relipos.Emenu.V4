@@ -522,8 +522,9 @@ onCallServices= async() => {
                     let a = Config.I_LimitQuntityBooking
                     Alert.alert(
                       this.translate.Get("Limited OrddQuantity!"),
-                      this.translate.Get("The total quantity of ordered items must not exceed ") + Config.I_LimitQuntityBooking +
-                      this.translate.Get(". Please reduce the quantity of items to continue the operation")
+                      this.translate.Get("The total quantity of ordered items must not exceed ") + Config.I_LimitQuntityBooking + 
+                      this.translate.Get("The total quantity of ordered items should not exceed ") + Config.I_LimitTypeBooking +
+                      this.translate.Get(".Please double-check to avoid incorrect or excessive food orders.")
                     );
                     return;
                   }
@@ -531,7 +532,8 @@ onCallServices= async() => {
                  if(TypeNumCheck>= Config.I_LimitTypeBooking && DataCurrent == null){
                   Alert.alert(
                         this.translate.Get("Limited Products!"),
-                        this.translate.Get("The total quantity of ordered items should not exceed ") + Config.I_LimitTypeBooking + this.translate.Get(".Please reduce the quantity of items to continue the operation")
+                        this.translate.Get("The total quantity of ordered items must not exceed ") + Config.I_LimitQuntityBooking + 
+                      this.translate.Get("The total quantity of ordered items should not exceed ") + Config.I_LimitTypeBooking +this.translate.Get(".Please double-check to avoid incorrect or excessive food orders.")
                       );
                       return;
                 }
@@ -540,16 +542,18 @@ onCallServices= async() => {
             if (QuantityCheck>= Config.I_LimitQuntityBooking && total > Config.I_LimitQuntityBooking) {
               Alert.alert(
                 this.translate.Get("Limited OrddQuantity!"),
-                this.translate.Get("The total quantity of ordered items must not exceed ") + Config.I_LimitQuntityBooking +
-                this.translate.Get(". Please reduce the quantity of items to continue the operation")
+                this.translate.Get("The total quantity of ordered items must not exceed ") + Config.I_LimitQuntityBooking + 
+                      this.translate.Get("The total quantity of ordered items should not exceed ") + Config.I_LimitTypeBooking +
+                this.translate.Get(".Please double-check to avoid incorrect or excessive food orders.")
               );
               return;
             }
             if ( total > Config.I_LimitQuntityBooking) {
               Alert.alert(
                 this.translate.Get("Limited OrddQuantity!"),
-                this.translate.Get("The total quantity of ordered items must not exceed ") + Config.I_LimitQuntityBooking +
-                this.translate.Get(". Please reduce the quantity of items to continue the operation")
+                this.translate.Get("The total quantity of ordered items must not exceed ") + Config.I_LimitQuntityBooking + 
+                      this.translate.Get("The total quantity of ordered items should not exceed ") + Config.I_LimitTypeBooking +
+                this.translate.Get(".Please double-check to avoid incorrect or excessive food orders.")
                 
               );
               return;
