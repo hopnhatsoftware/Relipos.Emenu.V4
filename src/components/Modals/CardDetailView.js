@@ -216,7 +216,6 @@ export class CardDetailView extends React.Component {
         TicketHitory = res.Data.Table2;
         let CheckKitData = res.Data.Table4;
         if(CheckKitData != '' ){
-          console.log('-------')
           CheckKitType = true;
           this.setState({CheckKitType})
         }
@@ -246,14 +245,13 @@ export class CardDetailView extends React.Component {
     let{ticketId,translate}=this.props;
     const a = '(Lên món)'
     if(item.TkdNote.includes(a)){
-      Alert.alert(translate.Get("Thông báo"),translate.Get("Món đã được nhắc"), [
+      Alert.alert(translate.Get("Thông báo"),translate.Get("Món đã được nhắc bếp, quý khách vui lòng chờ trong ít phút"), [
         {
           text: "OK", onPress: () => { }
         }
       ]);
       return;
     }
-    console.log('--------')
     DescriptionUp = '(Lên món)' + item.TkdNote 
     UpdateNote_TicketDetail(item,ticketId,DescriptionUp).then(res => {
       if(res.Status == 1)
