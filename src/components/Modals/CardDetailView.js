@@ -45,6 +45,7 @@ export class CardDetailView extends React.Component {
     this.state = {
       appState: AppState.currentState,
       TicketHitory:[],
+      CheckKitType:false,
       refreshing: false,
       isColor:false,
       ModalCallStaff: false,
@@ -207,11 +208,17 @@ export class CardDetailView extends React.Component {
     }
   }
   _getTicketInforOnTable = async () =>{
-    let{TicketHitory,}=this.state;
+    let{TicketHitory,CheckKitType}=this.state;
     let {settings,table}= this.props;
     getTicketInforOnTable(settings, table).then(res => {
       if("Table2" in res.Data) {
         TicketHitory = res.Data.Table2;
+        let CheckKitData = res.Data.Table4;
+        if(CheckKitData != null || CheckKitData != ''){
+          CheckKitType = true;
+          this.setState({CheckKitType})
+        }
+        
         this.setState({TicketHitory,refreshing:false})
       }
     })
@@ -439,7 +446,7 @@ export class CardDetailView extends React.Component {
       }
   render() {
     let { state,setState, onSendOrder,lockTable, BookingsStyle, CartToggleHandle, translate, ProductsOrdered} = this.props;
-    let {isColor,modalNote,Products1,Products2,ModalCallStaff,TicketHitory}= this.state;
+    let {isColor,modalNote,Products1,Products2,ModalCallStaff,TicketHitory,CheckKitType}= this.state;
     let HeightHistory = Bordy.height-(Titlecf.height+TabTitle.height)
     if (!this.state.IsLoaded) {
       return (
@@ -679,16 +686,16 @@ export class CardDetailView extends React.Component {
                   <View style={{justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.1,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdQuantity}</Text>
                   </View>
-                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.2,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
+                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.2,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',backgroundColor:item.Color}}>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdStatusName}</Text>
                   </View>
                   {!state.lockTable ?
                   <View style={{width:Bordy.width * 0.75*0.3,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingVertical:5,flexDirection:'row'}}>
-                    <TouchableOpacity onPress={()=>{item.TkdStatusName == 'Hoàn thành' ? null : this._UpdateStatus_TicketDetail(item,8)}} style={{backgroundColor:item.TkdStatusName != 'Hoàn thành' && item.TkdStatusName !='Lên món' ?'#66ccff': '#dddddd',borderRadius:3,borderWidth:0.5, height:H1_FONT_SIZE,paddingHorizontal:8,justifyContent:'center', marginHorizontal:5,width:Bordy.width * 0.75*0.3*0.38}}>
-                      <Text style={{fontSize:H3_FONT_SIZE,color: item.TkdStatusName == 'Hoàn thành' && item.TkdStatusName !='Lên món' ? "#808080" : '#000000',textAlign:'center'}}>Lên món</Text>
+                    <TouchableOpacity onPress={()=>{item.TkdStatus == 6 ? null : this._UpdateStatus_TicketDetail(item,8)}} style={{backgroundColor:item.TkdStatus != 6 && item.TkdStatus !=8 ?'#66ccff': '#dddddd',borderRadius:3,borderWidth:0.5, height:H1_FONT_SIZE,paddingHorizontal:8,justifyContent:'center', marginHorizontal:5,width:Bordy.width * 0.75*0.3*0.38}}>
+                      <Text style={{fontSize:H3_FONT_SIZE,color: item.TkdStatus == 6 && item.TkdStatus != 8 ? "#808080" : '#000000',textAlign:'center'}}>Lên món</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>{item.TkdStatusName == 'Hoàn thành' ? null : this._UpdateStatus_TicketDetail(item,6)}} style={{backgroundColor:item.TkdStatusName == 'Hoàn thành' ? '#dddddd' :'#009900',borderRadius:3,borderWidth:0.5, height:H1_FONT_SIZE,paddingHorizontal:8,justifyContent:'center',width:Bordy.width * 0.75*0.3*0.55}}>
-                      <Text style={{fontSize:H3_FONT_SIZE,color:item.TkdStatusName == 'Hoàn thành'? "#808080" : '#000000',textAlign:'center'}}>Hoàn thành</Text>
+                    <TouchableOpacity onPress={()=>{CheckKitType == true ? (item.TkdStatus == 2 ? this._UpdateStatus_TicketDetail(item,6) :null ):item.TkdStatus == 6 ? null : this._UpdateStatus_TicketDetail(item,6)}} style={{backgroundColor:CheckKitType == true ? (item.TkdStatus == 2 ? '#009900' :'#dddddd' ): item.TkdStatus == 6 ? '#dddddd' :'#009900',borderRadius:3,borderWidth:0.5, height:H1_FONT_SIZE,paddingHorizontal:8,justifyContent:'center',width:Bordy.width * 0.75*0.3*0.55}}>
+                      <Text style={{fontSize:H3_FONT_SIZE,color:item.TkdStatus == 6? "#808080" : '#000000',textAlign:'center'}}>Hoàn thành</Text>
                     </TouchableOpacity>
                   </View>
                   :null

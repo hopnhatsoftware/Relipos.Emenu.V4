@@ -1453,7 +1453,7 @@ if (ProductChoise==null) {
                     <Image resizeMode="contain" source={require('../../assets/icons/IconNew-09.png')}
                       style={{width: H1_FONT_SIZE*1.6, height: H1_FONT_SIZE*1.6, }}/>
                   </View>
-                  : item.ResName && item.SttName == 'SALE' ?
+                  : item.SttName == 'SALE' ?
                   <View style={{  position: "absolute", paddingTop: 0, right: 5}}>
                     <View style={{position: "absolute",zIndex:1000,width: H1_FONT_SIZE*4.2, height: H1_FONT_SIZE*1.3,justifyContent:'center',alignItems:'center',paddingHorizontal:5}}>
                     <Text style={{fontSize:H4_FONT_SIZE,color:'#FFFFFF'}}>{item.ResName}</Text>
