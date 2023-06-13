@@ -225,11 +225,20 @@ export class CardDetailView extends React.Component {
     })
   }
   _UpdateStatus_TicketDetail = async(item,TkdStatus) => {
+    try{
     let {table}= this.props;
     UpdateStatus_TicketDetail(item,TkdStatus,table).then(res => {
       if(res.Status == 1)
       this._getTicketInforOnTable();
-    })
+    })}
+    catch(error){
+      Alert.alert(translate.Get("Thông báo"),translate.Get("Lỗi hệ thống, UpdateStatus"), [
+        {
+          text: "OK", onPress: () => { }
+        }
+      ]);
+      return null;
+    }
   }
   _NoticeHT = async() => {
     const { translate } = this.props;
@@ -241,11 +250,12 @@ export class CardDetailView extends React.Component {
   }
   
   _UpdateNote_TicketDetail = async(item) => {
+    try{
     let{DescriptionUp} = this.state;
     let{ticketId,translate}=this.props;
     const a = '(Lên món)'
     if(item.TkdNote.includes(a)){
-      Alert.alert(translate.Get("Thông báo"),translate.Get("Món đã được nhắc bếp, quý khách vui lòng chờ trong ít phút"), [
+      Alert.alert(translate.Get("Thông báo"),translate.Get("Món đã được nhắc lên món, quý khách vui lòng chờ trong ít phút"), [
         {
           text: "OK", onPress: () => { }
         }
@@ -256,7 +266,15 @@ export class CardDetailView extends React.Component {
     UpdateNote_TicketDetail(item,ticketId,DescriptionUp).then(res => {
       if(res.Status == 1)
       this._getTicketInforOnTable();
-    })
+    })}
+    catch(error){
+      Alert.alert(translate.Get("Thông báo"),translate.Get("Lỗi hệ thống, UpdateNote"), [
+        {
+          text: "OK", onPress: () => { }
+        }
+      ]);
+      return null;
+    }
   }
   // Đã Order
   renderOrdered= ({ item, RowIndex }) => {
