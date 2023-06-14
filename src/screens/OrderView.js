@@ -13,7 +13,7 @@ import { setCustomText } from "react-native-global-props";
 import { ProductDetails, CardDetailView, _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor } from '../components';
 import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize,H2FontSize,H3FontSize,H4FontSize,H2_FONT_SIZE,H3_FONT_SIZE,FontSize,H4_FONT_SIZE, H1_FONT_SIZE } from "../config/constants";
 import translate from "../services/translate";
-import {getMasterData,GetViewGroup,GetPrdChildGroups,getProductByGroup,getTicketInfor, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getByChoiceId,CancelOrder,CallServices,getLanguage,CheckProductManyPrice,getFromTicketInfor} from "../services";
+import {getMasterData,GetViewGroup,GetPrdChildGroups,getProductByGroup,getTicketInfor, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getByChoiceId,CancelOrder,CallServices,getLanguage} from "../services";
 import { formatCurrency } from "../services/util";
 import colors from "../config/colors";
 import BookingsStyle from "../styles/bookings";
@@ -77,8 +77,6 @@ export default class OrderView extends Component {
       }],
       ProductsOrdered: [],
       isShowMash: false,
-      modalSize : false,
-      titleModalSize:'',
       Ticket: {},
       table: {},
       settings: {},
@@ -258,6 +256,7 @@ onCallServices= async() => {
     this.setState({  isShowMash: false });
     return;
   };
+
   _getProductByGroup = async group => {
     let { table, keysearch,Config,settings,language } = this.state;
     await getProductByGroup(Config,settings, table.TicketID,table.AreaID, group.PrgId, keysearch,language).then(res => {
@@ -1281,47 +1280,11 @@ if (ProductChoise==null) {
         />
       );
   };
-  setModalSize = (visible) => {
-    // this._CheckProductManyPrice(item)
-    this.setState({ modalSize: visible });
-  }
-  CheckSize = (item) =>{
-    this.HandleQuantity(item,1,false);
-    this.setState({checked:item.UnitName,modalSize:false,test:item.PrdId})
-  }
-  _CheckProductManyPrice =(item)=>{
-    let{table,DataSize,modalSize,checked}= this.state;
-    CheckProductManyPrice(item.PrdId,table.AreaID,1).then(res => {
-      if(res.Status == 1){
-        DataSize = res.Data;
-        this.setState({DataSize: DataSize,titleModalSize: item.PrdName,checked:item.UnitName,modalSize:!modalSize})
-      }
-    }).catch((error) => {
-      Question.alert( 'System Error',error, [
-        {
-          text: "OK", onPress: () => {
-          }
-        }
-      ]);
-    });
-  }
-  _getFromTicketInfor = () => {
-    let{table}=this.state;
-    getFromTicketInfor(table.TicketID).then(res => {
-    })
-  }
   GetSize = (ProductItem) => {
     try{
     let {Products2}= this.state;
     let prdPrices=[];
-    // Products2.forEach((item, index) => {
-    //   if (ProductItem.PrdId== item.PrdId){
-    //     item.PrdName=ProductItem.PrdName;
-    //   prdPrices.push(item);
-    //   }
-    // });
-    // return Products2;
-    const Products3 = Products2.filter((item) => item.PrdId == ProductItem.PrdId);
+    const Products3 = Products2.filter((item) => item.PrdName == ProductItem.PrdName);
     Products3.forEach((item, index) => {
       item.PrdName=ProductItem.PrdName;
       item.PrdNameUi=ProductItem.PrdNameUi;
@@ -1604,39 +1567,9 @@ if (ProductChoise==null) {
         </View>
       );
     }
-    const {ProductGroupList,endpoint,PrdChildGroups,checked,Products,CartInfor,itemChecked,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config,ProductsOrdered,isColor} = this.state; 
+    const {ProductGroupList,endpoint,PrdChildGroups,Products,CartInfor,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config,ProductsOrdered,isColor} = this.state; 
     return (
       <View style={{height:Bordy.height,width:Bordy.width, backgroundColor: isColor == true ? '#333333' : "#DDDDDD"}}>
-        {/* {modalSize ?
-          <Modal
-          onBackdropPress={() => this.setState({modalSize:!modalSize})}
-          isVisible={true}
-          visible={modalSize}>
-          <View style={{top: Bordy.height*0.15, left: Bordy.width*0.275, width: Bordy.width *0.35, height: Bordy.height*0.3,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
-            <View style={{borderTopLeftRadius:10,borderTopRightRadius:10,height:Bordy.height*0.3*0.25,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
-            <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{this.state.titleModalSize}</Text>
-            </View>
-            <View style={{height:Bordy.height*0.3*0.75,width:'100%',flexDirection:'row'}}>
-              <FlatList   data={this.state.DataSize}
-                renderItem={({ item, index }) =>
-                <TouchableOpacity  onPress={()=>this.CheckSize(item)}
-                  style={{width: '100%',justifyContent:'center',borderBottomWidth:0.5,paddingVertical:10,paddingHorizontal:8}}>
-                  <View style={{width:'100%',flexDirection: "row",alignItems:'center'}}>
-                  {checked == item.UnitName ?
-                    <Icon color={isColor==true?'#DAA520': '#009900'} name="check" type="entypo" style={{left: 2,fontSize: H1_FONT_SIZE*2,}}/>
-                    :<View>
-
-                    </View>
-                  }
-                    <Text style={{width:"80%",justifyContent:'center',textAlign:'left',fontSize:H3_FONT_SIZE*1.2,color: isColor==true?'#FFFFFF':'#000000'}} >{formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPriceBefore : item.UnitPriceAfter, "")}/{item.UnitName}</Text>
-                    
-                  </View>
-                </TouchableOpacity>}
-              />
-            </View>
-          </View>
-        </Modal>
-          : null} */}
         <View style={{flexDirection: "row"}}>
           <View name='pbLeft' style={[{ backgroundColor: "#333D4C",width:pnLeft.width, flexDirection: "column",height: Bordy.height }]}>
             <View style={{ justifyContent: 'center', alignItems: 'center', height: Bordy.height/6, }}>
