@@ -209,6 +209,7 @@ export class CardDetailView extends React.Component {
     }
   }
   _getTicketInforOnTable = async () =>{
+    try{
     let{TicketHitory,CheckKitType}=this.state;
     let {settings,table}= this.props;
     getTicketInforOnTable(settings, table).then(res => {
@@ -219,10 +220,17 @@ export class CardDetailView extends React.Component {
           CheckKitType = true;
           this.setState({CheckKitType})
         }
-        
         this.setState({TicketHitory,refreshing:false})
       }
-    })
+    })}
+    catch(error){
+      Alert.alert(translate.Get("Thông báo"),translate.Get("Lỗi hệ thống, _getTicketInforOnTable"), [
+        {
+          text: "OK", onPress: () => { }
+        }
+      ]);
+      return null;
+    }
   }
   _UpdateStatus_TicketDetail = async(item,TkdStatus) => {
     try{
