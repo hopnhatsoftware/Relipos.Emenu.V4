@@ -216,21 +216,11 @@ export const UploadFile = async (file) => {
   const URL = '/Emenu/UploadFile';
   return await fetchFile(URL, file);
 }
-
-export const getTicketInfor = async (settings, item) => {
-  const culture = await _retrieveData('culture', 1);
-  const URL = '/Emenu/getTicketInfor';
-  return await execFetch(URL, 'POST', {
-    BranchId: settings.I_BranchId, TabId: item.TabId, TicketId: item.TicketID,
-    PosId: settings.PosId ? settings.PosId : 1, Culture: culture, IsGroupView: 1
-  });
-}
 export const getTicketInforOnTable = async (settings, item) => {
   const culture = await _retrieveData('culture', 1);
   const URL = '/Ticket/getTicketInforOnTable';
   return await execFetch(URL, 'GET', {
-    TicketID: item.TicketID, BranchId: settings.I_BranchId,  Culture: culture,
-    PosId: settings.PosId ? settings.PosId : 1, isGroup: 1
+    TicketID: item.TicketID, isGroup: 0
   });
 }
 
