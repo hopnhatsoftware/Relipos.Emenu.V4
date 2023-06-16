@@ -216,11 +216,11 @@ export const UploadFile = async (file) => {
   const URL = '/Emenu/UploadFile';
   return await fetchFile(URL, file);
 }
-export const getTicketInforOnTable = async (settings, item) => {
+export const getTicketInforOnTable = async (Ticket) => {
   const culture = await _retrieveData('culture', 1);
   const URL = '/Ticket/getTicketInforOnTable';
   return await execFetch(URL, 'GET', {
-    TicketID: item.TicketID, isGroup: 0
+    TicketID: Ticket.TicketID, isGroup: 0
   });
 }
 
