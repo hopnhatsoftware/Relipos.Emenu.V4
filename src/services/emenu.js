@@ -223,7 +223,6 @@ export const getTicketInforOnTable = async (Ticket) => {
     TicketID: Ticket.TicketID, isGroup: 0
   });
 }
-
 export const UpdateNote_TicketDetail = async (item,ticketId, DescriptionUp ) => {
   const culture = await _retrieveData('culture', 1);
   const URL = '/Ticket/UpdateNote_TicketDetail';
