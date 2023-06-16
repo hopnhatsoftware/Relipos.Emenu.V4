@@ -9,9 +9,9 @@ import colors from "../../config/colors";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Icon } from "react-native-elements";
 import { _retrieveData, _storeData, _remove } from "../../services/storages";
-import {SetMenu_getExtraRequestFromProductId,API_Print,CancelOrder,getTicketInforOnTable,UpdateStatus_TicketDetail,UpdateNote_TicketDetail} from '../../services';
-import { H1FontSize,H2FontSize,H3FontSize,H4FontSize,H3_FONT_SIZE,H1_FONT_SIZE,H2_FONT_SIZE ,H4_FONT_SIZE} from "../../config/constants";
-import { formatCurrency, formatNumber,formatTime } from "../../services/util";
+import {SetMenu_getExtraRequestFromProductId,API_Print,CancelOrder,UpdateStatus_TicketDetail,UpdateNote_TicketDetail} from '../../services';
+import { H1FontSize,H2FontSize,H3FontSize,H4FontSize,H3_FONT_SIZE,H1_FONT_SIZE,H2_FONT_SIZE ,H4_FONT_SIZE, SCREEN_WIDTH} from "../../config/constants";
+import { formatCurrency,formatTime } from "../../services/util";
 import Question from '../Question';
 import { ScrollView } from "react-navigation";
 
@@ -44,8 +44,7 @@ export class CardDetailView extends React.Component {
     super(props);
     this.state = {
       appState: AppState.currentState,
-      TicketHitory:[],
-      CheckKitType:false,
+      ProductsOrdered:[],
       refreshing: false,
       isColor:false,
       ModalCallStaff: false,
@@ -208,36 +207,12 @@ export class CardDetailView extends React.Component {
       return null;
     }
   }
-  _getTicketInforOnTable = async () =>{
-    try{
-    let{TicketHitory,CheckKitType}=this.state;
-    let {settings,table}= this.props;
-    getTicketInforOnTable(settings, table).then(res => {
-      if("Table2" in res.Data) {
-        TicketHitory = res.Data.Table2;
-        let CheckKitData = res.Data.Table4;
-        if(CheckKitData != '' ){
-          CheckKitType = true;
-          this.setState({CheckKitType})
-        }
-        this.setState({TicketHitory,refreshing:false})
-      }
-    })}
-    catch(error){
-      Alert.alert(translate.Get("Thông báo"),translate.Get("Lỗi hệ thống, _getTicketInforOnTable"), [
-        {
-          text: "OK", onPress: () => { }
-        }
-      ]);
-      return null;
-    }
-  }
   _UpdateStatus_TicketDetail = async(item,TkdStatus) => {
     try{
     let {table}= this.props;
     UpdateStatus_TicketDetail(item,TkdStatus,table).then(res => {
       if(res.Status == 1)
-      this._getTicketInforOnTable();
+      this.props._getTicketInforOnTable();
     })}
     catch(error){
       Alert.alert(translate.Get("Thông báo"),translate.Get("Lỗi hệ thống, UpdateStatus"), [
@@ -270,10 +245,10 @@ export class CardDetailView extends React.Component {
       ]);
       return;
     }
-    DescriptionUp = '(Lên món)' + item.TkdNote 
+    DescriptionUp = '(Lên món) ' + item.TkdNote 
     UpdateNote_TicketDetail(item,ticketId,DescriptionUp).then(res => {
       if(res.Status == 1)
-      this._getTicketInforOnTable();
+      this.props._getTicketInforOnTable();
     })}
     catch(error){
       Alert.alert(translate.Get("Thông báo"),translate.Get("Lỗi hệ thống, UpdateNote"), [
@@ -286,60 +261,94 @@ export class CardDetailView extends React.Component {
   }
   // Đã Order
   renderOrdered= ({ item, RowIndex }) => {
-    const { BookingsStyle, ProductsOrdered} = this.props;
+    const { BookingsStyle,translate} = this.props;
     const {isColor} = this.state;
     if (item.TkdQuantity <= 0&&item.TksdQuantity<=0)
     return null;
       return (
-        <View style={{backgroundColor:isColor ==true ? '#333333':'#FFFFFF', width: Contentcf.width, borderBottomColor: colors.grey5, borderBottomWidth: 0.5,paddingBottom:1, }}>
+        <View style={{width:'100%', flexDirection:'row',backgroundColor: isColor == true ? '#333333' :'#EEEEEE',}}>
+                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.06,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.STT}</Text>
+                  </View>
+                  <View style={{ justifyContent:'center',alignItems:'left',width:Bordy.width * 0.75*0.42,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:5}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.PrdNameUi ? item.PrdNameUi : item.PrdName}</Text>
+                  </View>
+                  <View style={{justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.1,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.UnitName}</Text>
+                  </View>
+                  <View style={{justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.1,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdQuantity}</Text>
+                  </View>
+                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.2,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',backgroundColor:item.Color}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdStatusName ? item.TkdStatusName : ''}</Text>
+                  </View>
+                  <View style={{width:Bordy.width * 0.75*0.3,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingVertical:5,flexDirection:'row'}}>
+                    <TouchableOpacity onPress={()=>{item.TkdStatus != 6? this._UpdateNote_TicketDetail(item) : null}} style={{backgroundColor:item.TkdStatus != 6 ?'#66ccff': '#dddddd',borderRadius:3,borderWidth:0.5, height:H1_FONT_SIZE,paddingHorizontal:8,justifyContent:'center', marginHorizontal:5,width:Bordy.width * 0.75*0.3*0.38}}>
+                      <Text style={{fontSize:H3_FONT_SIZE,color: item.TkdStatus == 6 ? "#808080" : '#000000',textAlign:'center'}}>{translate.Get("Lên món")}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={()=>{item.IsUseKitchenScreen == true ? (item.TkdStatus == 2 ? this._UpdateStatus_TicketDetail(item,6) : item.TkdStatus == 6 ? null : this._NoticeHT() ):item.TkdStatus == 6 ? null : this._UpdateStatus_TicketDetail(item,6)}} style={{backgroundColor:item.IsUseKitchenScreen == true ? (item.TkdStatus == 2 ? '#009900' :'#dddddd' ): item.TkdStatus == 6 ? '#dddddd' :'#009900',borderRadius:3,borderWidth:0.5, height:H1_FONT_SIZE,paddingHorizontal:8,justifyContent:'center',width:Bordy.width * 0.75*0.3*0.55}}>
+                      <Text style={{fontSize:H3_FONT_SIZE,color:item.TkdStatus == 6? "#808080" : '#000000',textAlign:'center'}}>{translate.Get("Hoàn thành")}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={{ justifyContent:'center',width:Bordy.width * 0.75*0.25,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:8}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',textAlign:'left'}}>{item.TkdNote? item.TkdNote : ''}</Text>
+                  </View>
+                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.15,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdOrderTime ? formatTime(item.TkdOrderTime):''}</Text>
+                  </View>
+                  <View style={{ justifyContent:'center',width:Bordy.width * 0.75*0.15,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:8}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',textAlign:'right'}}>{formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.TkdItemAmount : item.TkdTotalAmount, "")}</Text>
+                  </View>
+                </View>
+      //   <View style={{backgroundColor:isColor ==true ? '#333333':'#FFFFFF', width: Contentcf.width, borderBottomColor: colors.grey5, borderBottomWidth: 0.5,paddingBottom:1, }}>
        
-       {item.TkdType==0||item.TkdType==1?
-        <View style={{ width: Contentcf.width, flexDirection: "row"}}>
-            <Text  style={{  color:isColor ==true ? '#FFFFFF': "#000000",textAlign:'center',alignItems: "center", width: Contentcf.width * 0.05, fontSize: H3_FONT_SIZE, }} >
-              {formatNumber(item.TkdQuantity)}
-            </Text>
-            <Text  style={[ BookingsStyle.left_menu_Item,
-                {
-                  color: isColor ==true ? '#FFFFFF':"#000000",
-                  width: Contentcf.width-(Contentcf.width * 0.05+Contentcf.width*0.14*2),
-                  justifyContent: "center",
-                  alignItems: "center",
-                  fontSize: H3_FONT_SIZE,
-                }
-              ]}
-            >
-              {item.PrdNameUi} ({item.UnitName})
-            </Text>
-            <View style={{  justifyContent:'center',width: Contentcf.width* 0.14 ,}}>
-            <Text style={{color: isColor ==true ? '#FFFFFF':"#000000",fontSize: H3FontSize,textAlign: "right"}}>{formatCurrency(item.TkdTotalAmount/item.TkdQuantity, "")}</Text>
-          </View>
-          <View style={{  justifyContent:'center',width: Contentcf.width* 0.14 ,paddingRight:5}}>
-            <Text style={{color: isColor ==true ? '#FFFFFF':"#000000",fontSize: H3FontSize,textAlign: "right"}}>{formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.TkdItemAmount : item.TkdTotalAmount, "")}</Text>
-          </View>
-          </View>
-          :
-          <View style={{ width: Contentcf.width, flexDirection: "row"}}> 
-          <Text  style={[ BookingsStyle.left_menu_Item,
-              {
-                color: isColor ==true ? '#FFFFFF':"#000000",
-                width: Contentcf.width-(Contentcf.width*0.14*2),
-                justifyContent: "center",
-                alignItems: "center",
-                fontSize: H4FontSize,
-                paddingLeft: Bordy.width * 0.03
-              }
-            ]}
-          >
-            {item.PrdNameUi}
-          </Text>
-          <View style={{  justifyContent:'center',width: Contentcf.width* 0.14 ,}}>
-            <Text style={{color: isColor ==true ? '#FFFFFF':"#000000",fontSize: H3FontSize,textAlign: "right"}}>{formatCurrency(item.TkdBasePrice, "")}</Text>
-          </View>
-          <View style={{  justifyContent:'center',width: Contentcf.width* 0.14 ,paddingRight:5}}>
-            <Text style={{color: isColor ==true ? '#FFFFFF':"#000000",fontSize: H3FontSize,textAlign: "right"}}>{formatCurrency(item.TkdBasePrice*item.TksdQuantity, "")}</Text>
-          </View>
-        </View>}
-        </View>
+      //  {item.TkdType==0||item.TkdType==1?
+      //   <View style={{ width: Contentcf.width, flexDirection: "row"}}>
+      //       <Text  style={{  color:isColor ==true ? '#FFFFFF': "#000000",textAlign:'center',alignItems: "center", width: Contentcf.width * 0.05, fontSize: H3_FONT_SIZE, }} >
+      //         {formatNumber(item.TkdQuantity)}
+      //       </Text>
+      //       <Text  style={[ BookingsStyle.left_menu_Item,
+      //           {
+      //             color: isColor ==true ? '#FFFFFF':"#000000",
+      //             width: Contentcf.width-(Contentcf.width * 0.05+Contentcf.width*0.14*2),
+      //             justifyContent: "center",
+      //             alignItems: "center",
+      //             fontSize: H3_FONT_SIZE,
+      //           }
+      //         ]}
+      //       >
+      //         {item.PrdNameUi} ({item.UnitName})
+      //       </Text>
+      //       <View style={{  justifyContent:'center',width: Contentcf.width* 0.14 ,}}>
+      //       <Text style={{color: isColor ==true ? '#FFFFFF':"#000000",fontSize: H3FontSize,textAlign: "right"}}>{formatCurrency(item.TkdTotalAmount/item.TkdQuantity, "")}</Text>
+      //     </View>
+      //     <View style={{  justifyContent:'center',width: Contentcf.width* 0.14 ,paddingRight:5}}>
+      //       <Text style={{color: isColor ==true ? '#FFFFFF':"#000000",fontSize: H3FontSize,textAlign: "right"}}>{formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.TkdItemAmount : item.TkdTotalAmount, "")}</Text>
+      //     </View>
+      //     </View>
+      //     :
+      //     <View style={{ width: Contentcf.width, flexDirection: "row"}}> 
+      //     <Text  style={[ BookingsStyle.left_menu_Item,
+      //         {
+      //           color: isColor ==true ? '#FFFFFF':"#000000",
+      //           width: Contentcf.width-(Contentcf.width*0.14*2),
+      //           justifyContent: "center",
+      //           alignItems: "center",
+      //           fontSize: H4FontSize,
+      //           paddingLeft: Bordy.width * 0.03
+      //         }
+      //       ]}
+      //     >
+      //       {item.PrdNameUi}
+      //     </Text>
+      //     <View style={{  justifyContent:'center',width: Contentcf.width* 0.14 ,}}>
+      //       <Text style={{color: isColor ==true ? '#FFFFFF':"#000000",fontSize: H3FontSize,textAlign: "right"}}>{formatCurrency(item.TkdBasePrice, "")}</Text>
+      //     </View>
+      //     <View style={{  justifyContent:'center',width: Contentcf.width* 0.14 ,paddingRight:5}}>
+      //       <Text style={{color: isColor ==true ? '#FFFFFF':"#000000",fontSize: H3FontSize,textAlign: "right"}}>{formatCurrency(item.TkdBasePrice*item.TksdQuantity, "")}</Text>
+      //     </View>
+      //   </View>}
+      //   </View>
       ); 
   };
   // Đang Order
@@ -499,9 +508,10 @@ export class CardDetailView extends React.Component {
         }); 
       }
   render() {
-    let { state,setState, onSendOrder,lockTable, BookingsStyle, CartToggleHandle, translate, ProductsOrdered} = this.props;
-    let {isColor,modalNote,Products1,Products2,ModalCallStaff,TicketHitory,CheckKitType}= this.state;
+    let { state,setState, onSendOrder,lockTable, BookingsStyle, CartToggleHandle, translate,_getTicketInforOnTable,ProductsOrdered,TicketHitory} = this.props;
+    let {isColor,modalNote,Products1,Products2,ModalCallStaff,}= this.state;
     let HeightHistory = Bordy.height-(Titlecf.height+TabTitle.height)
+    let HeightOrdered = Bordy.height-(Titlecf.height+TabTitle.height)
     if (!this.state.IsLoaded) {
       return (
         <View style={[styles.pnbody, styles.horizontal]}>
@@ -509,7 +519,7 @@ export class CardDetailView extends React.Component {
         </View>
       );
     }
-    const titleHitory = [
+    const titleProductsOrdered = [
       {Name: 'Stt',widthTitle:Bordy.width * 0.75*0.06},
       {Name: translate.Get("Tên hàng"),widthTitle:Bordy.width * 0.75*0.42},
       {Name: translate.Get("ĐVT"),widthTitle:Bordy.width * 0.75*0.1},
@@ -517,6 +527,17 @@ export class CardDetailView extends React.Component {
       {Name: translate.Get("Trạng thái bếp"),widthTitle:Bordy.width * 0.75*0.2},
       {Name: translate.Get("Thao tác"),widthTitle:Bordy.width * 0.75*0.3},
       {Name: translate.Get("Ghi chú"),widthTitle:Bordy.width * 0.75*0.25},
+      {Name: translate.Get("Giờ order"),widthTitle:Bordy.width * 0.75*0.15},
+      {Name: translate.Get("Tổng tiền"),widthTitle:Bordy.width * 0.75*0.15},
+    ]
+    const titleHitory = [
+      {Name: 'Stt',widthTitle:Bordy.width * 0.75*0.06},
+      {Name: translate.Get("Tên hàng"),widthTitle:Bordy.width * 0.75*0.42},
+      {Name: translate.Get("ĐVT"),widthTitle:Bordy.width * 0.75*0.1},
+      {Name: translate.Get("SL"),widthTitle:Bordy.width * 0.75*0.1},
+      {Name: translate.Get("Trạng thái bếp"),widthTitle:Bordy.width * 0.75*0.2},
+      {Name: translate.Get("Ghi chú"),widthTitle:Bordy.width * 0.75*0.25},
+      {Name: translate.Get("Lý do trả"),widthTitle:Bordy.width * 0.75*0.2},
       {Name: translate.Get("Giờ order"),widthTitle:Bordy.width * 0.75*0.15},
       {Name: translate.Get("Bắt đầu làm"),widthTitle:Bordy.width * 0.75*0.15},
       {Name: translate.Get("Làm xong"),widthTitle:Bordy.width * 0.75*0.15},
@@ -695,7 +716,6 @@ export class CardDetailView extends React.Component {
             <TouchableOpacity style={{justifyContent:'center', borderRadius: 20, backgroundColor: state.isHavingOrder == 3? '#dc7d46': colors.grey3,width: '32%',height:'90%'
             }}
             onPress={() => {
-                this._getTicketInforOnTable();
                 setState({isHavingOrder:3,iLoadNumber:state.iLoadNumber+1 });
             }} >
              <Text style={{ fontSize: H2FontSize,  color:"white",  textAlign: "center" }}>
@@ -703,14 +723,14 @@ export class CardDetailView extends React.Component {
               </Text>
             </TouchableOpacity>
             </View>
-            <View style={{backgroundColor: isColor == true ? '#444444' :'#FFFFFF',  width: "100%",marginTop:1, height:Bordy.height-(Titlecf.height+TabTitle.height+(state.isHavingOrder == 1 ? TabTitle.height*2.4 : state.isHavingOrder == 2 ?TabTitle.height :null))
+            <View style={{backgroundColor: isColor == true ? '#444444' :'#FFFFFF',  width: "100%",marginTop:1, height:Bordy.height-(Titlecf.height+TabTitle.height)
             }}>
             {state.isHavingOrder == 3 ?
             <ScrollView horizontal={true}>
-              <View style={{flexDirection:'column',height:HeightHistory,width:Bordy.width * 0.75*2.38 }}>
-              <View style={{flexDirection:'row',height:HeightHistory*0.05,width:Bordy.width * 0.75*2.38 }}>
+              <View style={{flexDirection:'column',height:HeightHistory,width:Bordy.width * 0.75*2.28 }}>
+              <View style={{flexDirection:'row',height:HeightHistory*0.05,width:Bordy.width * 0.75*2.28 }}>
                 <FlatList
-                numColumns={13}
+                numColumns={14}
                 data={titleHitory}
                 keyExtractor={(item, Index) => Index.toString()}
                 renderItem={({ item, index })=>
@@ -720,19 +740,19 @@ export class CardDetailView extends React.Component {
                 }
                 />
                 </View>
-                <View style={{flexDirection:'row',height:HeightHistory*0.95,width:Bordy.width * 0.75*2.38}}>
+                <View style={{flexDirection:'row',height:HeightHistory*0.95,width:Bordy.width * 0.75*2.28}}>
                 <FlatList
                 refreshing={this.state.refreshing}
-                onRefresh={this._getTicketInforOnTable}
+                onRefresh={_getTicketInforOnTable}
                 data={TicketHitory}
                 keyExtractor={(item, Index) => Index.toString()}
                 renderItem={({ item, index })=>
-                <View style={{width:'100%', flexDirection:'row',backgroundColor:isColor == true ? '#333333' :'#EEEEEE',}}>
+                <View style={{width:'100%', flexDirection:'row',backgroundColor:item.TkdStatus == 3 ? '#AA0000':isColor == true ? '#333333' :'#EEEEEE',}}>
                   <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.06,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.STT}</Text>
                   </View>
                   <View style={{ justifyContent:'center',alignItems:'left',width:Bordy.width * 0.75*0.42,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:5}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.PrdName}</Text>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.PrdNameUi ? item.PrdNameUi : item.PrdName}</Text>
                   </View>
                   <View style={{justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.1,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.UnitName}</Text>
@@ -740,19 +760,14 @@ export class CardDetailView extends React.Component {
                   <View style={{justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.1,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdQuantity}</Text>
                   </View>
-                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.2,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',backgroundColor:item.Color}}>
+                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.2,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',backgroundColor:item.TkdStatus == 3 ? '#AA0000':item.Color}}>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdStatusName ? item.TkdStatusName : ''}</Text>
-                  </View>
-                  <View style={{width:Bordy.width * 0.75*0.3,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingVertical:5,flexDirection:'row'}}>
-                    <TouchableOpacity onPress={()=>{item.TkdStatus != 6? this._UpdateNote_TicketDetail(item) : null}} style={{backgroundColor:item.TkdStatus != 6 && item.TkdStatus !=8 ?'#66ccff': '#dddddd',borderRadius:3,borderWidth:0.5, height:H1_FONT_SIZE,paddingHorizontal:8,justifyContent:'center', marginHorizontal:5,width:Bordy.width * 0.75*0.3*0.38}}>
-                      <Text style={{fontSize:H3_FONT_SIZE,color: item.TkdStatus == 6 && item.TkdStatus != 8 ? "#808080" : '#000000',textAlign:'center'}}>{translate.Get("Lên món")}</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={()=>{CheckKitType == true ? (item.TkdStatus == 2 ? this._UpdateStatus_TicketDetail(item,6) : this._NoticeHT() ):item.TkdStatus == 6 ? null : this._UpdateStatus_TicketDetail(item,6)}} style={{backgroundColor:CheckKitType == true ? (item.TkdStatus == 2 ? '#009900' :'#dddddd' ): item.TkdStatus == 6 ? '#dddddd' :'#009900',borderRadius:3,borderWidth:0.5, height:H1_FONT_SIZE,paddingHorizontal:8,justifyContent:'center',width:Bordy.width * 0.75*0.3*0.55}}>
-                      <Text style={{fontSize:H3_FONT_SIZE,color:item.TkdStatus == 6? "#808080" : '#000000',textAlign:'center'}}>{translate.Get("Hoàn thành")}</Text>
-                    </TouchableOpacity>
                   </View>
                   <View style={{ justifyContent:'center',width:Bordy.width * 0.75*0.25,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:8}}>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',textAlign:'left'}}>{item.TkdNote}</Text>
+                  </View>
+                  <View style={{ justifyContent:'center',width:Bordy.width * 0.75*0.2,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:8}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',textAlign:'left'}}>{item.TkdReason}</Text>
                   </View>
                   <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.15,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdOrderTime ? formatTime(item.TkdOrderTime):''}</Text>
@@ -778,18 +793,19 @@ export class CardDetailView extends React.Component {
                 </View>
                 </View>
             </ScrollView>
-            
             :null
             }
-            <FlatList
-              keyExtractor={(item, RowIndex) => RowIndex.toString()}
-              data={state.isHavingOrder == 1 ? state.CartInfor.items : state.isHavingOrder == 2 ? ProductsOrdered : null }
-              extraData={state.iLoadNumber}
-              renderItem={state.isHavingOrder ==1 ? this.renderOrder : state.isHavingOrder == 2 ? this.renderOrdered : null}
-            /> 
-            </View>
             {state.isHavingOrder == 1 ? (
-            <View style={{ height: TabTitle.height, width: "100%",  flexDirection: "column" }}>
+              <View style={{flexDirection:'column',height:HeightOrdered,width:Bordy.width * 0.75}}>
+              <View style={{flexDirection:'row',height:HeightOrdered-(TabTitle.height*2.4 ),width:Bordy.width * 0.75}}>
+              <FlatList
+              keyExtractor={(item, RowIndex) => RowIndex.toString()}
+              data={state.CartInfor.items}
+              extraData={state.iLoadNumber}
+              renderItem={this.renderOrder }
+            /> 
+              </View>
+              <View style={{ height: TabTitle.height, width: "100%",  flexDirection: "column" }}>
               <View style={{ width: "100%", height: TabTitle.height, flexDirection: "row", backgroundColor:isColor == true ? '#222222' : colors.grey5 }}>
              
                   <View style={[styles.button_end_left_order, { width: "50%",textAlign:'left',paddingTop:(TabTitle.height-H2FontSize)/2  }]}> 
@@ -845,15 +861,37 @@ export class CardDetailView extends React.Component {
 
               </View>
             </View>
-          ) : state.isHavingOrder == 2 ?
+            </View>
+            
+          ) :null}
+          { state.isHavingOrder == 2 ?
           (
-            <View  style={{height:TabTitle.height,width: "100%",
-                position: "absolute", flexDirection: "row",
-                bottom: 0,right: 0,borderTopColor: isColor == true ? '#222222' :colors.grey5,
+            <ScrollView horizontal={true}>
+            <View style={{flexDirection:'column',height:HeightOrdered,width:Bordy.width * 0.75*1.73 }}>
+              <View style={{flexDirection:'row',height:HeightOrdered*0.05,width:Bordy.width * 0.75*1.73 }}>
+              <FlatList
+                numColumns={14}
+                data={titleProductsOrdered}
+                keyExtractor={(item, Index) => Index.toString()}
+                renderItem={({ item, index })=>
+                <View style={{backgroundColor:isColor == true ? '#232323' :'#C0C0C0', width:item.widthTitle, justifyContent:'center',alignItems:'center',height:HeightHistory*0.05,borderBottomWidth:0.5,borderRightWidth:0.5,borderTopWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
+                  <Text style={{fontSize:H3_FONT_SIZE*1.1,color:isColor == true ? '#FFFFFF' :'black',}}>{item.Name}</Text>
+                </View>
+                }
+                />
+              </View>
+              <View style={{flexDirection:'row',height:HeightOrdered*0.95-TabTitle.height,width:Bordy.width * 0.75*1.73}}>
+              <FlatList
+              keyExtractor={(item, RowIndex) => RowIndex.toString()}
+              data={ProductsOrdered}
+              extraData={state.iLoadNumber}
+              renderItem={this.renderOrdered }
+            /> 
+              </View>
+            <View  style={{height:TabTitle.height,width: '100%',borderTopColor: isColor == true ? '#222222' :colors.grey5,
                 borderTopWidth: 1,backgroundColor:isColor == true ? '#222222' : colors.grey5,
-                alignContent:'center',justifyContent:'space-between'
               }}>
-                <View style={{width:'100%',flexDirection: "row",alignItems: "center"}}>
+                <View style={{width:'100%',alignItems: "left",flexDirection: "row",}}>
                 <Text style={{color:isColor == true ? '#FFFFFF' : '#000000', fontSize: H2FontSize,marginLeft:10 }}>
                       {translate.Get("Tạm tính")}:
                       </Text>
@@ -861,13 +899,13 @@ export class CardDetailView extends React.Component {
                     {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? state.table.Ticket.TkItemAmout : state.table.Ticket.TkTotalAmount, "")}
                   </Text>
                 </View>
-                {/* <TouchableOpacity 
-                onPress={()=>{this.onPressNext()}} 
-             style={{  height: "100%", width: "50%",shadowColor: "#000",shadowOffset: {width: 0,height: 3},shadowOpacity: 0.27,shadowRadius: 4.65,elevation: 6,justifyContent: "center", alignItems: "center", backgroundColor: '#00adee' }}>
-              <Text style={{ textAlign: "center",color:'#FFFFFF',fontFamily: "RobotoBold", width: "100%", fontSize: H2FontSize}}>Thanh toán</Text>
-            </TouchableOpacity> */}
             </View>
+            </View>
+            </ScrollView>
           ):null}
+            
+            </View>
+            
           </View>
           {this.state.showS_CodeHandleData ?
             <View style={{

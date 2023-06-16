@@ -3,16 +3,15 @@ import React, { Component } from "react";
 import {AppState,TouchableOpacity,Dimensions,Image,TouchableHighlight,ActivityIndicator, UIManager,StatusBar,ImageBackground,Keyboard,StyleSheet,Alert,Platform,Animated,Easing,Text,View,
   TextInput,ScrollView} from "react-native";
 import * as Font from "expo-font";
-import Modal from "react-native-modal";
 import Constants from "expo-constants";
 import { _retrieveData, _storeData, _remove } from "../services/storages";
 import { FlatList } from "react-native";
-import { Input, Button, Icon,CheckBox } from "react-native-elements";
+import { Input, Button, Icon ,CheckBox} from "react-native-elements";
 import { setCustomText } from "react-native-global-props";
 import { ProductDetails, CardDetailView, _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor } from '../components';
 import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize,H2FontSize,H3FontSize,H4FontSize,H2_FONT_SIZE,H3_FONT_SIZE,FontSize,H4_FONT_SIZE, H1_FONT_SIZE } from "../config/constants";
 import translate from "../services/translate";
-import {getMasterData,GetViewGroup,GetPrdChildGroups,getProductByGroup,getTicketInfor, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getByChoiceId,CancelOrder,CallServices,getLanguage} from "../services";
+import {getMasterData,GetViewGroup,GetPrdChildGroups,getProductByGroup,getTicketInforOnTable, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getByChoiceId,CancelOrder,CallServices,getLanguage} from "../services";
 import { formatCurrency } from "../services/util";
 import colors from "../config/colors";
 import BookingsStyle from "../styles/bookings";
@@ -74,6 +73,7 @@ export default class OrderView extends Component {
       Products2: [{
         PrdName:''
       }],
+      TicketHitory:[],
       ProductsOrdered: [],
       isShowMash: false,
       Ticket: {},
@@ -155,7 +155,7 @@ export default class OrderView extends Component {
         return false;
       });
       await this._getMasterData();
-      await this._getTicketInfor();
+      await this._getTicketInforOnTable();
       await this._getLanguage(true);
       await this.fetchData();
       await this.CaculatorCardInfor();
@@ -416,42 +416,45 @@ onCallServices= async() => {
     };
     setCustomText(customTextProps);
   }
-  _getTicketInfor = async () => {
+  _getTicketInforOnTable = async () =>{
     try{
-    let { table, Ticket, ProductsOrdered ,Config} = this.state;
+      this.setState({ isShowMash: true });
+    let{TicketHitory,ProductsOrdered,table,Ticket}=this.state;
     if ("TicketID" in table && table.TicketID > 0) {
-      getTicketInfor(Config, table).then(res => {
-        if (!("Table" in res.Data) || res.Data.Table.length == 0) {
-        }
-        if ("Table2" in res.Data) {
-          ProductsOrdered = res.Data.Table2;
-        }
-        if ("Table1" in res.Data) {
-          if (res.Data.Table1.length > 0) {
-            Ticket = res.Data.Table1[0];
-          } else {
-            Ticket = { TkTotalAmount: 0, TkNo: 0, TkServiceChargeAmout: 0 };
-          }
-        }
-        table.Ticket = Ticket;
-        _storeData("APP@TABLE", JSON.stringify(table), () => {
-          this.setState({ Ticket, table, ProductsOrdered});
-        });
-      }).catch(error => {
-        this.setState({ empty: true, isShowMash: false });
-      });
-    }
-    this.setState({isShowMash: false});
-  }
-  catch{((error) => {
-    Question.alert( 'System Error',error, [
-      {
-        text: "OK", onPress: () => {
+    getTicketInforOnTable(table).then(res => {
+      this.setState({ isShowMash: false });
+      if ("Table" in res.Data) {
+        if (res.Data.Table.length > 0) {
+          Ticket = res.Data.Table[0];
+        } else {
+          Ticket = { TkTotalAmount: 0,TkItemAmout:0, TkNo: 0, TkServiceChargeAmout: 0 };
         }
       }
-    ]);
-  })};
-  };
+      table.Ticket = Ticket;
+      if("Table1" in res.Data) {
+        ProductsOrdered = res.Data.Table1;
+      }
+      
+      if("Table2" in res.Data) {
+        TicketHitory = res.Data.Table2;
+      }
+      _storeData("APP@TABLE", JSON.stringify(table), () => {
+        this.setState({ Ticket, table, ProductsOrdered,TicketHitory,refreshing:false});
+      });
+    }).catch(error => {
+      this.setState({ isShowMash: false });
+    });
+  }
+  this.setState({isShowMash: false});}
+    catch(error){
+      Alert.alert(translate.Get("Thông báo"),translate.Get("Lỗi hệ thống, _getTicketInforOnTable"), [
+        {
+          text: "OK", onPress: () => { }
+        }
+      ]);
+      return null;
+    }
+  }
   static getDerivedStateFromProps = (props, state) => {
     if (
       props.navigation.getParam("settings", state.settings) != state.settings ||
@@ -627,7 +630,7 @@ onCallServices= async() => {
                     TimeToNextBooking: Config.I_Limit_Booking_Time ? Config.I_Limit_Booking_Time : 5
                   }, async () => {
                     await this.CartToggleHandle(false);
-                    this._getTicketInfor();
+                    this._getTicketInforOnTable();
                   });
                 });
               }
@@ -641,7 +644,7 @@ onCallServices= async() => {
           table.OrderId = res.Data;
           await _storeData("APP@TABLE", JSON.stringify(table), async () => {
             await this.setState({ table: table, isShowMash: false }, async () => {
-              this._getTicketInfor();
+              this._getTicketInforOnTable();
             });
           }
           );
@@ -661,7 +664,7 @@ onCallServices= async() => {
       );
       this.setState({ isShowMash: false }, async () => {
         await this.CartToggleHandle(false);
-        this._getTicketInfor();
+        this._getTicketInforOnTable();
       });
     });
   }
@@ -819,7 +822,7 @@ onCallServices= async() => {
   CartToggleHandle = async (isShow) =>{
     const endWidth = !this.state.isShowFormCard ? SCREEN_WIDTH * 0.75 : 0;
     if (isShow) {
-      await this._getTicketInfor();
+      await this._getTicketInforOnTable();
       this.setState({ isShowFormCard: isShow});
     }
     Animated.timing(this.state.FullCartWidth, {
@@ -1566,7 +1569,7 @@ if (ProductChoise==null) {
         </View>
       );
     }
-    const {ProductGroupList,endpoint,PrdChildGroups,Products,CartInfor,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config,ProductsOrdered,isColor} = this.state; 
+    const {ProductGroupList,endpoint,PrdChildGroups,Products,CartInfor,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config,ProductsOrdered,isColor,TicketHitory} = this.state; 
     return (
       <View style={{height:Bordy.height,width:Bordy.width, backgroundColor: isColor == true ? '#333333' : "#DDDDDD"}}>
         <View style={{flexDirection: "row"}}>
@@ -1684,6 +1687,7 @@ if (ProductChoise==null) {
         : (
           <CardDetailView
             state={this.state}
+            _getTicketInforOnTable={this._getTicketInforOnTable}
             CartToggleHandle={(val) => this.CartToggleHandle(val)}
             translate={this.translate}
             ticketId={this.state.table.TicketID}
@@ -1694,6 +1698,7 @@ if (ProductChoise==null) {
             table={this.state.table}
             lockTable={this.state.lockTable}
             BookingsStyle={BookingsStyle}
+            TicketHitory={TicketHitory}
             ProductsOrdered={ProductsOrdered}
             onPressNext={this.onPressNext}
             HandleDescription={(item,Description) => { this.HandleDescription(item,Description) }}

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { TouchableOpacity, Dimensions, Image,Keyboard, TouchableHighlight, ActivityIndicator, UIManager, StatusBar, ImageBackground, StyleSheet, Platform, Animated, Text, View,TextInput } from "react-native";
+import { TouchableOpacity, Dimensions, Image,Keyboard, TouchableHighlight, ActivityIndicator, UIManager, StatusBar, Alert,ImageBackground, StyleSheet, Platform, Animated, Text, View,TextInput } from "react-native";
 import * as Font from "expo-font";
 import Constants from 'expo-constants';
 import { _retrieveData, _storeData, _remove } from "../services/storages";
@@ -35,6 +35,7 @@ export default class SetMenuView extends Component {
       IsPostBack: false,
       isShowFullImage:false,
       ImageUrl:'',
+      indexLength: 0,
       ProductGroupList: [],
       CategorySelectedIndex: -1,
       ChoiceSet: [],
@@ -129,7 +130,6 @@ export default class SetMenuView extends Component {
   }
   componentDidMount = async () => {
     try {
-     // console.log('componentDidMount ');
       this.translate = await this.translate.loadLang();
       StatusBar.setHidden(true);
       let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
@@ -284,7 +284,8 @@ export default class SetMenuView extends Component {
       await SetMenu_getChoiceCategory(Config, ProductSet).then(res => {
         if (res.Data.Table.length >0){
         let ProductGroupList = res.Data.Table;
-        this.setState({ table, ProductGroupList, });
+        let indexLength = res.Data.Table.length
+        this.setState({ table, ProductGroupList, indexLength:indexLength});
         }
       });
     }
@@ -349,7 +350,7 @@ export default class SetMenuView extends Component {
     let { ProductSet, ProductGroupList, CategorySelectedIndex,Config } = this.state;
     let group = ProductGroupList[CategorySelectedIndex];
     if (('OrddQuantity' in group && group.OrddQuantity + OrddQuantity > group.ChcgMaxQuantity) || group.ChcgMaxQuantity <= 0) {
-      Question.alert(this.translate.Get("Alert"), this.translate.Get("ChoiseOrderlimited"));
+      Alert.alert(this.translate.Get("Alert"), this.translate.Get("ChoiseOrderlimited"));
       //console.log('Limited OrddQuantity:'+ JSON.stringify(group));
       return null;
     }
@@ -369,7 +370,7 @@ export default class SetMenuView extends Component {
     });
     if (Detail != null && OrddQuantity > 0) {
       if (Config.I_LimitTypeBooking > 0 && ProductSet.subItems.length >= Config.I_LimitTypeBooking) {
-        Question.alert(this.translate.Get("Limited ChoiceSet!"), this.translate.Get("Your products number is limited, Please check in!"));
+        Alert.alert(this.translate.Get("Limited ChoiceSet!"), this.translate.Get("Your products number is limited, Please check in!"));
         return;
       }
     }
@@ -387,6 +388,10 @@ export default class SetMenuView extends Component {
         TksdQuantity: OrddQuantity,
       });
       GroupQuantity = OrddQuantity;
+      console.log('----------------')
+      console.log('CategorySelectedIndex',CategorySelectedIndex)
+      console.log(ProductGroupList[CategorySelectedIndex+1])
+      this._ChoiceCategorySelect(ProductGroupList[CategorySelectedIndex+1],true)
     } 
     // console.log('Detail product:'+ JSON.stringify(Detail));
     /*Kiểm tra xoá hoặc cập nhật */
@@ -435,11 +440,17 @@ export default class SetMenuView extends Component {
     }
   };
   _ChoiceCategorySelect = (item, index) => {
-    console.log('item',item)
-    console.log('index',index)
-    this.setState({ CategorySelectedIndex: index}, () => {
-      this._getAllItembyChoiceId(item);
-    });
+    let{CategorySelectedIndex,indexLength} = this.state;
+    if(index == true ){
+      this.setState({  CategorySelectedIndex:CategorySelectedIndex >= indexLength - 1 ? CategorySelectedIndex : CategorySelectedIndex + index}, () => {
+        this._getAllItembyChoiceId(item);
+      });
+    }
+    else{
+      this.setState({  CategorySelectedIndex: index }, () => {
+        this._getAllItembyChoiceId(item);
+      });
+    }
   };
   _ValidateProductSet= async () => {
     let { ProductSet } = this.state;
@@ -693,7 +704,7 @@ export default class SetMenuView extends Component {
                     {this._showQty(item)} 
                   </Text>
                 </View> 
-                <TouchableOpacity style={{}} onPress={() => this._HandleQuantityDetail(item, 1, false) && this._ChoiceCategorySelect(ProductGroupList[CategorySelectedIndex+1],+1)}>
+                <TouchableOpacity style={{}} onPress={() => this._HandleQuantityDetail(item, 1, false)}>
                   <Image resizeMode="stretch" source={require('../../assets/icons/IconAdd.png')}
                     style={{ width: H2FontSize, height: H2FontSize }} />
                 </TouchableOpacity>

@@ -1,6 +1,6 @@
 
 import { _retrieveData, _storeData, _clearData } from './storages';
-import { execFetch,execFetch_NoAuthor, fetchFile, execFormData } from './services';
+import { execFetch,execFetch_NoAuthor, fetchFile,execFetch2, execFormData } from './services';
 
 
 
@@ -220,7 +220,7 @@ export const getTicketInforOnTable = async (Ticket) => {
   const culture = await _retrieveData('culture', 1);
   const URL = '/Ticket/getTicketInforOnTable';
   return await execFetch(URL, 'GET', {
-    TicketID: Ticket.TicketID, isGroup: 0
+    TicketID: Ticket.TicketID, isGroup: false
   });
 }
 export const UpdateNote_TicketDetail = async (item,ticketId, DescriptionUp ) => {
@@ -232,13 +232,13 @@ export const UpdateNote_TicketDetail = async (item,ticketId, DescriptionUp ) => 
     PrdNo: item.PrdNo,
     PrdName: item.PrdName,
     TkdBasePrice: item.TkdPrice,
-    TkdUpAmount: item.TkdUpAmount,
+    TkdUpAmount: item.TkdUpAmount == null ? 0 : item.TkdUpAmount,
     TkdUnitId: item.TkdUnitId,
-    TkdDiscountItemPer: item.TkdDiscountItemAmount,
-    TkdVatPercent: item.TkdVatPercent,
+    TkdDiscountItemPer: item.TkdDiscountItemAmount == null ? 0 : item.TkdDiscountItemAmount,
+    TkdVatPercent: 0,
     TkdNote: item.TkdNote,
     AtdId: null,
-    TkdisPromotion: item.TkdisPromotion,
+    TkdisPromotion: false,
     TkdOrderNo: '',
     TicketID:ticketId,
     Note: DescriptionUp
@@ -378,5 +378,5 @@ export const Ticket_Flush = async (settings,TicketId, B_UseOrderDefault, sItemTa
  */
 export const API_Print = async (OrgId,TicketId,PrintType,Description) => {
   const URL = '/Ticket/API_Print';
-  return await execFetch(URL, 'GET', { OrgId: OrgId,TicketId:TicketId, PrintType: PrintType ,Description:Description });
+  return await execFetch2(URL, 'GET', { OrgId: OrgId,TicketId:TicketId, PrintType: PrintType ,Description:Description });
 }

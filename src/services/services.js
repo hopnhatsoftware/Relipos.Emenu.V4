@@ -85,7 +85,7 @@ export const execFetch = async (Path, Method, Data) => {
   let URL = endpoint +'/'+ Path;
   if (Method == 'GET') {
     URL = URL + '?' + serialize(Data);
-    //console.log('URL:',URL)
+    // console.log('URL:',URL)
     return fetch(URL, {
       method: Method,
       headers: {
@@ -132,6 +132,54 @@ export const execFetch = async (Path, Method, Data) => {
         data.Exception_Message,
       )
     }
+    return data;
+  }).catch(async (error) => {
+    Alert.alert(
+      "Error",error+Path,
+    )
+  });
+}
+export const execFetch2 = async (Path, Method, Data) => {
+  let endpoint = await _retrieveData('APP@BACKEND_ENDPOINT', JSON.stringify(ENDPOINT_URL));
+  endpoint = JSON.parse(endpoint);
+  endpoint = endpoint.replace("/api/", "").replace("/api", "");
+  endpoint=endpoint+'/api'
+  let user = await _retrieveData('APP@USER', JSON.stringify({}));
+  user = JSON.parse(user);
+  let JwtToken = await _retrieveData('APP@JWT', JSON.stringify({}));
+  JwtToken = JSON.parse(JwtToken);
+  let URL = endpoint +'/'+ Path;
+  if (Method == 'GET') {
+    URL = URL + '?' + serialize(Data);
+    // console.log('URL:',URL)
+    return fetch(URL, {
+      method: Method,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: 'JwtToken ' + JwtToken
+      },
+    }).then((res) => {
+      return res.json();
+    }).then((data) => {
+      return data;
+    }).catch(async (error) => {
+      Alert.alert( "System Error",error+Path,
+      )
+    });
+  }
+
+  return fetch(URL, {
+    method: Method, 
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: 'JwtToken ' + JwtToken
+    },
+    body: JSON.stringify(Data),
+  }).then((res) => {
+    return res.json();
+  }).then((data) => {
     return data;
   }).catch(async (error) => {
     Alert.alert(
