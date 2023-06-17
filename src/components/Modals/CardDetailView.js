@@ -300,55 +300,6 @@ export class CardDetailView extends React.Component {
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',textAlign:'right'}}>{formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.TkdItemAmount : item.TkdTotalAmount, "")}</Text>
                   </View>
                 </View>
-      //   <View style={{backgroundColor:isColor ==true ? '#333333':'#FFFFFF', width: Contentcf.width, borderBottomColor: colors.grey5, borderBottomWidth: 0.5,paddingBottom:1, }}>
-       
-      //  {item.TkdType==0||item.TkdType==1?
-      //   <View style={{ width: Contentcf.width, flexDirection: "row"}}>
-      //       <Text  style={{  color:isColor ==true ? '#FFFFFF': "#000000",textAlign:'center',alignItems: "center", width: Contentcf.width * 0.05, fontSize: H3_FONT_SIZE, }} >
-      //         {formatNumber(item.TkdQuantity)}
-      //       </Text>
-      //       <Text  style={[ BookingsStyle.left_menu_Item,
-      //           {
-      //             color: isColor ==true ? '#FFFFFF':"#000000",
-      //             width: Contentcf.width-(Contentcf.width * 0.05+Contentcf.width*0.14*2),
-      //             justifyContent: "center",
-      //             alignItems: "center",
-      //             fontSize: H3_FONT_SIZE,
-      //           }
-      //         ]}
-      //       >
-      //         {item.PrdNameUi} ({item.UnitName})
-      //       </Text>
-      //       <View style={{  justifyContent:'center',width: Contentcf.width* 0.14 ,}}>
-      //       <Text style={{color: isColor ==true ? '#FFFFFF':"#000000",fontSize: H3FontSize,textAlign: "right"}}>{formatCurrency(item.TkdTotalAmount/item.TkdQuantity, "")}</Text>
-      //     </View>
-      //     <View style={{  justifyContent:'center',width: Contentcf.width* 0.14 ,paddingRight:5}}>
-      //       <Text style={{color: isColor ==true ? '#FFFFFF':"#000000",fontSize: H3FontSize,textAlign: "right"}}>{formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.TkdItemAmount : item.TkdTotalAmount, "")}</Text>
-      //     </View>
-      //     </View>
-      //     :
-      //     <View style={{ width: Contentcf.width, flexDirection: "row"}}> 
-      //     <Text  style={[ BookingsStyle.left_menu_Item,
-      //         {
-      //           color: isColor ==true ? '#FFFFFF':"#000000",
-      //           width: Contentcf.width-(Contentcf.width*0.14*2),
-      //           justifyContent: "center",
-      //           alignItems: "center",
-      //           fontSize: H4FontSize,
-      //           paddingLeft: Bordy.width * 0.03
-      //         }
-      //       ]}
-      //     >
-      //       {item.PrdNameUi}
-      //     </Text>
-      //     <View style={{  justifyContent:'center',width: Contentcf.width* 0.14 ,}}>
-      //       <Text style={{color: isColor ==true ? '#FFFFFF':"#000000",fontSize: H3FontSize,textAlign: "right"}}>{formatCurrency(item.TkdBasePrice, "")}</Text>
-      //     </View>
-      //     <View style={{  justifyContent:'center',width: Contentcf.width* 0.14 ,paddingRight:5}}>
-      //       <Text style={{color: isColor ==true ? '#FFFFFF':"#000000",fontSize: H3FontSize,textAlign: "right"}}>{formatCurrency(item.TkdBasePrice*item.TksdQuantity, "")}</Text>
-      //     </View>
-      //   </View>}
-      //   </View>
       ); 
   };
   // Đang Order
@@ -914,7 +865,7 @@ export class CardDetailView extends React.Component {
                    {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? state.table.Ticket.TkItemAmout : state.table.Ticket.TkTotalAmount, "")}
                  </Text>
                 </View>
-                <TouchableOpacity onPress={()=>{this.props._getTicketInforOnTable();}} style={{position:'absolute',right:5,height:'90%',width:'10%',backgroundColor:'#0099FF', borderWidth:0.5, borderRadius:5, justifyContent:'center',alignItems:'center',flexDirection:'row'}}>
+                <TouchableOpacity onPress={()=>{this.props._getTicketInforOnTable();}} style={{position:'absolute',right:5,height:'90%',width:'10%',backgroundColor:'#0099FF', borderWidth:0.5, borderRadius:5, justifyContent:'space-evenly',alignItems:'center',flexDirection:'row'}}>
                   <Icon name="reload1" type="antdesign" size={H1_FONT_SIZE} iconStyle={{ color: 'black', fontFamily: "RobotoBold",height:'100%'}} />
                   <Text style={{fontSize:H2_FONT_SIZE}}>{translate.Get("Tải lại")}</Text>
                 </TouchableOpacity>
