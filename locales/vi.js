@@ -182,6 +182,7 @@ export default en={
     "Thao tác":"Thao tác",
     "Lên món":"Lên món",
     "Hoàn thành":"Hoàn thành",
+    "Tải lại":"Tải lại",
     "Note: cooking":"Cần bếp bấm 'Xong' trên màn hình Bếp mới có thể hoàn thành",
     "Limited OrddQuantity!": "Số lượng order có hạn!",
     "The total quantity of ordered items must not exceed ": "Tổng số lượng món đặt không được quá " ,

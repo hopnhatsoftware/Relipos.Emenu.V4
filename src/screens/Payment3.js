@@ -383,6 +383,7 @@ export default class Payment3 extends Component {
    * typeView == 2 (Gọi nhân viên)
    */
   _AcceptPayment = async (Description,typeView) => {
+    try{
     let{Ticket,user,ModalCallStaff} = this.state;
     this.setState({ isPostBack: false});
     if(typeView == 1){
@@ -390,6 +391,15 @@ export default class Payment3 extends Component {
         this.setState({ isPostBack: true});
         if (res.Status == 1){
          this.onPressNext();
+        }
+        else{
+          Alert.alert( this.translate.Get('Notice'),"Máy in lỗi,KHÔNG THỂ in thông báo tự động đến quầy", [
+            {
+              text: "OK", onPress: () => {
+                this.setState({ isPostBack: true});
+              }
+            }
+          ]);
         }
       }).catch((error) => {
         this.setState({ isPostBack: true});
@@ -413,6 +423,15 @@ export default class Payment3 extends Component {
             }
           ]);
         }
+        else{
+          Alert.alert( this.translate.Get('Notice'),"Máy in lỗi,KHÔNG THỂ in thông báo tự động đến quầy", [
+            {
+              text: "OK", onPress: () => {
+                this.setState({ isPostBack: true});
+              }
+            }
+          ]);
+        }
       }).catch((error) => {
         this.setState({ isPostBack: true,});
         Alert.alert( this.translate.Get('Notice'),"Máy in lỗi,KHÔNG THỂ in thông báo tự động đến quầy", [
@@ -423,6 +442,16 @@ export default class Payment3 extends Component {
           }
         ]);
       }); 
+    }
+    }catch{
+      this.setState({ isPostBack: true,});
+      Alert.alert( this.translate.Get('Notice'),"Lỗi hệ thống!", [
+        {
+          text: "OK", onPress: () => {
+            this.setState({ isPostBack: true});
+          }
+        }
+      ]);
     }
   }
   /**

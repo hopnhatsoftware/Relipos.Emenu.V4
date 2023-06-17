@@ -45,7 +45,7 @@ export class CardDetailView extends React.Component {
     this.state = {
       appState: AppState.currentState,
       ProductsOrdered:[],
-      refreshing: false,
+      
       isColor:false,
       ModalCallStaff: false,
       IsLoaded:false,
@@ -496,6 +496,15 @@ export class CardDetailView extends React.Component {
                 }
               }
             ]);
+          }else{
+            this.setState({ isPostBack: true});
+            Alert.alert( this.translate.Get('Notice'),"Máy in lỗi,KHÔNG THỂ in thông báo tự động đến quầy", [
+            {
+              text: "OK", onPress: () => {
+                this.setState({ isPostBack: true});
+              }
+            }
+          ]);
           }
         }).catch((error) => {
           Alert.alert( this.translate.Get('Notice'),"Máy in lỗi,KHÔNG THỂ in thông báo tự động đến quầy", [
@@ -511,7 +520,7 @@ export class CardDetailView extends React.Component {
     let { state,setState, onSendOrder,lockTable, BookingsStyle, CartToggleHandle, translate,_getTicketInforOnTable,ProductsOrdered,TicketHitory} = this.props;
     let {isColor,modalNote,Products1,Products2,ModalCallStaff,}= this.state;
     let HeightHistory = Bordy.height-(Titlecf.height+TabTitle.height)
-    let HeightOrdered = Bordy.height-(Titlecf.height+TabTitle.height)
+    let HeightOrdered = Bordy.height-(Titlecf.height+TabTitle.height*2)
     if (!this.state.IsLoaded) {
       return (
         <View style={[styles.pnbody, styles.horizontal]}>
@@ -742,7 +751,7 @@ export class CardDetailView extends React.Component {
                 </View>
                 <View style={{flexDirection:'row',height:HeightHistory*0.95,width:Bordy.width * 0.75*2.28}}>
                 <FlatList
-                refreshing={this.state.refreshing}
+                refreshing={this.props.refreshing}
                 onRefresh={_getTicketInforOnTable}
                 data={TicketHitory}
                 keyExtractor={(item, Index) => Index.toString()}
@@ -796,8 +805,8 @@ export class CardDetailView extends React.Component {
             :null
             }
             {state.isHavingOrder == 1 ? (
-              <View style={{flexDirection:'column',height:HeightOrdered,width:Bordy.width * 0.75}}>
-              <View style={{flexDirection:'row',height:HeightOrdered-(TabTitle.height*2.4 ),width:Bordy.width * 0.75}}>
+              <View style={{flexDirection:'column',height:HeightHistory,width:Bordy.width * 0.75}}>
+              <View style={{flexDirection:'row',height:HeightHistory-(TabTitle.height*2.4 ),width:Bordy.width * 0.75}}>
               <FlatList
               keyExtractor={(item, RowIndex) => RowIndex.toString()}
               data={state.CartInfor.items}
@@ -868,7 +877,7 @@ export class CardDetailView extends React.Component {
           (
             <ScrollView horizontal={true}>
             <View style={{flexDirection:'column',height:HeightOrdered,width:Bordy.width * 0.75*1.73 }}>
-              <View style={{flexDirection:'row',height:HeightOrdered*0.05,width:Bordy.width * 0.75*1.73 }}>
+              <View style={{flexDirection:'row',height:HeightOrdered*0.055,width:Bordy.width * 0.75*1.73 }}>
               <FlatList
                 numColumns={14}
                 data={titleProductsOrdered}
@@ -880,30 +889,37 @@ export class CardDetailView extends React.Component {
                 }
                 />
               </View>
-              <View style={{flexDirection:'row',height:HeightOrdered*0.95-TabTitle.height,width:Bordy.width * 0.75*1.73}}>
+              <View style={{flexDirection:'row',height:HeightOrdered*0.945,width:Bordy.width * 0.75*1.73}}>
               <FlatList
               keyExtractor={(item, RowIndex) => RowIndex.toString()}
               data={ProductsOrdered}
               extraData={state.iLoadNumber}
+              refreshing={this.props.refreshing}
+              onRefresh={_getTicketInforOnTable}
               renderItem={this.renderOrdered }
             /> 
               </View>
-            <View  style={{height:TabTitle.height,width: '100%',borderTopColor: isColor == true ? '#222222' :colors.grey5,
-                borderTopWidth: 1,backgroundColor:isColor == true ? '#222222' : colors.grey5,
-              }}>
-                <View style={{width:'100%',alignItems: "left",flexDirection: "row",}}>
-                <Text style={{color:isColor == true ? '#FFFFFF' : '#000000', fontSize: H2FontSize,marginLeft:10 }}>
-                      {translate.Get("Tạm tính")}:
-                      </Text>
-                    <Text style={{ fontSize: H2FontSize, color:isColor == true ? '#DAA520' : colors.red,marginLeft:10 }}>
-                    {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? state.table.Ticket.TkItemAmout : state.table.Ticket.TkTotalAmount, "")}
-                  </Text>
-                </View>
-            </View>
             </View>
             </ScrollView>
           ):null}
-            
+            {state.isHavingOrder == 2 ?
+               <View  style={{bottom:0,position:'absolute',height:TabTitle.height,width: '100%',borderTopColor: isColor == true ? '#222222' :colors.grey5,
+               borderTopWidth: 1,backgroundColor:isColor == true ? '#222222' : colors.grey5,
+             }}>
+               <View style={{width:'100%',alignItems: "left",flexDirection: "row",}}>
+                <Text style={{color:isColor == true ? '#FFFFFF' : '#000000', fontSize: H2FontSize,marginLeft:10 }}>
+                     {translate.Get("Tạm tính")}:
+                     </Text>
+                   <Text style={{ fontSize: H2FontSize, color:isColor == true ? '#DAA520' : colors.red,marginLeft:10 }}>
+                   {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? state.table.Ticket.TkItemAmout : state.table.Ticket.TkTotalAmount, "")}
+                 </Text>
+                </View>
+                <TouchableOpacity onPress={()=>{this.props._getTicketInforOnTable();}} style={{position:'absolute',right:5,height:'90%',width:'10%',backgroundColor:'#0099FF', borderWidth:0.5, borderRadius:5, justifyContent:'center',alignItems:'center',flexDirection:'row'}}>
+                  <Icon name="reload1" type="antdesign" size={H1_FONT_SIZE} iconStyle={{ color: 'black', fontFamily: "RobotoBold",height:'100%'}} />
+                  <Text style={{fontSize:H2_FONT_SIZE}}>{translate.Get("Tải lại")}</Text>
+                </TouchableOpacity>
+           </View>:null
+            }
             </View>
             
           </View>

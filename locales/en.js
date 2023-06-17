@@ -217,6 +217,7 @@ export default en = {
     "Hoàn thành":"Completed",
     "Note: cooking":"Note: cooking",
     "Limited OrddQuantity!": "Limited OrddQuantity!",
+    "Tải lại":"Refresh",
     "The total quantity of ordered items must not exceed ": "The total quantity of ordered items must not exceed " ,
     "Limited Products!": "Limited Products!",
     "The total quantity of ordered items should not exceed ":" and the total quantity of ordered items should not exceed ",

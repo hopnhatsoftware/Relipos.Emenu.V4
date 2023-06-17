@@ -211,6 +211,7 @@ export default en = {
     "Lên món":"上菜",
     "Hoàn thành":"完成",
     "Note: cooking":"正在煮",
+    "Tải lại":"刷新"
     // "Limited OrddQuantity!": ,
     // "Your quantity is limited, Please check in!": ,
     // "Limited Products!": ,

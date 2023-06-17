@@ -42,6 +42,7 @@ export default class OrderView extends Component {
       appState: AppState.currentState,
       isHavingOrder: 1,
       showCall:false,
+      refreshing: false,
       isRenderProduct: true,
       selectedType: null,
       isPostBack: false,
@@ -57,8 +58,6 @@ export default class OrderView extends Component {
       listLanguage:[],
       listLanguage2:{},
       language: 1,
-      languageText: '',
-      languageImg: '',
       a:'',
       b:'',
       call: 1,
@@ -206,7 +205,6 @@ _getLanguage(IsActive){
     listLanguage2 = listLanguage.find((item) => {
       return item.LgId == language;
     })  
-    this.setState({languageText: listLanguage2.LgName,languageImg: listLanguage2.LgClsIco})
     })  
   }
   catch{((error) => {
@@ -595,7 +593,7 @@ onCallServices= async() => {
     if (this.state.language != lang) {
       await _storeData("culture", lang.toString(), async () => {
         this.translate = await this.translate.loadLang();
-        this.setState({ language: lang, languageText: item.LgName, languageImg: item.LgClsIco }, () => this.fetchData());
+        this.setState({ language: lang,}, () => this.fetchData());
       });
     }
     this.setState({ language: lang });
@@ -801,7 +799,7 @@ onCallServices= async() => {
     }
     Animated.timing(this.state.CartWidth, {
       toValue: endWidth,
-      duration: 500,
+      duration: 300,
       easing: Easing.linear,
       useNativeDriver: true
     }).start(() => this.setState({ ShowFullCart: isShow }));
@@ -827,7 +825,7 @@ onCallServices= async() => {
     }
     Animated.timing(this.state.FullCartWidth, {
       toValue: endWidth,
-      duration: 400,
+      duration: 300,
       easing: Easing.linear,
       useNativeDriver: false
     }).start(() => this.setState({ isShowFormCard: isShow ,isHavingOrder : 1}));
@@ -1612,8 +1610,6 @@ if (ProductChoise==null) {
               onCallServices={() => { this.onCallServices(); }}
               listLanguage={this.state.listLanguage}
               listLanguage2={this.state.listLanguage2}
-              languageText={this.state.languageText}
-              languageImg={this.state.languageImg}
               translate={this.translate}
               name={'OrderView'}
               setState={(state) => this.setState(state)}
@@ -1690,6 +1686,7 @@ if (ProductChoise==null) {
             _getTicketInforOnTable={this._getTicketInforOnTable}
             CartToggleHandle={(val) => this.CartToggleHandle(val)}
             translate={this.translate}
+            refreshing={this.state.refreshing}
             ticketId={this.state.table.TicketID}
             BranchID={this.state.settings.I_BranchID}
             HandleQuantity={(item,OrddQuantity,isReplace,Json) => { this.HandleQuantity(item,OrddQuantity,isReplace) }}

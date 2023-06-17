@@ -272,10 +272,19 @@ _AcceptCallStaff = async (Description,typeView) => {
           }
         }
       ]);
+    }else{
+      this.setState({ isPostBack: true});
+      Alert.alert( this.translate.Get('Notice'),"Máy in lỗi,KHÔNG THỂ in thông báo tự động đến quầy", [
+      {
+        text: "OK", onPress: () => {
+          this.setState({ isPostBack: true});
+        }
+      }
+    ]);
     }
   }).catch((error) => {
     this.setState({ isPostBack: true});
-    QAlert.alert( this.translate.Get('Notice'),"Máy in lỗi,KHÔNG THỂ in thông báo tự động đến quầy", [
+    Alert.alert( this.translate.Get('Notice'),"Máy in lỗi,KHÔNG THỂ in thông báo tự động đến quầy", [
       {
         text: "OK", onPress: () => {
           this.setState({ isPostBack: true});
