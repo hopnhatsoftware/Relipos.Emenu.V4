@@ -443,7 +443,7 @@ export class _HeaderNew extends React.Component  {
             />
           </TouchableOpacity>
           <View style={{ flexDirection: 'column', width: '50%', justifyContent: "center", alignItems: 'center', }}>
-            <TouchableOpacity onPress={()=>state.lockTable == true ? null :  this.setState({ isShowTicketInfor: true })} style={{ flexDirection: 'column', width: '100%', justifyContent: "center", alignItems: 'left', }}>
+            <TouchableOpacity onPress={()=>state.lockTable == true ? null :  this.setState({ isShowTicketInfor: true })} style={{ flexDirection: 'column', width: '100%', justifyContent: "center", alignItems: 'flex-start', }}>
               <Text style={[{ color: "#FFFFFF", textAlign: 'left', fontFamily: "RobotoBold", fontSize: H3_FONT_SIZE*0.9 }]}> {table.TbNo} </Text>
             </TouchableOpacity>
           </View>
