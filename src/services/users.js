@@ -51,11 +51,12 @@ export const login = async (userName, passWord) => {
     DeviceId: Constants.deviceId ? Constants.deviceId : 'simulator',
     PosId: settings.PosId && settings.PosId > 0 ? settings.PosId : 1
   }
+
   const URL = endpoint + '/LoginView/Login?' + serialize({
     username: userName,
     password: passWord,
     Culture: culture,
-    Device,
+    Device:Device,
     ModId: 5,
   });
   let data = { UserName: userName,  Password: passWord,  Culture: culture,  Device, ModId: 5,  };
