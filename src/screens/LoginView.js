@@ -224,7 +224,7 @@ const passwordValid = this.validatePassword();
         return;
     this.setState({  isWorking: true, });
         login(username, password).then((res) => {
-         // console.log('login in form LoginView:'+JSON.stringify(res));
+         //console.log('login in form LoginView:'+JSON.stringify(res));
           if (res.Status != 1)
           {
             Question.alert(  this.translate.Get('Notice'),
