@@ -66,6 +66,7 @@ export class CardDetailView extends React.Component {
     this.appStateSubscription.remove();
   };
   componentDidMount= async () => {
+
     this.appStateSubscription = AppState.addEventListener(
       'change',
       nextAppState => {
@@ -78,6 +79,7 @@ export class CardDetailView extends React.Component {
     );
     let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
     isColor = JSON.parse(isColor);
+
     this.setState({IsLoaded:true ,KeyCode:'',isColor});
     
   };
@@ -472,6 +474,7 @@ export class CardDetailView extends React.Component {
     let {isColor,modalNote,Products1,Products2,ModalCallStaff,}= this.state;
     let HeightHistory = Bordy.height-(Titlecf.height+TabTitle.height)
     let HeightOrdered = Bordy.height-(Titlecf.height+TabTitle.height*2)
+    
     if (!this.state.IsLoaded) {
       return (
         <View style={[styles.pnbody, styles.horizontal]}>
@@ -862,7 +865,7 @@ export class CardDetailView extends React.Component {
                      {translate.Get("Tạm tính")}:
                      </Text>
                    <Text style={{ fontSize: H2FontSize, color:isColor == true ? '#DAA520' : colors.red,marginLeft:10 }}>
-                   {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? state.table.Ticket.TkItemAmout : state.table.Ticket.TkTotalAmount, "")}
+                   {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? state.table.TkItemAmout : state.Ticket.TkTotalAmount, "")}
                  </Text>
                 </View>
                 <TouchableOpacity onPress={()=>{this.props._getTicketInforOnTable();}} style={{position:'absolute',right:5,height:'90%',width:'10%',backgroundColor:'#0099FF', borderWidth:0.5, borderRadius:5, justifyContent:'space-evenly',alignItems:'center',flexDirection:'row'}}>

@@ -7,7 +7,7 @@ const commonConfig = {
     "android",
     "web"
   ],
-    version: "2.4",
+    version: "2.5",
     orientation: "landscape",
     icon: "./assets/Customer/Logo.png",
     splash: {
@@ -22,7 +22,7 @@ const commonConfig = {
       "**/*"
     ],
     "ios": {
-      "buildNumber": "4",
+      "buildNumber": "1",
       "infoPlist": {
         "supportsTablet": true,
         "UIBackgroundModes": [

@@ -418,8 +418,10 @@ onCallServices= async() => {
     try{
       this.setState({ isShowMash: true });
     let{TicketHitory,ProductsOrdered,table,Ticket}=this.state;
-    if ("TicketID" in table && table.TicketID > 0) {
+    if ("TicketID" in table && table.TicketID > 0) 
+    {
     getTicketInforOnTable(table).then(res => {
+
       this.setState({ isShowMash: false });
       if ("Table" in res.Data) {
         if (res.Data.Table.length > 0) {
@@ -1624,6 +1626,7 @@ if (ProductChoise==null) {
             </View>
           </View>
         </View>
+      
         {!this.state.isShowFormCard ? 
          //Bottonbar 
           <Animated.View style={[styles.BottonMenu, { width:Center.width+2,height:Booton.height }]}>
