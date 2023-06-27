@@ -503,7 +503,7 @@ export default class Payment3 extends Component {
       {payTitle: 'Vip', payImg: require("../../assets/icons/IconVIP-11.png"), payOnpress:this._ShowVip},
     ]
     return (
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.Container}>
+      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? 30 : "height"} style={styles.Container}>
         {ModalCallStaff ?
         <ScrollView>
           <Modal
@@ -691,27 +691,27 @@ export default class Payment3 extends Component {
                 <View style={{width:'100%',height:'90%',justifyContent:'center',alignItems:'center',paddingHorizontal:'2%'}}>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center'}}>
                     <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Tên khách hàng")}:</Text>
-                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.Name}</Text>
+                    <TextInput style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.Name}</TextInput>
                   </View>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center'}}>
                     <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Số điện thoại")}:</Text>
-                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.SDT}</Text>
+                    <TextInput style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.SDT}</TextInput>
                   </View>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center',}}>
                     <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Ngày sinh")}:</Text>
-                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.date}</Text>
+                    <TextInput style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.date}</TextInput>
                   </View>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center'}}>
                     <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Mã thẻ")}:</Text>
-                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8}}>{Vip.cardNo}</Text>
+                    <TextInput style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8}}>{Vip.cardNo}</TextInput>
                   </View>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center'}}>
                     <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Điểm tích lũy")}:</Text>
-                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.point}</Text>
+                    <TextInput style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.point}</TextInput>
                   </View>
                   <View style={{height:'15%', width:'100%', flexDirection:'row',justifyContent:'center', alignItems:'center'}}>
                     <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'40%', fontSize:H3_FONT_SIZE, }}>{this.translate.Get("Hạng thẻ")}:</Text>
-                    <Text style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.rank}</Text>
+                    <TextInput style={{color:isColor == true ? '#FFFFFF':'#000000',width:'60%',height:'80%', fontSize:H3_FONT_SIZE, borderWidth:1,borderColor:'#CCCCCC', paddingHorizontal:8,}}>{Vip.rank}</TextInput>
                   </View>
                 </View>
               </View>

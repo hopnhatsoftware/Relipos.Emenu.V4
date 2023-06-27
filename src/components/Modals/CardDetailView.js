@@ -311,7 +311,7 @@ export class CardDetailView extends React.Component {
     const Column1=Contentcf.width* 0.17;
     const QuantityWidth=Column1-H2FontSize*3
     return (
-      <View style={{backgroundColor: isColor == true ? '#333333' :'#FFFFFF',width: Contentcf.width, borderBottomColor: colors.grey5, borderBottomWidth: 1,}}>
+      <View style={{ width: Contentcf.width, borderBottomColor: colors.grey4, borderBottomWidth: 1,}}>
         <View style={{ width: Contentcf.width, paddingTop:1,paddingBottom:1}}> 
         <View style={{ width: Contentcf.width, flexDirection: "row"}}> 
         <View style={{ flexDirection: "row", width: Column1}} >
@@ -656,6 +656,12 @@ export class CardDetailView extends React.Component {
               <Text style={{ fontSize: H2FontSize, fontFamily: "RobotoBold", color: "white",  textAlign: "center" }}>
                 {translate.Get("Giỏ hàng")}
               </Text>
+              {state.isHavingOrder == 2 ?
+              <TouchableOpacity onPress={()=>{this.props._getTicketInforOnTable();}} style={{position:'absolute',right:5,height:'80%',paddingHorizontal:5,backgroundColor:'#0099FF', borderWidth:0.5, borderRadius:5, justifyContent:'space-evenly',alignItems:'center',flexDirection:'row'}}>
+                  <Icon name="reload1" type="antdesign" size={H2_FONT_SIZE} iconStyle={{top:3, color: 'black', fontFamily: "RobotoBold",height:'90%'}} />
+                  <Text style={{fontSize:H2_FONT_SIZE}}>{translate.Get("Tải lại")}</Text>
+                </TouchableOpacity>
+                :null}
             </View>
             <View style={{backgroundColor: isColor == true ? '#333333': '#cccccc', width: Bordy.width * 0.75, height: TabTitle.height, flexDirection: "row" ,justifyContent:'space-evenly',alignItems:'center'}}>
             <TouchableOpacity style={{justifyContent:'center', borderRadius: 20, backgroundColor: state.isHavingOrder == 1?  '#dc7d46': colors.grey3,width: '32%',height:'90%'
@@ -760,7 +766,11 @@ export class CardDetailView extends React.Component {
             }
             {state.isHavingOrder == 1 ? (
               <View style={{flexDirection:'column',height:HeightHistory,width:Bordy.width * 0.75}}>
+              {/* <View style={{position:'absolute',height:'100%', width:'100%', backgroundColor:'blue',zIndex:1}}></View> */}
               <View style={{flexDirection:'row',height:HeightHistory-(TabTitle.height*2.4 ),width:Bordy.width * 0.75}}>
+                <View style={{position:'absolute', top: '35%', right:'35%',height:200, width:200,opacity:0.3}}>
+                  <Image resizeMode='contain' style={{ width: '100%', height: '100%' }} source={isColor == true ? require('../../../assets/images/RelisoftLogo_trans-07.png') : require('../../../assets/images/RelisoftLogo_trans-05.png')} />
+                </View>
               <FlatList
               keyExtractor={(item, RowIndex) => RowIndex.toString()}
               data={state.CartInfor.items}
@@ -868,10 +878,6 @@ export class CardDetailView extends React.Component {
                    {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? state.table.TkItemAmout : state.Ticket.TkTotalAmount, "")}
                  </Text>
                 </View>
-                <TouchableOpacity onPress={()=>{this.props._getTicketInforOnTable();}} style={{position:'absolute',right:5,height:'90%',width:'10%',backgroundColor:'#0099FF', borderWidth:0.5, borderRadius:5, justifyContent:'space-evenly',alignItems:'center',flexDirection:'row'}}>
-                  <Icon name="reload1" type="antdesign" size={H1_FONT_SIZE} iconStyle={{ color: 'black', fontFamily: "RobotoBold",height:'100%'}} />
-                  <Text style={{fontSize:H2_FONT_SIZE}}>{translate.Get("Tải lại")}</Text>
-                </TouchableOpacity>
            </View>:null
             }
             </View>
