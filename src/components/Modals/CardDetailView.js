@@ -654,7 +654,7 @@ export class CardDetailView extends React.Component {
                 {translate.Get("Giỏ hàng")}
               </Text>
               {state.isHavingOrder == 2 ?
-              <TouchableOpacity onPress={()=>{this.props._getTicketInforOnTable();}} style={{position:'absolute',right:5,height:'80%',width:'15%',backgroundColor:'#0099FF', borderWidth:0.5, borderRadius:5, justifyContent:'space-evenly',alignItems:'center',flexDirection:'row'}}>
+              <TouchableOpacity onPress={()=>{this.props._getTicketInforOnTable();}} style={{position:'absolute',right:5,height:'80%',paddingHorizontal:5,backgroundColor:'#0099FF', borderWidth:0.5, borderRadius:5, justifyContent:'space-evenly',alignItems:'center',flexDirection:'row'}}>
                   <Icon name="reload1" type="antdesign" size={H2_FONT_SIZE} iconStyle={{top:3, color: 'black', fontFamily: "RobotoBold",height:'90%'}} />
                   <Text style={{fontSize:H2_FONT_SIZE}}>{translate.Get("Tải lại")}</Text>
                 </TouchableOpacity>

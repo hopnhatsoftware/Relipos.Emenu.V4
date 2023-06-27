@@ -21,8 +21,8 @@ UIManager.setLayoutAnimationEnabledExperimental &&
   UIManager.setLayoutAnimationEnabledExperimental(true);
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
- const SCREEN_HEIGHT = Dimensions.get("window").height //- Constants.statusBarHeight;
- const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
+const SCREEN_HEIGHT = Dimensions.get("window").height //- Constants.statusBarHeight;
+const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
 const pnLeft={ width:Bordy.width*0.17,height:SCREEN_HEIGHT };  
 const Center={width:Bordy.width-pnLeft.width, height:Bordy.height};
 const Header={width:Center.width,height:Bordy.height* 0.085};
@@ -153,10 +153,10 @@ export default class OrderView extends Component {
         this.setState({state,CartInfor,SelectedGroupIndex:-1});
         return false;
       });
+      await this.fetchData();
       await this._getMasterData();
       await this._getTicketInforOnTable();
       await this._getLanguage(true);
-      await this.fetchData();
       await this.CaculatorCardInfor();
       this.setState({  isPostBack: true,isColor });
     //  this.interval = setInterval(() => {
@@ -360,16 +360,22 @@ onCallServices= async() => {
         }
         if ("TicketID" in table && table.TicketID > 0) {
           this.setState( { isShowMash:true});
-          CheckAndGetOrder(table, OrdPlatform).then(res => {
-       if(res.Status == 1){
-        table.OrderId = res.Data;
+          if(table.OrderId == null){
+            CheckAndGetOrder(table, OrdPlatform).then(res => {
+              if(res.Status == 1){
+              table.OrderId = res.Data;
+              }else{
+              this.props.navigation.navigate('TableView')
+              }
+                })
+          }
         _storeData("APP@TABLE", JSON.stringify(table), () => {
           GetViewGroup(Config, table).then(res => {
             if (res.Data.Table.length > 0) {
               ProductGroupList = res.Data.Table;
               SelectedGroupIndex = SelectedGroupIndex < 0 ? 0 : SelectedGroupIndex;
-              this.setState( { table,isShowMash:false,   ProductGroupList,  SelectedGroupIndex },
-                () => {  this._loadChildGroups(SelectedGroupIndex);  }
+              this.setState( { table,isShowMash:false, ProductGroupList,  SelectedGroupIndex },
+                () => {  this._loadChildGroups(SelectedGroupIndex); }
               );
             }
           }).catch(error => {
@@ -381,11 +387,8 @@ onCallServices= async() => {
               ]
             );
           });
-        });
-       }else{
-        this.props.navigation.navigate('TableView')
-       }
-          }).catch(error => {
+        })
+       .catch(error => {
             Question.alert('System Error', error,
             [{
                 text: "OK",
@@ -1196,7 +1199,6 @@ if (ProductChoise==null) {
     );
   };
   PrerenderProductModal= (item,CartFilter,index) => {
-    
     let ishowSetInCart=false,iCartItemSelected=null,iCartProductIndex=-1;
     if (item.PrdIsSetMenu == true) {
       /*1:Cách chọn set Bình thường */
