@@ -97,9 +97,9 @@ export const execFetch = async (Path, Method, Data) => {
       return res.json();
     }).then((data) => {
       if (data.Status == 2 || data.Status == 3) { //   if (data.Status != 1) {
-        if (data.Status == 3) {
-          data.Exception_Message = URL + " - " + data.Exception_Message;
-        }
+        // if (data.Status == 3) {
+        //   data.Exception_Message =  URL + " - " + data.Exception_Message;
+        // }
         Alert.alert(
           data.Exception_Title,
           data.Exception_Message,

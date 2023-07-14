@@ -24,8 +24,8 @@ export class _Header extends React.Component {
     const {isShowBack, state, table, language, BookingsStyle, _searchProduct, onPressBack, translate, name, titleSet, setState, lockTable,islockTable,backgroundColor,iheight,isShowFlag } = this.props;
    
     return (
-      <View style={[BookingsStyle.header,{  backgroundColor: backgroundColor, width:SCREEN_WIDTH,height:iheight }]}>
-        <View style={{ height:iheight,paddingTop: 1, width: "20%", flexDirection: 'row', justifyContent: "space-between" }}>
+      <View style={[BookingsStyle.header,{  backgroundColor: backgroundColor, width:'100%',height:'8.5%' }]}>
+        <View style={{ height:'100%',paddingTop: 1, width: "30%", flexDirection: 'row', justifyContent: "space-between" }}>
         {(isShowBack==true)? 
           <TouchableOpacity  onPress={() => { onPressBack.apply(null, []); }}  style={{ width: '14%', justifyContent: 'center', alignItems: 'center' }}>
             <Image  resizeMode="contain" 
@@ -78,7 +78,7 @@ export class _Header extends React.Component {
             }
         </View>
 
-        <View style={{ height:iheight,width: "68%", flexDirection: "row", justifyContent: "center", alignItems: 'center', }}>
+        <View style={{ height:'100%',width: "70%", flexDirection: "row", justifyContent: "center", alignItems: 'center', }}>
           <View style={[BookingsStyle.header_search, { flexDirection: "row" }]}>
             {name == 'OrderView' ?
               <TextInput
@@ -108,7 +108,7 @@ export class _Header extends React.Component {
               </TouchableOpacity>
               : <View style={{ width: ITEM_FONT_SIZE * 2, }}>
               </View>}
-              {
+              {/* {
               language == 1 ?
                 <TouchableOpacity style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
                   onPress={() => setState({ showFilterBell: !state.showFilterBell })}>
@@ -121,7 +121,7 @@ export class _Header extends React.Component {
                   <Image resizeMode="stretch" source={require('../../assets/icons/iconNew/TiengAnh-10.png')}
                     style={{ width: ITEM_FONT_SIZE * 2, height: ITEM_FONT_SIZE * 1.4, }} />
                 </TouchableOpacity>
-            }
+            } */}
           </View>
         </View>
       </View>

@@ -77,9 +77,7 @@ export class ScannerQRVip extends Component {
               return <Text style={{ paddingTop: Constants.statusBarHeight, textAlign: 'center' }}>No access to camera</Text>;
             }
     return (
-      <View style={{
-        backgroundColor: "black", height: Bordy.height, width: Bordy.width, position: 'absolute', bottom: 0, right: 0,
-      }}>
+      <View style={{backgroundColor: "black", height: '100%', width: '100%', position: 'absolute', bottom: 0, right: 0,}}>
        {isViewCamera ? 
         <View style={{flex : 1, }}>
         <View style={{

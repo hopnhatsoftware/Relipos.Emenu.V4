@@ -30,7 +30,7 @@ export class _ChoiceCategory extends React.Component {
     let { pnWidth,pnHeight,ItemWidth, BookingsStyle, ProductGroupList, _ChoiceCategorySelect, CategorySelectedIndex, setState } = this.props;
  // console.log('ItemWidth:'+ItemWidth);
     return (
-      <View style={[BookingsStyle.header, { height:pnHeight, backgroundColor: "#E3E3E3", paddingTop: 2, }]}>
+      <View style={[BookingsStyle.header, { height:'8%',width:'100%', backgroundColor: "#E3E3E3", paddingTop: 2, }]}>
         <FlatList horizontal={true} data={ProductGroupList}   renderItem={({ item, index }) => 
         <TouchableOpacity  key={index}  style={{width:ItemWidth, height:'100%', justifyContent: 'center', alignItems: 'center',  }}
             onPress={() => { _ChoiceCategorySelect(item, index) }}>

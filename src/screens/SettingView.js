@@ -222,12 +222,12 @@ export default class Settings extends Component {
     }
 
     return (
-      <View style={{ height:Bordy.height,width:Bordy.width, backgroundColor:isColor == true ? '#333333' : '#EEEEEE' }}>
+      <View style={{ flex:1, backgroundColor:isColor == true ? '#333333' : '#EEEEEE' }}>
         <StatusBar hidden={true} />
         {this.renderHeader()}
         <View style={{ flex: 1 }}>
-          <ScrollView style={{ width: Bordy.width, }}>
-            <View style={{width: Bordy.width, flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          <ScrollView style={{ width: '100%', }}>
+            <View style={{width: '100%', flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
               <View style={{ flexDirection: "row", paddingBottom: 5, borderBottomColor: 'white', borderBottomWidth: 1 }}>
                 <View style={{ flexDirection: "row", justifyContent: 'flex-start', alignItems: 'center', paddingLeft: 10, width: '100%' }}>
                   <View style={{ width: '25%', justifyContent: 'flex-start', alignItems: 'flex-start' }}>

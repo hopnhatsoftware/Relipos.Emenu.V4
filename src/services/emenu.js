@@ -117,7 +117,7 @@ export const ApplyVoucher = async ( TicketId, settings,VoucherCode) => {
 }
 export const ApplyVipCard = async ( TicketId, Vipcode) => {
   const URL = '/Crm/ApplyVipCard';
-  return await execFetch(URL, 'GET', {
+  return await execFetch2(URL, 'GET', {
     TicketId: TicketId,Vipcode:Vipcode
   });
 }

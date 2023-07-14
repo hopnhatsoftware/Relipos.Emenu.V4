@@ -7,7 +7,7 @@ export default en={
     "Khách nước ngoài" : "Khách nước ngoài",
     "Số lượng khách" : "Số lượng khách",
     "Khách hàng" : "Khách hàng",
-    "Ghi chú" : "Ghi chú",
+    "Ghi chú" : "Diễn giải",
     "Gọi thanh toán":"Gọi thanh toán",
     "Nhập yêu cầu...":"Nhập yêu cầu...",
     "Tên khách hàng":"Tên khách hàng",

@@ -10,7 +10,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Icon } from "react-native-elements";
 import { _retrieveData, _storeData, _remove } from "../../services/storages";
 import {SetMenu_getExtraRequestFromProductId,API_Print,CancelOrder,UpdateStatus_TicketDetail,UpdateNote_TicketDetail} from '../../services';
-import { H1FontSize,H2FontSize,H3FontSize,H4FontSize,H3_FONT_SIZE,H1_FONT_SIZE,H2_FONT_SIZE ,H4_FONT_SIZE, SCREEN_WIDTH} from "../../config/constants";
+import { H1FontSize,H2FontSize,H3FontSize,H4FontSize,H3_FONT_SIZE,H1_FONT_SIZE,H2_FONT_SIZE ,H4_FONT_SIZE, SCREEN_WIDTH, SCREEN_HEIGHT} from "../../config/constants";
 import { formatCurrency,formatTime } from "../../services/util";
 import Question from '../Question';
 import { ScrollView } from "react-navigation";
@@ -72,6 +72,7 @@ export class CardDetailView extends React.Component {
       nextAppState => {
         if ( this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
           console.log('App has come to the foreground!');
+          this._CancelOrder();
         }
         this.setState({appState: nextAppState});
         this._CancelOrder();
@@ -87,6 +88,7 @@ export class CardDetailView extends React.Component {
     let{appState}= this.state;
     let{table}=this.props;
     if(appState == 'background'){
+      console.log(table.OrderId);
       await CancelOrder(table.OrderId);
     }
   }
@@ -311,20 +313,20 @@ export class CardDetailView extends React.Component {
     const Column1=Contentcf.width* 0.17;
     const QuantityWidth=Column1-H2FontSize*3
     return (
-      <View style={{ width: Contentcf.width, borderBottomColor: colors.grey4, borderBottomWidth: 1,}}>
-        <View style={{ width: Contentcf.width, paddingTop:1,paddingBottom:1}}> 
-        <View style={{ width: Contentcf.width, flexDirection: "row"}}> 
-        <View style={{ flexDirection: "row", width: Column1}} >
+      <View style={{ width: '100%', borderBottomColor: colors.grey4, borderBottomWidth: 1,}}>
+        <View style={{ width: '100%', paddingTop:1,paddingBottom:1}}> 
+        <View style={{ width: '100%', flexDirection: "row"}}> 
+        <View style={{ flexDirection: "row", width: '17%'}} >
          { (!item.PrdIsSetMenu) ?
-            <TouchableOpacity  style={{width: Column1 * 0.3, justifyContent: "center", alignItems: 'center'  }} onPress={() => this._HandleQuantity(item, -1, false)}>
+            <TouchableOpacity  style={{width: '30%', justifyContent: "center", alignItems: 'center'  }} onPress={() => this._HandleQuantity(item, -1, false)}>
               <Image resizeMode='contain' source={require('../../../assets/icons/IconDelete.png')} 
               style={{ width: H2_FONT_SIZE,height: H2_FONT_SIZE,  }} />
             </TouchableOpacity>:   
-            <TouchableOpacity style={{ width: Column1 * 0.3, justifyContent: "center", alignItems: 'center' }}  onPress={() => { this._HandleQuantity(item,-1,false) }}>
+            <TouchableOpacity style={{ width: '30%', justifyContent: "center", alignItems: 'center' }}  onPress={() => { this._HandleQuantity(item,-1,false) }}>
             <Icon name="close" type="antdesign" size={H2FontSize} iconStyle={{ color: colors.red, fontFamily: "RobotoBold",height:H2FontSize}} />
           </TouchableOpacity> 
           }
-            <View style={{ width: Column1 * 0.4,justifyContent: 'center', alignItems: 'center'}}>
+            <View style={{ width: '40%',justifyContent: 'center', alignItems: 'center'}}>
               <TextInput ref={input => this.textInput = input} style={{  color:isColor == true ? "#FFFFFF" : "#af3037", width: '100%',  fontSize: H3FontSize, textAlign:'center',fontFamily: "RobotoBold",}}
                 autoFocus={false}  autoCapitalize="none" autoCorrect={false} keyboardAppearance="dark"
                 keyboardType='numeric' autoCompleteType='off' returnKeyType='done' blurOnSubmit={true}
@@ -340,7 +342,7 @@ export class CardDetailView extends React.Component {
               />
             </View>
            
-           <TouchableOpacity name='btnAddQuantity' style={{width: Column1 * 0.3, justifyContent: "center", alignItems: "center" }} onPress={() =>{
+           <TouchableOpacity name='btnAddQuantity' style={{width: '30%', justifyContent: "center", alignItems: "center" }} onPress={() =>{
                if (item.PrdIsSetMenu)
                return;
                this._HandleQuantity(item, 1, false)
@@ -352,18 +354,17 @@ export class CardDetailView extends React.Component {
           }
            </TouchableOpacity>
             </View>
-
-          <TouchableOpacity onPress={()=>this._loadExtraRequest(item)} style={{width: Contentcf.width* 0.55,paddingLeft:5, justifyContent:'center', }}>
+          <TouchableOpacity onPress={()=>this._loadExtraRequest(item)} style={{width: '55%',paddingLeft:5, justifyContent:'center', }}>
           {!item.PrdIsSetMenu ? 
-            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", width: Contentcf.width* 0.555, fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left',paddingBottom:3 }} numberOfLines={5}>
+            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", width: '100%', fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left',paddingBottom:3 }} numberOfLines={5}>
              {item.PrdNameUi} ({item.UnitName})
             </Text> 
             :
-            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", width: Contentcf.width* 0.555, fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left',paddingBottom:3 }} numberOfLines={5}>
+            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", width: '100%', fontSize: H3_FONT_SIZE,  flexWrap: "wrap",textAlign:'left',paddingBottom:3 }} numberOfLines={5}>
              {item.PrdName}
             </Text> 
             }
-            <View style={{flexDirection:'row',width: Contentcf.width* 0.5, borderTopWidth:0.55,borderColor:isColor ==true ? '#FFFFFF':"#000000",paddingVertical:3}}>
+            <View style={{flexDirection:'row',width: '100%', borderTopWidth:0.55,borderColor:isColor ==true ? '#FFFFFF':"#000000",paddingVertical:3}}>
               <Text style={{ color: isColor ==true ? item.OrddDescription?'#FFFFFF':'#777777':item.OrddDescription?"#000000":'#777777', fontSize: H4_FONT_SIZE*0.8,  flexWrap: "wrap",textAlign:'left',marginLeft:3 }} numberOfLines={5}>
               {translate.Get("Ghi chú")} 
               </Text>
@@ -376,13 +377,13 @@ export class CardDetailView extends React.Component {
             }
             </View>
           </TouchableOpacity>
-          <View style={{  justifyContent:'center',width: Contentcf.width* 0.14 ,}}>
-            <Text style={{color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H3_FONT_SIZE ,textAlign:'center' }}>
+          <View style={{  justifyContent:'center',width:'14%' ,}}>
+            <Text style={{color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H3_FONT_SIZE ,textAlign:'right' }}>
             {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.UnitPrice : item.UnitPriceAfter, "")}
             </Text>
           </View>
-          <View style={{  justifyContent: "center",width: Contentcf.width* 0.14 ,}}>
-            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H3_FONT_SIZE,fontWeight:'bold',textAlign:'center' }}>
+          <View style={{  justifyContent: "center",width: '14%' ,}}>
+            <Text style={{ color: isColor ==true ? '#FFFFFF':"#000000", fontSize: H3_FONT_SIZE,fontWeight:'bold',textAlign:'right' ,paddingRight:5}}>
             {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.TkdItemAmount : item.TkdTotalAmount, "")}
             </Text>
           </View>
@@ -512,7 +513,7 @@ export class CardDetailView extends React.Component {
     state.isHavingOrder=1; 
     return ( 
       <View name='vwMash' style={{ position: "absolute", right: 0, top: 0,flexDirection: "row",
-          justifyContent: "space-between",width: Bordy.width, height: Bordy.height*2,
+          justifyContent: "space-between",width: '100%', height: '100%',
           backgroundColor: "rgba(0, 0, 0, 0.6)"
         }}
       >
@@ -563,20 +564,20 @@ export class CardDetailView extends React.Component {
           // onBackdropPress={() => this.setModalNote(!modalNote)}
           isVisible={true}
           visible={modalNote}>
-          <View style={{top: Bordy.height*0.2, left: Bordy.width*0.2, width: Bordy.width *0.5, height: Bordy.height*0.6,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:1,borderColor:isColor==true?'#DAA520':'#000000'}}>
-            <View style={{height:Bordy.height*0.6*0.1,borderTopLeftRadius:9,borderTopRightRadius:9,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
+          <View style={{top: '20%', left: '25%', width: '50%', height: '60%',borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:1,borderColor:isColor==true?'#DAA520':'#000000'}}>
+            <View style={{height:'10%',borderTopLeftRadius:9,borderTopRightRadius:9,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
               <ScrollView >
                 <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{this.state.textModal}</Text>
               </ScrollView>
             </View>
-            <View style={{height: Bordy.height*0.4*0.12,justifyContent:'center',alignItems:'center',marginVertical:5}}>
+            <View style={{height: '12%',justifyContent:'center',alignItems:'center',marginVertical:5}}>
             <TextInput
                   placeholder={translate.Get("Nhập yêu cầu...")}
                   placeholderTextColor={isColor == true ? '#808080' : "#777777"}
                   value={this.state.TksdNote}
                   multiline={true} 
                   onChangeText={(number) => this.setState({TksdNote : number})}
-                  style={[{width:'95%',height:Bordy.height*0.4*0.12,paddingLeft:12,paddingRight:Bordy.height*0.4*0.12+5,borderWidth:0.5,borderRadius:10,fontSize: H3_FONT_SIZE,color:isColor == true ? '#ffffff' : "#000000", backgroundColor: isColor == true ? '#333333':'#FFFFFF',}]}>
+                  style={[{width:'95%',height:'100%',paddingLeft:12,paddingRight:'13%',borderWidth:0.5,borderRadius:10,fontSize: H3_FONT_SIZE,color:isColor == true ? '#ffffff' : "#000000", backgroundColor: isColor == true ? '#333333':'#FFFFFF',}]}>
                 </TextInput>
                 <TouchableOpacity style={{position:'absolute',width: Bordy.height*0.4*0.12, height: Bordy.height*0.4*0.12,right:15}} 
                   onPress={()=> this.setState({TksdNote : ''})} >
@@ -597,39 +598,39 @@ export class CardDetailView extends React.Component {
                 </TouchableOpacity>
             </View>
             
-            <View style={{height: Bordy.height*0.6*0.68+7,flexDirection:'row', width:Bordy.width *0.5,}}>
+            <View style={{height: '65%',flexDirection:'row', width:'100%'}}>
                     <FlatList
                       keyExtractor={(item, RowIndex) => RowIndex.toString()}
-                      numColumns={3}
+                      numColumns={2}
                       data={Products1}
                       extraData={this.state.selectedIndex}
-                      style={{width:Bordy.width *0.5/2}}
+                      style={{width:'50%'}}
                       renderItem={({item, index}) =>
                       <TouchableOpacity
                       onPress={() => this.IncrementDescription(item, index)}
-                      style={{width: Bordy.width *0.5 * 0.1655 ,  backgroundColor: index == this.state.selectedIndex?'#ea6721':item.StlBgColor.trim(), justifyContent:"center",alignItems:'center',  borderRadius: 2, borderWidth:0.5, borderColor: 'white',}}>
-                        <View style={{ justifyContent:"center",alignItems:'center', height: Bordy.height * 0.1, borderRadius: 2,  borderColor: 'white',}}>
+                      style={{width: '50%%' ,  backgroundColor: index == this.state.selectedIndex?'#ea6721':item.StlBgColor.trim(), justifyContent:"center",alignItems:'center',  borderRadius: 2, borderWidth:0.5, borderColor: 'white',}}>
+                        <View style={{ justifyContent:"center",alignItems:'center', height:SCREEN_HEIGHT * 0.1, borderRadius: 2,  borderColor: 'white',}}>
                           <Text style={{ color: item.StlFontColor ? item.StlFontColor.trim(): '#000000', width: '100%',  textAlign: "center", fontSize: item.StlFontSize ? item.StlFontSize: H3_FONT_SIZE, }}>{item.MrqDescription}</Text>
                         </View>
                       </TouchableOpacity>}
                     />
                     <FlatList
                       keyExtractor={(item, RowIndex) => RowIndex.toString()}
-                      numColumns={3}
+                      numColumns={2}
                       data={Products2}
                       extraData={this.state.selectedIndex}
-                      style={{width:Bordy.width *0.5/2}}
+                      style={{width:'50%'}}
                       renderItem={({item, index}) =>
                       <TouchableOpacity
                       onPress={() => this.IncrementDescription(item, index)}
-                      style={{width: Bordy.width *0.5 * 0.1655, backgroundColor: index == this.state.selectedIndex?'#ea6721':item.StlBgColor.trim(), justifyContent:"center",alignItems:'center', borderRadius: 2, borderWidth:0.5, borderColor: 'white',}}>
+                      style={{width: '50%', backgroundColor: index == this.state.selectedIndex?'#ea6721':item.StlBgColor.trim(), justifyContent:"center",alignItems:'center', borderRadius: 2, borderWidth:0.5, borderColor: 'white',}}>
                         <View style={{ justifyContent:"center",alignItems:'center', height: Bordy.height * 0.1, borderRadius: 2,  borderColor: 'white',}}>
                           <Text style={{ color: item.StlFontColor ? item.StlFontColor.trim(): '#000000', width: '100%',  textAlign: "center", fontSize: item.StlFontSize ? item.StlFontSize: H3_FONT_SIZE, }}>{item.MrqDescription}</Text>
                         </View>
                       </TouchableOpacity>}
                     />
             </View>
-            <View style={{height:Bordy.height*0.6*0.1,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',borderBottomLeftRadius:10,borderBottomRightRadius:10,justifyContent:'space-evenly',flexDirection:'row',alignItems:'center'}}>
+            <View style={{position:'absolute',bottom:0,height:'10%',width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',borderBottomLeftRadius:9,borderBottomRightRadius:9,justifyContent:'space-evenly',flexDirection:'row',alignItems:'center'}}>
               <TouchableOpacity onPress={() => this.setModalNote(!modalNote)} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:'#af3037',justifyContent:'center',alignItems:'center'}}>
               <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{translate.Get("Trở lại")}</Text>
               </TouchableOpacity>
@@ -642,17 +643,17 @@ export class CardDetailView extends React.Component {
           : null}
         <TouchableOpacity
           onPress={() => CartToggleHandle(false)}
-          style={{ height: Bordy.height, width: Bordy.width * 0.25 }}
+          style={{ height: '100%', width: '25%' }}
         ></TouchableOpacity>
         <Animated.View
-          style={{height:Platform.OS === "android"? Bordy.height * 1.08: Bordy.height,
-            width: state.FullCartWidth,
+          style={{height:Platform.OS === "android"? '100%': '100%',
+            width: '75%',
             backgroundColor: colors.white,
             borderColor: colors.grey3
           }}
         > 
-          <View  name='pnContent' style={{ width: Bordy.width * 0.75,backgroundColor: isColor == true ? '#333333': 'white', flexDirection: "column", height: Bordy.height }}>
-            <View style={{  height: Titlecf.height,  borderBottomColor: colors.grey3,  borderBottomWidth: 1,backgroundColor: colors.Header,  width: "100%", justifyContent: "center",   alignItems: "center",  flexDirection: "row" }}>
+          <View  name='pnContent' style={{ width: '100%',backgroundColor: isColor == true ? '#333333': 'white', flexDirection: "column", height: '100%' }}>
+            <View style={{  height: '6%',  borderBottomColor: colors.grey3,  borderBottomWidth: 1,backgroundColor: colors.Header,  width: "100%", justifyContent: "center",   alignItems: "center",  flexDirection: "row" }}>
               <Text style={{ fontSize: H2FontSize, fontFamily: "RobotoBold", color: "white",  textAlign: "center" }}>
                 {translate.Get("Giỏ hàng")}
               </Text>
@@ -663,7 +664,7 @@ export class CardDetailView extends React.Component {
                 </TouchableOpacity>
                 :null}
             </View>
-            <View style={{backgroundColor: isColor == true ? '#333333': '#cccccc', width: Bordy.width * 0.75, height: TabTitle.height, flexDirection: "row" ,justifyContent:'space-evenly',alignItems:'center'}}>
+            <View style={{backgroundColor: isColor == true ? '#333333': '#cccccc', width:'100%', height: '6%', flexDirection: "row" ,justifyContent:'space-evenly',alignItems:'center'}}>
             <TouchableOpacity style={{justifyContent:'center', borderRadius: 20, backgroundColor: state.isHavingOrder == 1?  '#dc7d46': colors.grey3,width: '32%',height:'90%'
             }}
             onPress={() => {
@@ -692,12 +693,12 @@ export class CardDetailView extends React.Component {
               </Text>
             </TouchableOpacity>
             </View>
-            <View style={{backgroundColor: isColor == true ? '#444444' :'#FFFFFF',  width: "100%",marginTop:1, height:Bordy.height-(Titlecf.height+TabTitle.height)
+            <View style={{backgroundColor: isColor == true ? '#444444' :'#FFFFFF',  width: "100%",marginTop:1, height:'88%'
             }}>
             {state.isHavingOrder == 3 ?
             <ScrollView horizontal={true}>
-              <View style={{flexDirection:'column',height:HeightHistory,width:Bordy.width * 0.75*2.28 }}>
-              <View style={{flexDirection:'row',height:HeightHistory*0.05,width:Bordy.width * 0.75*2.28 }}>
+              <View style={{flexDirection:'column',height:'88%',width:Bordy.width * 0.75*2.28 }}>
+              <View style={{flexDirection:'row',height:'5%',width:Bordy.width * 0.75*2.28 }}>
                 <FlatList
                 numColumns={14}
                 data={titleHitory}
@@ -709,7 +710,7 @@ export class CardDetailView extends React.Component {
                 }
                 />
                 </View>
-                <View style={{flexDirection:'row',height:HeightHistory*0.95,width:Bordy.width * 0.75*2.28}}>
+                <View style={{flexDirection:'row',height:'95%',width:Bordy.width * 0.75*2.28}}>
                 <FlatList
                 refreshing={this.props.refreshing}
                 onRefresh={_getTicketInforOnTable}
@@ -765,23 +766,21 @@ export class CardDetailView extends React.Component {
             :null
             }
             {state.isHavingOrder == 1 ? (
-              <View style={{flexDirection:'column',height:HeightHistory,width:Bordy.width * 0.75}}>
-              {/* <View style={{position:'absolute',height:'100%', width:'100%', backgroundColor:'blue',zIndex:1}}></View> */}
-              <View style={{flexDirection:'row',height:HeightHistory-(TabTitle.height*2.4 ),width:Bordy.width * 0.75}}>
+              <View style={{flexDirection:'column',height:'100%',width:'100%'}}>
+              <View style={{flexDirection:'row',height:'88%',width:'100%'}}>
                 <View style={{position:'absolute', top: '35%', right:'35%',height:200, width:200,opacity:0.3}}>
                   <Image resizeMode='contain' style={{ width: '100%', height: '100%' }} source={isColor == true ? require('../../../assets/images/RelisoftLogo_trans-07.png') : require('../../../assets/images/RelisoftLogo_trans-05.png')} />
                 </View>
-              <FlatList
+                <FlatList
               keyExtractor={(item, RowIndex) => RowIndex.toString()}
               data={state.CartInfor.items}
               extraData={state.iLoadNumber}
               renderItem={this.renderOrder }
             /> 
               </View>
-              <View style={{ height: TabTitle.height, width: "100%",  flexDirection: "column" }}>
-              <View style={{ width: "100%", height: TabTitle.height, flexDirection: "row", backgroundColor:isColor == true ? '#222222' : colors.grey5 }}>
-             
-                  <View style={[styles.button_end_left_order, { width: "50%",textAlign:'left',paddingTop:(TabTitle.height-H2FontSize)/2  }]}> 
+              <View style={{ height: '12%', width: "100%",  flexDirection: "column" }}>
+              <View style={{ width: "100%", height: '45%', flexDirection: "row", backgroundColor:isColor == true ? '#222222' : colors.grey5 }}>
+                  <View style={[styles.button_end_left_order, { width: "50%",height:'100%', textAlign:'left',paddingTop:(TabTitle.height-H2FontSize)/2  }]}> 
                     <Text style={{ fontSize: H3FontSize, color: isColor == true ? '#DAA520' : "#af3037",paddingLeft:10 }}>
                       {translate.Get("Số lượng")}: 
                       <Text style={{ fontSize: H3FontSize, color: isColor == true ? '#FFFFFF' :"black" }}>
@@ -798,7 +797,7 @@ export class CardDetailView extends React.Component {
                       </Text>
                   </View>
               </View>
-              <View style={{ backgroundColor: isColor == true ? '#444444' :'#FFFFFF',width: "100%", flexDirection: "row" ,height:TabTitle.height*1.4, justifyContent:'space-evenly',alignItems:'center'}}>
+              <View style={{ backgroundColor: isColor == true ? '#444444' :'#FFFFFF',width: "100%", flexDirection: "row" ,height:'55%', justifyContent:'space-evenly',alignItems:'center'}}>
               <TouchableOpacity style={{justifyContent:'center', borderRadius: 8, backgroundColor:isColor == true ?'#009900':'#dc7d46',width: "48%",height:"80%"
             }}
             onPress={() => {
@@ -840,46 +839,49 @@ export class CardDetailView extends React.Component {
           { state.isHavingOrder == 2 ?
           (
             <ScrollView horizontal={true}>
-            <View style={{flexDirection:'column',height:HeightOrdered,width:Bordy.width * 0.75*1.73 }}>
-              <View style={{flexDirection:'row',height:HeightOrdered*0.055,width:Bordy.width * 0.75*1.73 }}>
+            <View style={{flexDirection:'column',height:'100%',width:Bordy.width * 0.75*1.73 }}>
+              
+              <View style={{flexDirection:'column',height:'100%',width:Bordy.width * 0.75*1.73 }}>
+              <View style={{flexDirection:'row',height:'4%',width:Bordy.width * 0.75*1.73 }}>
               <FlatList
                 numColumns={14}
                 data={titleProductsOrdered}
                 keyExtractor={(item, Index) => Index.toString()}
                 renderItem={({ item, index })=>
-                <View style={{backgroundColor:isColor == true ? '#232323' :'#C0C0C0', width:item.widthTitle, justifyContent:'center',alignItems:'center',height:HeightHistory*0.05,borderBottomWidth:0.5,borderRightWidth:0.5,borderTopWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
+                <View style={{backgroundColor:isColor == true ? '#232323' :'#C0C0C0', width:item.widthTitle, justifyContent:'center',alignItems:'center',borderBottomWidth:0.5,borderRightWidth:0.5,borderTopWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
                   <Text style={{fontSize:H3_FONT_SIZE*1.1,color:isColor == true ? '#FFFFFF' :'black',}}>{item.Name}</Text>
                 </View>
                 }
                 />
               </View>
-              <View style={{flexDirection:'row',height:HeightOrdered*0.945,width:Bordy.width * 0.75*1.73}}>
+              <View style={{flexDirection:'row',height:'90%',width:Bordy.width * 0.75*1.73}}>
               <FlatList
               keyExtractor={(item, RowIndex) => RowIndex.toString()}
               data={ProductsOrdered}
               extraData={state.iLoadNumber}
               refreshing={this.props.refreshing}
               onRefresh={_getTicketInforOnTable}
-              renderItem={this.renderOrdered }
+              renderItem={this.renderOrdered } 
             /> 
               </View>
-            </View>
-            </ScrollView>
-          ):null}
-            {state.isHavingOrder == 2 ?
-               <View  style={{bottom:0,position:'absolute',height:TabTitle.height,width: '100%',borderTopColor: isColor == true ? '#222222' :colors.grey5,
+              </View>
+              
+              
+              <View  style={{bottom:0,position:'absolute',height:'6%',width: '100%',borderTopColor: isColor == true ? '#222222' :colors.grey5,
                borderTopWidth: 1,backgroundColor:isColor == true ? '#222222' : colors.grey5,
              }}>
-               <View style={{width:'100%',alignItems: "left",flexDirection: "row",}}>
+               <View style={{width:'100%',alignItems: "left",flexDirection: "row"}}>
                 <Text style={{color:isColor == true ? '#FFFFFF' : '#000000', fontSize: H2FontSize,marginLeft:10 }}>
                      {translate.Get("Tạm tính")}:
                      </Text>
                    <Text style={{ fontSize: H2FontSize, color:isColor == true ? '#DAA520' : colors.red,marginLeft:10 }}>
-                   {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? state.table.TkItemAmout : state.Ticket.TkTotalAmount, "")}
+                   {formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? state.Ticket.TkItemAmout : state.Ticket.TkTotalAmount, "")}
                  </Text>
                 </View>
-           </View>:null
-            }
+           </View>
+            </View>
+            </ScrollView>
+          ):null}
             </View>
             
           </View>

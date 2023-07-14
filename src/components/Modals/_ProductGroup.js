@@ -31,7 +31,7 @@ export class _ProductGroup extends React.Component {
   render() {
     let { ProductGroupList,PrdChildGroups, _GroupClick,_selectChildGroup,SelectedChildGroupIndex, SelectedGroupIndex,pnheight} = this.props;
     return ( 
-      <View style={[{ height:pnheight,width:'100%' }]}>
+      <View style={[{ height:'83%',width:'100%' }]}>
         <FlatList data={ProductGroupList} renderItem={({ item, index }) => 
         <View>
         <TouchableOpacity  key={index} style={{  width: '100%', justifyContent: 'center', alignItems: 'center',borderTopWidth:1,borderTopColor:colors.grey5  }}

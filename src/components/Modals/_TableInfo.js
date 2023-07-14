@@ -70,15 +70,15 @@ export class _TableInfo extends React.Component {
     const { onClose, onPressAc, onPressShow, translate, isLoading,backgroundColor,TicketInfor } = this.props;
     let {isColor}=this.state;
     return (
-      <View style={{backgroundColor: "rgba(98,98,98,0.6)", position: "absolute", width: SCREEN_WIDTH, justifyContent: 'center', alignItems: 'center', height: SCREEN_HEIGHT}}>
-        <View style={[{backgroundColor:this.state.isColor == true ? "#222222" : colors.white, borderWidth: 1, position: "absolute",  width: SCREEN_WIDTH*0.65,height:SCREEN_HEIGHT*0.6, borderColor: backgroundColor},]}>
+      <View style={{backgroundColor: "rgba(98,98,98,0.6)", position: "absolute", width: '100%', justifyContent: 'center', alignItems: 'center', height: '100%'}}>
+        <View style={[{backgroundColor:this.state.isColor == true ? "#222222" : colors.white, borderWidth: 1, position: "absolute",  width: '65%',height:'60%', borderColor: backgroundColor},]}>
             <KeyboardAvoidingView behavior='position'>
-            <ScrollView style={{ width: '100%', }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopLeftRadius: 8, borderTopRightRadius: 8, borderColor: backgroundColor,marginTop:-1,marginRight:-1,marginLeft:-1,
-          backgroundColor: backgroundColor, height: SCREEN_HEIGHT*0.6*0.1,paddingTop:10,paddingBottom:10 }}> 
+            <ScrollView style={{ width: '100%',height:'100%' }}>
+            <View style={{backgroundColor:'red', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopLeftRadius: 8, borderTopRightRadius: 8, borderColor: backgroundColor,marginTop:-1,marginRight:-1,marginLeft:-1,
+          backgroundColor: backgroundColor, height: '10%',paddingTop:10,paddingBottom:10 }}> 
             <Text style={{ height: 35, fontSize:H2FontSize, color: colors.white, textAlign: 'center', fontFamily: 'RobotoBold' }}>{translate.Get("ticket_info")}</Text>
           </View>
-                <View style={{ backgroundColor: this.state.isColor == true ? "#222222" :'white', height:SCREEN_HEIGHT*0.6*0.7,flexDirection:'column'}}>
+                <View style={{ backgroundColor: this.state.isColor == true ? "#222222" :'white', height:'70%',flexDirection:'column'}}>
                   <View style={{flexDirection:'row',width: '100%', height:SCREEN_HEIGHT*0.6*0.15, justifyContent:'space-evenly'}}>
                   <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
                       <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
@@ -163,7 +163,7 @@ export class _TableInfo extends React.Component {
                       </TextInput>
                     </View>
                   </View>
-                  <View style={{ position: 'absolute', right: '4%', top: '48%', }}>
+                  <View style={{ position: 'absolute', right: '4%', top: '60%', }}>
                           <TouchableOpacity onPress={() => { Keyboard.dismiss(); onPressShow.apply(null, []); }}>
                             <Icon name="contacts" type="antdesign" color={this.state.isColor == true ? "#FFFFFF" : '#000000'} size={H1_FONT_SIZE} />
                           </TouchableOpacity>
@@ -183,12 +183,12 @@ export class _TableInfo extends React.Component {
                       </TextInput>
                  </View>
                 </View>
-                <View style={{ width: '100%', justifyContent:'center',height:SCREEN_HEIGHT*0.6*0.08}}> 
-            <Text style={{color: this.state.isColor == true ? "#FFFFFF" : "red",textAlign:'center' ,fontSize:H2_FONT_SIZE*0.9}}>Sau khi vào bàn, bạn hãy khóa bàn trước khi giao cho khách</Text>
-            </View>
-            <View style={{
-            width: '100%', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', height: SCREEN_HEIGHT*0.6*0.12,
-          }}>
+            </ScrollView>
+            <View style={{position:'absolute',bottom: 0, width: '100%', justifyContent:'center',height:'20%'}}>
+              <View style={{ width: '100%', justifyContent:'center',height:'30%'}}> 
+                <Text style={{color: this.state.isColor == true ? "#FFFFFF" : "red",textAlign:'center' ,fontSize:H3_FONT_SIZE*0.9}}>Chú ý: Sau khi vào bàn, bạn hãy khóa bàn trước khi giao cho khách</Text>
+              </View>
+              <View style={{width: '100%', flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', height: '70%'}}>
               <Button
                 containerStyle={{ backgroundColor: colors.red, justifyContent: 'center', alignItems: 'center', 
                 width: '48%',borderBottomLeftRadius: 6,height:'85%',}}
@@ -196,7 +196,6 @@ export class _TableInfo extends React.Component {
                 titleStyle={{ color: colors.white, fontSize: H3FontSize }}
                 onPress={() => onClose.apply(null, [])}
                 disabled={isLoading} />
-             
               <Button
                 containerStyle={{ backgroundColor: BACKGROUND_COLOR, justifyContent: 'center',
                  alignItems: 'center', width: '48%',height:'85%', borderBottomRightRadius: 6,}}
@@ -205,7 +204,9 @@ export class _TableInfo extends React.Component {
                 onPress={() => onPressAc.apply(null, [])}
                 disabled={isLoading} />
             </View>
-            </ScrollView>
+            </View>
+            
+            
             </KeyboardAvoidingView>
           
         </View>

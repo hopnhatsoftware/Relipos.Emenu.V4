@@ -9,6 +9,7 @@ import Question from '../components/Question';
 import translate from '../services/translate';
 import {Icon, Button} from 'react-native-elements';
 import { H3_FONT_SIZE,H1_FONT_SIZE } from '../config/constants';
+import { ScreenHeight } from 'react-native-elements/dist/helpers';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
@@ -68,7 +69,7 @@ export class ScannerQR extends Component {
      onSelect(BarCode, Quantity);
   }
   render() {
-    const maskRowHeight = Math.round((SCREEN_HEIGHT - 300) / 20);
+    const maskRowHeight =(SCREEN_HEIGHT - 300) / 2;
         const maskColWidth = (SCREEN_WIDTH - 300) / 2;
     const { hasCameraPermission, IsScaned, isViewCamera } = this.state;
     if (hasCameraPermission === null) {
@@ -78,7 +79,7 @@ export class ScannerQR extends Component {
               return <Text style={{ paddingTop: Constants.statusBarHeight, textAlign: 'center' }}>No access to camera</Text>;
             }
     return ( 
-      <View style={{backgroundColor: "black",height: Bordy.height, width: Bordy.width, position: 'absolute', bottom: 0, right: 0}}>
+      <View style={{backgroundColor: "black",height: '100%', width: '100%',position: 'absolute', bottom: 0, right: 0}}>
         {isViewCamera ?  
         <View style={{flex : 1}}>
           <View style={{position: 'absolute', right: 12, top: 5, backgroundColor: "transpanent", zIndex: 10,flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-end', }}>
@@ -94,13 +95,13 @@ export class ScannerQR extends Component {
           style={StyleSheet.absoluteFillObject}
         />
         <View style={styles.maskOutter}>
-                            <View style={[{ flex: maskRowHeight }, styles.maskRow, styles.maskFrame]} />
+                            <View style={[{ height: maskRowHeight }, styles.maskRow, styles.maskFrame]} />
                             <View style={[{ flex: 30 }, styles.maskCenter]}>
                                 <View style={[{ width: maskColWidth }, styles.maskFrame]} />
                                 <View style={styles.maskInner} />
                                 <View style={[{ width: maskColWidth }, styles.maskFrame]} />
                             </View>
-                            <View style={[{ flex: maskRowHeight }, styles.maskRow, styles.maskFrame]} />
+                            <View style={[{ height: maskRowHeight }, styles.maskRow, styles.maskFrame]} />
                         </View>
         {IsScaned && (
           <Button title={'Tap to Scan Again'} onPress={() => this.setState({ IsScaned: false })} />

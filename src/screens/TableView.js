@@ -15,6 +15,7 @@ import { formatCurrency } from "../services/util";
 import AreasStyle from "../styles/areas";
 import Question from '../components/Question';
 import { TITLE_FONT_SIZE, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize, H2FontSize, H3FontSize, H4FontSize } from '../config/constants';
+import { ScreenWidth } from 'react-native-elements/dist/helpers';
 
 // Enable LayoutAnimation on Android
 UIManager.setLayoutAnimationEnabledExperimental &&
@@ -164,8 +165,7 @@ export default class TableView extends Component {
 
   onPressLogout = () => {
     let that = this;
-    _remove('APP@USER', () => { 
-     
+    _remove('APP@USER', () => {
       that.props.navigation.navigate('LoginView') ;
     });
   }
@@ -238,7 +238,9 @@ export default class TableView extends Component {
         this.setState({ isLoading: false });
         _storeData('APP@TABLE', JSON.stringify(item),
           () => {
+            _remove('APP@CART', () => {
             this.props.navigation.navigate("OrderView", { settings, user, table: item ,AreasList, selectedAreaIndex,sItemTable,CustomerList});
+              })
           });
       })}
       catch{((error) => {
@@ -278,7 +280,9 @@ export default class TableView extends Component {
                   _storeData('APP@TABLE', JSON.stringify(sItemTable),
                     () => {
                       this.setState({ isWorking: false, sItemTable, TicketInfor }, () => {
+                        _remove('APP@CART', () => {
                         this.props.navigation.navigate("OrderView", { settings, user, table: sItemTable });
+                        })
                         return;
                       });
                     });
@@ -350,7 +354,6 @@ export default class TableView extends Component {
     return (
       <View style={[styles.container,{backgroundColor: isColor == true ? '#444444' : colors.grey5,}]}>
         <StatusBar hidden={true} />
-        <View style={{ flex: 1 }}>
           <View style={[styles.toolbar,{height:pnHeaderheight,backgroundColor:"#333D4C"}]}>
             <TouchableOpacity onPress={() => this.onPressLogout()} >
               <Icon name="lock" iconStyle={{ color: colors.white, paddingLeft: H1FontSize * 1, }} fontSize={H1FontSize} type="antdesign"></Icon>
@@ -384,7 +387,7 @@ export default class TableView extends Component {
           <FlatList numColumns={5}   data={TablesList} 
             renderItem={({ item, index }) =>
               <TouchableOpacity onPress={() => this._onPressTable(item, index)}
-                style={{ width: I_TableWidth-3, borderRadius: 5, borderWidth: 0.5, borderColor:isColor == true ? '#444444' : colors.grey5, marginHorizontal:1.5,marginVertical:1.5}}>
+                style={{ width: '19.7%', borderRadius: 5, borderWidth: 0.5, borderColor:isColor == true ? '#444444' : colors.grey5, marginHorizontal:1.5,marginVertical:1.5}}>
                 <View style={{
                   justifyContent: "center", alignItems: 'center', height: Bordy.height * 0.18, borderRadius: 5, borderColor:isColor == true ? '#444444' : colors.grey5,
                   backgroundColor: getTableColor(item.Status)
@@ -393,12 +396,11 @@ export default class TableView extends Component {
                     <Text style={{ color: colors.white, width: '100%', textAlign: "center", fontSize: H3FontSize, }}>{item.TbNo}</Text>
                   </View>
                   <View style={{ position: 'absolute', bottom: 0, right: 0, paddingRight: 2 }}>
-                    <Text style={{ color: colors.white, width: '100%', fontSize: H4FontSize, }}>{formatCurrency(item.TkPaymentAmount, '')}</Text>
+                    <Text style={{ color: colors.white, width: '100%', fontSize: H4FontSize, }}>{formatCurrency(item.TkPaymentAmount == 0 ? '' : item.TkPaymentAmount, '')}</Text>
                   </View>
                 </View>
               </TouchableOpacity>}
           />
-        </View>
 
         {isShowTicketInfor ?
           <_TableInfo
@@ -414,7 +416,7 @@ export default class TableView extends Component {
         {showCustomer ?
           <TouchableWithoutFeedback onPress={() => this.setState({ showCustomer: false, isWorking: false })}>
             <View style={{
-              position: "absolute", right: 0, top: 0, width: Bordy.width, height: Bordy.height + Constants.statusBarHeight,
+              position: "absolute", right: 0, top: 0, width: '100%', height: '100%',
               alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)',
             }}>
               <View style={{ backgroundColor: 'white', marginTop: 60, height: Bordy.height + Constants.statusBarHeight, width: Bordy.width / 1.46, borderRadius: 10 }}>
@@ -514,8 +516,7 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: colors.grey5,
-    height:Bordy.height,
-    width:Bordy.width,
+    flex:1,
     justifyContent: 'space-around',
   },
   toolbar: {

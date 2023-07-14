@@ -7,7 +7,7 @@ import Constants from "expo-constants";
 import {ITEM_FONT_SIZE, BUTTON_FONT_SIZE,H1_FONT_SIZE,H3_FONT_SIZE ,H2_FONT_SIZE,H4_FONT_SIZE} from "../config/constants";
 import { Audio } from 'expo-av';
 import translate from '../services/translate';
-import {_retrieveData, _storeData } from "../services/storages";
+import {_retrieveData, _storeData ,_remove} from "../services/storages";
 import { _TableInfo } from '../components';
 import {API_Print,CancelOrder,Ticket_Flush,Ticket_getById} from "../services";
 import { ScrollView } from "react-native-gesture-handler";
@@ -30,6 +30,9 @@ export class _HeaderNew extends React.Component  {
         ObjWaiterName: '',
       },
       showCustomer: false,
+      showLogout: false,
+      x: 0,
+      y: 0,
       Description:'',
       modalLanguage : false,
       ModalCallStaff: false,
@@ -144,6 +147,9 @@ export class _HeaderNew extends React.Component  {
   setModalCallStaff = (visible) => {
     this.setState({ ModalCallStaff: visible });
   }
+  setshowLogout = (visible) => {
+    this.setState({ showLogout: visible });
+  }
   setshowCustomer = (visible) => {
     this.setState({ showCustomer: visible });
   }
@@ -153,6 +159,28 @@ export class _HeaderNew extends React.Component  {
     Ticket.CustomerName = item.ObjName;
     this.setState({ sCustomerItem: item, sCustomerIndex: index, showCustomer: false,Ticket });
   }
+  
+  addNote = (item) => {
+    let {Description} = this.state;
+    const isExists = Description.includes(item);
+    if(isExists){
+      return;
+    }else{
+      this.setState({Description: this.state.Description + item +' '})
+    }
+  }
+
+  dialogLogout = () => {
+    Alert.alert(  this.translate.Get('Notice'),"Bạn có chắc chắn muốn đăng xuất", [
+      {
+        text: "Cancel", onPress: () => {}
+      },
+      {
+        text: "OK", onPress: this.props.onPressLogout
+      }
+    ]);
+  }
+  
   renderCustomer = (item, index) => {
     return (
       <TouchableOpacity onPress={() => { this._setItemCustomer(item, index); }}
@@ -167,9 +195,15 @@ export class _HeaderNew extends React.Component  {
     );
   };
   render() {
-   
+    const abcdef = (event) => {
+      let {x,y} = this.state;
+      const { locationX, locationY } = event.nativeEvent;
+      x = locationX;
+      y = locationY;
+      this.setState({ showLogout: true, x , y });
+    }
     const { state, table, BookingsStyle, _searchProduct, onPressBack, translate, name, titleSet, setState,backgroundColor,changeLanguage,data,CustomerList,Ticket} = this.props;
-    const{modalLanguage,isColor,ModalCallStaff,isShowTicketInfor,showCustomer}=this.state
+    const{modalLanguage,isColor,ModalCallStaff,isShowTicketInfor,showCustomer,showLogout}=this.state
     if (state.showCall==undefined||state.showCall==null) {
       state.showCall=false;
     }
@@ -182,19 +216,19 @@ export class _HeaderNew extends React.Component  {
       );
     }
     return (
-      <View style={[BookingsStyle.header,{ backgroundColor: backgroundColor, width: '100%', }]}>
+      <View style={{ backgroundColor: backgroundColor, width: '100%', height:'100%',flexDirection: 'row',}}>
         {isShowTicketInfor ?
         <ScrollView>
         <Modal
         onBackdropPress={() => this.setState({ isShowTicketInfor: false })}
         isVisible={true}
         visible={isShowTicketInfor}>
-        <View style={{top: Bordy.height*0.07, left: Bordy.width*0.15, width: Bordy.width *0.6, height: Bordy.height*0.65,borderRadius:10, zIndex: 100, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
-          <View style={{borderTopLeftRadius:10,borderTopRightRadius:10,height:  Bordy.height*0.65*0.1,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
+        <View style={{top: '10%', left: '20%', width: '60%', height: '65%',borderRadius:10, zIndex: 100, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+          <View style={{borderTopLeftRadius:10,borderTopRightRadius:10,height:  '10%',width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
           <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white', textAlign: 'center', fontFamily: 'RobotoBold' }}>{translate.Get("ticket_info")}</Text>
           </View>
-          <View style={{ backgroundColor: this.state.isColor == true ? "#222222" :'white', height:  Bordy.height*0.65*0.75,flexDirection:'column'}}>
-                  <View style={{flexDirection:'row',width: '100%', height:  Bordy.height*0.65*0.16, justifyContent:'space-evenly'}}>
+          <View style={{ backgroundColor: this.state.isColor == true ? "#222222" :'white', height: '78%',flexDirection:'column'}}>
+                  <View style={{flexDirection:'row',width: '100%', height:  '21.3%', justifyContent:'space-evenly'}}>
                   <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
                       <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
                         <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Khách nam')}</Text>                      
@@ -222,7 +256,7 @@ export class _HeaderNew extends React.Component  {
                       </TextInput>
                     </View>
                   </View>
-                  <View style={{flexDirection:'row',width: '100%', height:  Bordy.height*0.65*0.16, justifyContent:'space-evenly'}}>
+                  <View style={{flexDirection:'row',width: '100%', height:  '21.3%', justifyContent:'space-evenly'}}>
                   <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
                       <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
                         <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Trẻ em')}</Text>                      
@@ -250,7 +284,7 @@ export class _HeaderNew extends React.Component  {
                       </TextInput>
                     </View>
                   </View>
-                  <View style={{flexDirection:'row',width: '100%', height:  Bordy.height*0.65*0.16, justifyContent:'space-evenly'}}>
+                  <View style={{flexDirection:'row',width: '100%', height:  '21.3%', justifyContent:'space-evenly'}}>
                   <View style={{height:'100%',width:'49%',justifyContent:'center',alignItems:'center'}}>
                       <View style={{position:'absolute',top:'5%',left:'10%',zIndex:101}} >
                         <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Số lượng khách')}</Text>                      
@@ -282,7 +316,7 @@ export class _HeaderNew extends React.Component  {
                             <Icon name="contacts" type="antdesign" color={this.state.isColor == true ? "#FFFFFF" : '#000000'} size={H1_FONT_SIZE} />
                           </TouchableOpacity>
                         </View> */}
-                 <View style={{ backgroundColor: this.state.isColor == true ? "#222222" :'white', height:  Bordy.height*0.65*0.28, justifyContent:'center',alignItems:'center'}}>
+                 <View style={{ backgroundColor: this.state.isColor == true ? "#222222" :'white', height: '36.1%', justifyContent:'center',alignItems:'center'}}>
                     <View style={{position:'absolute',top:'0%',left:'5%',zIndex:101}} >
                         <Text style={{backgroundColor:isColor == true ?'#222222':'#FFFFFF',height:'100%',width:'100%',fontSize:H4_FONT_SIZE, color:isColor == true ? '#FFFFFF': '#000000'}}>{translate.Get('Ghi chú')}</Text>                      
                       </View>
@@ -297,7 +331,7 @@ export class _HeaderNew extends React.Component  {
                       </TextInput>
                  </View>
                 </View>
-          <View style={{height:  Bordy.height*0.65*0.147,width:'100%',borderBottomLeftRadius:10,borderBottomRightRadius:10,backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'space-evenly',flexDirection:'row',alignItems:'center'}}>
+          <View style={{height:  '12%',width:'100%',borderBottomLeftRadius:10,borderBottomRightRadius:10,backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'space-evenly',flexDirection:'row',alignItems:'center'}}>
             <TouchableOpacity onPress={() => this.setState({ isShowTicketInfor: false })} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:'#af3037',justifyContent:'center',alignItems:'center'}}>
               <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{translate.Get("Trở lại")}</Text>
             </TouchableOpacity>
@@ -355,42 +389,53 @@ export class _HeaderNew extends React.Component  {
               </View>
             </Modal>
           : null}
+          {this.state.showLogout == true ?
+          <Modal
+          animationIn={"bounce"}
+          onBackdropPress={() => this.setshowLogout( !showLogout )}
+          isVisible={true}
+          visible={showLogout}>
+            <View style={{top:this.state.y, right: this.state.x, width: H1_FONT_SIZE*6, height: H1_FONT_SIZE*1.3, zIndex: 300, position: 'absolute',backgroundColor:isColor==true?'#FFCC00':'white',borderWidth:0.5,justifyContent:'center', alignItems:'center'}}>
+               <TouchableOpacity onPress={this.dialogLogout} style={{justifyContent:'center', alignItems:'center', flexDirection:'row', paddingHorizontal:5}}>
+                <Icon name="logout" type="antdesign" color={"#000000"} size={H1_FONT_SIZE} />
+                  <Text style={{fontSize:H3_FONT_SIZE*1.2, paddingLeft:5}}>Đăng xuất</Text>
+               </TouchableOpacity>
+              </View>
+            </Modal>
+          : null}
         {ModalCallStaff ?
         <ScrollView>
           <Modal
           // onBackdropPress={() => this.setModalCallStaff(!ModalCallStaff)}
           isVisible={true}
           visible={ModalCallStaff}>
-          <View style={{top: Bordy.height*0.15, left: Bordy.width*0.275, width: Bordy.width *0.35, height: Bordy.height*0.35,borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
-            <View style={{borderTopLeftRadius:10,borderTopRightRadius:10,height:Bordy.height*0.35*0.2,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
+          <View style={{top: '20%', left: '30%', width: '40%', height: '35%',borderRadius:10, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+            <View style={{borderTopLeftRadius:10,borderTopRightRadius:10,height:'20%',width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
             <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{translate.Get("Gọi nhân viên")}</Text>
             </View>
-            <View style={{height:Bordy.height*0.35*0.18,width:'100%', justifyContent:'space-evenly',alignItems:'center',flexDirection:'row'}}>
-              <TouchableOpacity onPress={() => this.setState({Description: this.state.Description + translate.Get("Gọi nhân viên") +' '})} style={{width:'45%', height:'75%',borderRadius:10, backgroundColor:'#BBBBBB',justifyContent:'center',alignItems:'center'}}>
-                <Text style={{fontSize:H3_FONT_SIZE, color:'#000000'}}>{translate.Get("Gọi nhân viên")}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => this.setState({Description: this.state.Description + translate.Get("Gọi thanh toán") +' '})}style={{width:'45%', height:'75%',borderRadius:10,backgroundColor:'#BBBBBB',justifyContent:'center',alignItems:'center'}}>
-                <Text style={{fontSize:H3_FONT_SIZE, color:'#000000'}}>{translate.Get('Gọi thanh toán')}</Text>
-              </TouchableOpacity>
+            <View style={{height:'18%',width:'100%', justifyContent:'space-evenly',alignItems:'center',flexDirection:'row'}}>
+              <Text style={{fontSize:H3_FONT_SIZE, color:isColor==true?'#FFFFFF':'#000000'}}>Từ khoá: </Text>
+                <Text onPress={() => this.addNote(translate.Get("Gọi nhân viên"))}  style={{fontSize:H3_FONT_SIZE*0.9, color:isColor==true?'#FFFFFF':'#000000',textDecorationLine: 'underline',}}>{translate.Get("Gọi nhân viên")}</Text>
+                <Text onPress={() => this.addNote(translate.Get("Gọi thanh toán"))} style={{fontSize:H3_FONT_SIZE*0.9, color:isColor==true?'#FFFFFF':'#000000',textDecorationLine: 'underline',}}>{translate.Get('Gọi thanh toán')}</Text>
             </View>
-            <View style={{height: Bordy.height*0.35*0.42,justifyContent:'center',alignItems:'center'}}>
+            <View style={{height: '42%',justifyContent:'center',alignItems:'center'}}>
               <TextInput
-                  placeholder={translate.Get("Nhập yêu cầu...")}
+                  placeholder={translate.Get("Nhập yêu cầu. Ví dụ: thêm đũa, muỗng, chén...")}
                   placeholderTextColor={isColor == true ? '#808080' : "#777777"}
                   value={this.state.Description}
                   onChangeText={(item) => this.setState({Description : item})}  
                   multiline={true} 
                   numberOfLines={10} 
-                  style={[{width:'95%',height:Bordy.height*0.35*0.38,paddingHorizontal:12,borderWidth:0.5,borderRadius:10,fontSize: H3_FONT_SIZE,color:isColor == true ? '#ffffff' : "#000000", backgroundColor: isColor == true ? '#333333':'#FFFFFF',}]}>
+                  style={[{width:'95%',height:'80%',paddingHorizontal:12,borderWidth:0.5,borderRadius:10,fontSize: H3_FONT_SIZE,color:isColor == true ? '#ffffff' : "#000000", backgroundColor: isColor == true ? '#333333':'#FFFFFF',}]}>
               </TextInput>
             </View>
             
-            <View style={{height:Bordy.height*0.35*0.195,width:'100%',borderBottomLeftRadius:10,borderBottomRightRadius:10,backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'space-evenly',flexDirection:'row',alignItems:'center'}}>
+            <View style={{height:'20%',width:'100%',borderBottomLeftRadius:10,borderBottomRightRadius:10,backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'space-evenly',flexDirection:'row',alignItems:'center'}}>
               <TouchableOpacity onPress={() => this.setModalCallStaff(!ModalCallStaff)} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:'#af3037',justifyContent:'center',alignItems:'center'}}>
                 <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{translate.Get("Trở lại")}</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={()=>{this._AcceptPayment(this.state.Description,2)}} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:isColor == true ? '#DAA520' :'#009900',justifyContent:'center',alignItems:'center'}}>
-              <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{translate.Get('Xác nhận')}</Text>
+              <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{translate.Get('Gửi yêu cầu')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -402,15 +447,15 @@ export class _HeaderNew extends React.Component  {
           onBackdropPress={() => this.setModalLanguage(!modalLanguage)}
           isVisible={true}
           visible={modalLanguage}>
-          <View style={{top: Bordy.height*0.2, left: Bordy.width*0.28, width: Bordy.width *0.36, height: Bordy.height*0.4, zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
-            <View style={{height:Bordy.height*0.4*0.15,width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'space-between',flexDirection:'row',alignItems:'center'}}>
+          <View style={{top: '20%', left: '32%', width: '36%', height: '40%', zIndex: 2, position: 'absolute',backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+            <View style={{height:'15%',width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',justifyContent:'space-between',flexDirection:'row',alignItems:'center'}}>
             <TouchableOpacity><Icon name="close" iconStyle={{ color: isColor==true?'#111111':'#257DBC', left:5 }} fontSize={H1_FONT_SIZE} type="antdesign"/></TouchableOpacity>
             <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold"}}>{translate.Get('language')}</Text>
             <TouchableOpacity onPress={() => this.setModalLanguage(!modalLanguage)}>
               <Icon name="close" iconStyle={{ color: isColor==true?'#DAA520':'white',  right:5 }} fontSize={H1_FONT_SIZE} type="antdesign"/>
             </TouchableOpacity>
             </View>
-            <View style={{height: Bordy.height*0.4*0.70}}>
+            <View style={{height: '70%'}}>
             <FlatList
             data={data}
             renderItem={({ item, index }) =>
@@ -427,18 +472,18 @@ export class _HeaderNew extends React.Component  {
               </TouchableOpacity>}
             />
             </View>
-            <View style={{height:Bordy.height*0.4*0.14, justifyContent:'center',width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',}}> 
+            <View style={{height:'15%', justifyContent:'center',width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',}}> 
               <Text style={{color: isColor==true?'#FFFFFF':'#000000',fontSize: H2_FONT_SIZE,textAlign:'center',fontFamily: "RobotoBold"}}>{this.translate.Get("Power by Relisoft")}</Text>
             </View>
           </View>
         </Modal>
           : null}
-        <View style={{ paddingTop: 1, width: "35%", flexDirection: 'row', justifyContent: "space-between" }}>
+        <View style={{paddingTop: 1, width: "35%", height:'100%', flexDirection: 'row', justifyContent: "space-between" }}>
           <TouchableOpacity
             onPress={() => { onPressBack.apply(null, []); }}
             style={{ width: '14%', justifyContent: 'center', alignItems: 'center' }}>
             <Image   resizeMode="contain"  source={require('../../assets/icons/IconBack.png')}
-              style={[  BookingsStyle.header_logo, { maxWidth: '42%',  height: Bordy.height * 0.085,  justifyContent: "center", alignItems: "center"  }
+              style={[  BookingsStyle.header_logo, { maxWidth: '45%',height:'80%',  justifyContent: "center", alignItems: "center"  }
               ]}
             />
           </TouchableOpacity>
@@ -482,7 +527,7 @@ export class _HeaderNew extends React.Component  {
              </TouchableOpacity>
             </View>
             </View>
-        <View style={{ width: "65%", flexDirection: "row", justifyContent: "center", alignItems: 'center', }}>
+        <View style={{ width: "65%", flexDirection: "row", justifyContent: "center", alignItems: 'center'}}>
           <View style={[BookingsStyle.header_search, { flexDirection: "row" }]}>
             {name == 'OrderView' ?
               <TextInput
@@ -505,7 +550,7 @@ export class _HeaderNew extends React.Component  {
               </View>
             }
             {name == 'OrderView' ?
-              <TouchableOpacity style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
+              <TouchableOpacity style={{ marginLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
                 onPress={() => { _searchProduct(); }}>
                 <Image resizeMode="stretch" source={require('../../assets/icons/v2/icon_Find.png')}
                   style={{ width: ITEM_FONT_SIZE * 1.4, height: ITEM_FONT_SIZE * 1.4, }} />
@@ -517,11 +562,11 @@ export class _HeaderNew extends React.Component  {
                 onPress={() => {
                   setState({ lockTable: true })
                 }}>
-                <Icon name="unlock" iconStyle={{ color: colors.white, paddingLeft: ITEM_FONT_SIZE * 1, }} fontSize={ITEM_FONT_SIZE * 1.4} type="antdesign"></Icon>
+                <Icon name="unlock" iconStyle={{ color: colors.white, marginleft: ITEM_FONT_SIZE * 1, }} fontSize={ITEM_FONT_SIZE * 1.4} type="antdesign"></Icon>
               </TouchableOpacity>
-              : <View style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}>
-                <Icon name="lock" iconStyle={{ color: colors.red, paddingLeft: ITEM_FONT_SIZE * 1, }} fontSize={ITEM_FONT_SIZE * 1.4} type="antdesign"></Icon>
-              </View>}
+              : <TouchableOpacity onPress={abcdef} style={{ paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}>
+                <Icon name="lock" iconStyle={{ color: colors.red, marginleft: ITEM_FONT_SIZE * 1, }} fontSize={ITEM_FONT_SIZE * 1.4} type="antdesign"></Icon>
+              </TouchableOpacity>}
               {state.language == 1 ?
                 <TouchableOpacity style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
                 onPress={() => this.setModalLanguage(!modalLanguage )} >

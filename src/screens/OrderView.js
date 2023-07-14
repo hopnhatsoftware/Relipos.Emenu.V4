@@ -11,7 +11,7 @@ import { setCustomText } from "react-native-global-props";
 import { ProductDetails, CardDetailView, _CallOptions, _HeaderNew, _ProductGroup, _Infor, _TotalInfor } from '../components';
 import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1FontSize,H2FontSize,H3FontSize,H4FontSize,H2_FONT_SIZE,H3_FONT_SIZE,FontSize,H4_FONT_SIZE, H1_FONT_SIZE } from "../config/constants";
 import translate from "../services/translate";
-import {getMasterData,GetViewGroup,GetPrdChildGroups,getProductByGroup,getTicketInforOnTable, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getByChoiceId,CancelOrder,CallServices,getLanguage} from "../services";
+import {GetViewGroup,GetPrdChildGroups,getProductByGroup,getTicketInforOnTable, sendOrder,CheckAndGetOrder,SetMenu_getChoiceCategory,getByChoiceId,CancelOrder,CallServices,getLanguage} from "../services";
 import { formatCurrency } from "../services/util";
 import colors from "../config/colors";
 import BookingsStyle from "../styles/bookings";
@@ -22,11 +22,9 @@ UIManager.setLayoutAnimationEnabledExperimental &&
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height //- Constants.statusBarHeight;
-const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
-const pnLeft={ width:Bordy.width*0.17,height:SCREEN_HEIGHT };  
-const Center={width:Bordy.width-pnLeft.width, height:Bordy.height};
-const Header={width:Center.width,height:Bordy.height* 0.085};
-
+const pnLeft={ width:SCREEN_WIDTH*0.17,height:SCREEN_HEIGHT };  
+const Center={width:SCREEN_WIDTH-pnLeft.width, height:SCREEN_HEIGHT};
+const Header={width:SCREEN_WIDTH,height:SCREEN_HEIGHT* 0.085};
 const Booton={width:Center.width,height:Center.height* 0.07};
 const ProductList={width:Center.width,height:Center.height-Header.height-Booton.height,ColumnNum:3,RowNum:3}
 export default class OrderView extends Component {
@@ -84,7 +82,7 @@ export default class OrderView extends Component {
       ShowFullCart: true,
       isShowFormCard: false,
       FullCartWidth: new Animated.Value(0),
-      CartWidth: new Animated.Value(Bordy.width * 0.82),
+      CartWidth: new Animated.Value(SCREEN_WIDTH * 0.82),
       /*Dòng mặt hàng đang chọn trong giỏ hàng */
       CartItemSelected: null,
       CartProductIndex: -1,
@@ -148,7 +146,7 @@ export default class OrderView extends Component {
         state.CartInfor = CartInfor;
         state.Product = this.state.Product;
         state.FullCartWidth = new Animated.Value(0);
-        state.CartWidth = new Animated.Value(Bordy.width * 0.82);
+        state.CartWidth = new Animated.Value(SCREEN_WIDTH * 0.82);
       _storeData("OrderView@STATE", JSON.stringify(state), async () => {
         this.setState({state,CartInfor,SelectedGroupIndex:-1});
         return false;
@@ -177,6 +175,8 @@ export default class OrderView extends Component {
     let{appState,table}= this.state;
     if(appState == 'background'){
       await CancelOrder(table.OrderId);
+      table.OrderId = '';
+      this.setState({table})
     }
   }
   onPressBack = async() => {
@@ -194,6 +194,17 @@ export default class OrderView extends Component {
   
   });
 }
+}
+
+onPressLogout = () => {
+  console.log('đăng xuất');
+  _remove('APP@USER', () => {
+    _remove('APP@TABLE', () => {
+      _remove('APP@CART', () => {
+    this.props.navigation.navigate('LoginView') ;
+    })
+  })
+  });
 }
 _getLanguage(IsActive){
   try{
@@ -614,6 +625,27 @@ onCallServices= async() => {
     });
   };
   
+  checkOrdId = async () => {
+    let { table, OrdPlatform } = this.state;
+    if(table.OrderId == null || table.OrderId == '' ){
+      CheckAndGetOrder(table, OrdPlatform).then(res => {
+        if(res.Status == 1){
+        table.OrderId = res.Data;
+        this.setState({table});
+        this._sendOrder();
+        }else{
+          Alert.alert(this.translate.Get("Thông báo"),this.translate.Get("Lỗi hệ thống, vui lòng thoát bàn và vào lại"), [
+            {
+              text: "OK", onPress: () => {}
+            }
+          ]);
+        }
+      })
+    }
+else{
+  this._sendOrder();
+}
+  }
   _sendOrder = async () => {
     try{
     let { table, CartInfor, OrdPlatform,Config } = this.state;
@@ -642,16 +674,21 @@ onCallServices= async() => {
           }
           );
         });
-      } else {
-        await CheckAndGetOrder(table, OrdPlatform).then(async res => {
-          table.OrderId = res.Data;
-          await _storeData("APP@TABLE", JSON.stringify(table), async () => {
-            await this.setState({ table: table, isShowMash: false }, async () => {
-              this._getTicketInforOnTable();
+      } else{
+            Alert.alert(this.translate.Get("Thông báo"),this.translate.Get("Phiếu này đã đóng hoặc huỷ, vui lòng kiểm tra lại"), [
+              {
+                text: "OK", onPress: () => {}
+              }
+            ]);
+            await CheckAndGetOrder(table, OrdPlatform).then(async res => {
+              table.OrderId = res.Data;
+              await _storeData("APP@TABLE", JSON.stringify(table), async () => {
+                await this.setState({ table: table, isShowMash: false }, async () => {
+                  this._getTicketInforOnTable();
+                });
+              }
+              );
             });
-          }
-          );
-        });
       }
     }).catch(error => {
       Question.alert( 'System Error',error,
@@ -764,7 +801,6 @@ onCallServices= async() => {
    if (item==undefined||item==null)
    return {CartFilter};
     let TotalQuantity=0;
-    
     CartInfor.items.forEach((product, index) => {
       if (!('Json' in product) )
              product.Json ='';
@@ -781,7 +817,6 @@ onCallServices= async() => {
         return {CartFilter};
       }
     });
-    
     return {CartFilter};
   };
   _showIsSetQty = item => {
@@ -823,7 +858,7 @@ onCallServices= async() => {
     }
   }
   CartToggleHandle = async (isShow) =>{
-    const endWidth = !this.state.isShowFormCard ? SCREEN_WIDTH * 0.75 : 0;
+    const endWidth = !this.state.isShowFormCard ? SCREEN_WIDTH > SCREEN_HEIGHT  ? SCREEN_WIDTH * 0.75 : SCREEN_HEIGHT * 0.75 : 0;
     if (isShow) {
       await this._getTicketInforOnTable();
       this.setState({ isShowFormCard: isShow});
@@ -1141,7 +1176,7 @@ if (ProductChoise==null) {
   };
 /*Danh sách setmenu để chọn edit */
   RenderListSetmenuViewDetail = (CartItem, ind) => {
-    let RowWidth=(Bordy.width*0.85)-10;
+    let RowWidth=(SCREEN_WIDTH*0.85)-10;
       //return(<Text style={{ color: '#2285BE', paddingLeft: 5, fontSize: H3FontSize * 0.8 }}>{CartItem.PrdName} </Text>);
     return (
         <View style={{ borderColor: colors.grey5, borderWidth: 1, borderRadius: 4, width: RowWidth }}>
@@ -1389,7 +1424,7 @@ if (ProductChoise==null) {
     const dataSize = this.GetSize(item)
     this.state.isRenderProduct=true;
     return (
-      <TouchableHighlight   style={ { borderBottomWidth:6,borderColor: isColor == true ?'#333333': '#DDDDDD',width:iWith,height: iHeight,marginRight:6}}>
+      <TouchableHighlight   style={ { borderBottomWidth:6,borderColor: isColor == true ?'#333333': '#DDDDDD',width:'32.8%',height: iHeight,marginRight:6}}>
         <View style={{ flexDirection: "row", flexWrap: "wrap", width: "100%", height: '100%'}}>
           <View style={{ width: "100%", height:'60%' ,}}>
             {item.PrdDescription ?
@@ -1558,7 +1593,6 @@ if (ProductChoise==null) {
       </TouchableHighlight>
     );
   };
-  
   render() {
     if (!this.state.isPostBack) {
       return (
@@ -1573,21 +1607,23 @@ if (ProductChoise==null) {
     }
     const {ProductGroupList,endpoint,PrdChildGroups,Products,CartInfor,CartItemSelected,CartProductIndex,SelectedChildGroupIndex,SelectedGroupIndex, Config,ProductsOrdered,isColor,TicketHitory} = this.state; 
     return (
-      <View style={{height:Bordy.height,width:Bordy.width, backgroundColor: isColor == true ? '#333333' : "#DDDDDD"}}>
-        <View style={{flexDirection: "row"}}>
-          <View name='pbLeft' style={[{ backgroundColor: "#333D4C",width:pnLeft.width, flexDirection: "column",height: Bordy.height }]}>
-            <View style={{ justifyContent: 'center', alignItems: 'center', height: Bordy.height/6, }}>
+      <View style={{flex:1, backgroundColor: isColor == true ? '#333333' : "#DDDDDD"}}>
+        <View style={{flexDirection: "row",height:'100%',width:'100%'}}>
+          <View name='pbLeft' style={[{ backgroundColor: "#333D4C",width:'17%', flexDirection: "column",height:'100%' }]}>
+            <View style={{ justifyContent: 'center', alignItems: 'center', height: '17%', }}>
               <Image resizeMode='contain' 
                source={{uri:endpoint+'/Resources/Images/View/Logo.jpg'}}
                 style={{ width: '99%', height: '99%' }} />
             </View> 
             <_ProductGroup state={this.state}  
               translate={this.translate}
+              BordyWidth={SCREEN_WIDTH}
+              BordyHeight={SCREEN_HEIGHT}
               ProductGroupList={ProductGroupList}
               SelectedGroupIndex={SelectedGroupIndex}
               _GroupClick={(index) => this._GroupClick(index)}
               setState={(state) => this.setState(state)}
-              pnheight={Bordy.height-Bordy.height/6}
+              pnheight={SCREEN_HEIGHT-SCREEN_HEIGHT/6}
               BookingsStyle={BookingsStyle}
               PrdChildGroups={PrdChildGroups}
               SelectedChildGroupIndex={SelectedChildGroupIndex}
@@ -1597,7 +1633,8 @@ if (ProductChoise==null) {
               <Image resizeMode='contain' style={{ width: '99%', height: '99%' }} source={require('../../assets/images/RelisoftLogo_trans-07.png')} />
             </View> */}
           </View>
-          <View style={{width:Center.width,height:Center.height, flexDirection: "column"}}>
+          <View style={{width:'83%',height:"100%", flexDirection: "column"}}>
+          <View style={{width:'100%',height:"8%"}}>
             <_HeaderNew
               state={this.state}
               Ticket={this.state.Ticket}
@@ -1608,6 +1645,7 @@ if (ProductChoise==null) {
               selectedAreaIndex={this.state.selectedAreaIndex}
               ticketId={this.state.table.TicketID}
               onPressBack={() => { this.onPressBack(); }}
+              onPressLogout={() => { this.onPressLogout(); }}
               _searchProduct={(val) => this._searchProduct(val)}
               changeLanguage={(lang,item) => this.changeLanguage(lang,item)}
               data={this.state.listLanguage}
@@ -1619,28 +1657,30 @@ if (ProductChoise==null) {
               setState={(state) => this.setState(state)}
               BookingsStyle={BookingsStyle}
                style={{height:Header.height}}  />
-            <View styles={{ height:ProductList.height,width:ProductList.width,flexDirection: "column"}} >
+                
+          </View>
+          <View styles={{ height:'92%',width:'100%',flexDirection: "column"}} >
               <FlatList   data={Products}  numColumns={ProductList.ColumnNum}
                 extraData={this.state.isRenderProduct==false}
                 renderItem={this.renderProduct}  style={{width:'100%'}}
                 contentContainerStyle={{paddingBottom: ProductList.height/ProductList.RowNum}}
               />
             </View>
-          </View>
+            </View>
         </View>
-      
+        
         {!this.state.isShowFormCard ? 
          //Bottonbar 
-          <Animated.View style={[styles.BottonMenu, { width:Center.width+2,height:Booton.height }]}>
+          <Animated.View style={[styles.BottonMenu, { width:'83%',height:'7%'}]}>
             {this.state.ShowFullCart ? 
-              <View style={{ width: "100%", flexDirection: "row" }}>
-                <View style={{ flexDirection: "row",justifyContent: "center",alignItems: "center", width: (Center.width * 0.4)}}>                    
+              <View style={{ width: "100%", flexDirection: "row",height:'100%' }}>
+                <View style={{ flexDirection: "row",justifyContent: "center",alignItems: "center", width: '40%'}}>                    
                 <View style={{ width: '100%',height:'100%', justifyContent: 'center', alignItems: 'center',backgroundColor:isColor == true ? '#333333' : "#FFFFFF" }}>
                     <Text style={{fontSize:H3FontSize, fontFamily:'RobotoBold',color:isColor == true ?'#FFFFFF' :"#000000",textShadowColor:'#FFFFFF',textShadowOffset: {width:1, height:0.5 },textShadowRadius: 1 }}>{Config.B_ViewUnitPriceBefor ? this.translate.Get("Giá chưa bao gồm VAT") : this.translate.Get("Giá đã bao gồm VAT")}</Text>
                     
                    </View>
                 </View> 
-                <View style={[BookingsStyle.bottombar, styles.item_menu_order, { width: (Center.width*0.2), flexDirection: "row" }]}>
+                <View style={[ styles.item_menu_order, { width: '20%',height:'100%', flexDirection: "row" }]}>
                   <View style={{ position: 'absolute', left: 10, paddingTop: 5, justifyContent: 'center', alignItems: 'center' }}>
                     {<Image resizeMode="stretch" source={require('../../assets/icons/iconCash.png')}
                       style={{ width: H3FontSize * 1.3, height: H3FontSize * 1.3, }} /> }
@@ -1649,10 +1689,8 @@ if (ProductChoise==null) {
                     {formatCurrency(Config.B_ViewUnitPriceBefor ? CartInfor.ItemAmount : CartInfor.TotalAmount, "")}
                   </Text>
                 </View>
-                <TouchableOpacity onPress={() =>{this.CartToggleHandle(true)}}>
-                  <View style={[BookingsStyle.bottombar, { width: (Center.width*0.2), flexDirection: "row", color: "white", alignItems: "center", justifyContent: "center", 
-                  backgroundColor: "#0D66CE"
-                  }]}> 
+                <TouchableOpacity onPress={() =>{this.CartToggleHandle(true)}}style={{ width: '20%',height:'100%', flexDirection: "row", color: "white", alignItems: "center", justifyContent: "center", 
+                  backgroundColor: "#0D66CE"}} >
                     <View style={{ justifyContent: 'center', alignItems: 'center' ,flexDirection: "column"}}>
                       <View style={{backgroundColor:'#CC0000', borderRadius:35,width:H4_FONT_SIZE*0.9,height:H4_FONT_SIZE*0.9,justifyContent:'center',alignItems:'center',marginBottom:-3, marginLeft:2}}>
                         <Text style={{color: "white", fontSize: H4_FONT_SIZE*0.6, textAlign:'center' }}>{CartInfor.TotalQuantity}</Text>
@@ -1663,15 +1701,11 @@ if (ProductChoise==null) {
                     <Text style={[{ color: "white", fontSize: H3FontSize, paddingLeft: 10 }]}>
                       {this.translate.Get("Giỏ hàng")}
                     </Text>
-                  </View>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() =>(ProductsOrdered.length > 0 &&  CartInfor.TotalAmount == 0 )? this.onPressNext(): null}>
-                  <View style={[BookingsStyle.bottombar, { width: (Center.width*0.2), flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor:(ProductsOrdered.length > 0  && CartInfor.TotalAmount == 0 )? "#009900":"#dddddd"
-                  }]}>
+                <TouchableOpacity onPress={() =>(ProductsOrdered.length > 0 &&  CartInfor.TotalAmount == 0 )? this.onPressNext(): null} style={{ width: '20%',height:'100%', flexDirection: "row", alignItems: "center", justifyContent: "center", backgroundColor:(ProductsOrdered.length > 0  && CartInfor.TotalAmount == 0 )? "#009900":"#dddddd"}}>
                     <Text style={[{ color: "white",fontSize: H3FontSize,}]}>
                       {this.translate.Get("Thanh toán")}
                     </Text>
-                  </View>
                 </TouchableOpacity>
               </View>
              : 
@@ -1704,7 +1738,7 @@ if (ProductChoise==null) {
             ProductsOrdered={ProductsOrdered}
             onPressNext={this.onPressNext}
             HandleDescription={(item,Description) => { this.HandleDescription(item,Description) }}
-            onSendOrder={() => this._sendOrder()}
+            onSendOrder={() => this.checkOrdId()}
             onCallServices={() => { this.onCallServices(); }}
             _addExtraRequestToItem={(item, RowIndex) => { this._addExtraRequestToItem(item, RowIndex); }}
           />
@@ -1715,14 +1749,14 @@ if (ProductChoise==null) {
         { 
         /* Hiển thị Edit Set */
         (CartItemSelected != undefined &&  CartItemSelected != null && CartProductIndex >= 0 && CartItemSelected.PrdIsSetMenu && this.state.showSetInCart)? ( 
-            <View name='pnListSetmenuView' style={{ width: Bordy.width,height: Bordy.height, backgroundColor: "rgba(98,98,98,0.6)", 
+            <View name='pnListSetmenuView' style={{ width: SCREEN_WIDTH,height: SCREEN_HEIGHT, backgroundColor: "rgba(98,98,98,0.6)", 
              position: "absolute",
             justifyContent: "center", alignItems: "center",   }}  > 
               <View style={[{ 
                  position: "absolute",
-                width:(Bordy.width*0.85),height:(Bordy.height-Header.height),top: Header.height,  borderColor:'gray',backgroundColor:'gray',  borderWidth: 2, borderRadius: 6}]} >
+                width:(SCREEN_WIDTH*0.85),height:(SCREEN_HEIGHT-Header.height),top: Header.height,  borderColor:'gray',backgroundColor:'gray',  borderWidth: 2, borderRadius: 6}]} >
                 <View  name='pnShowSetHeader' style={{ flexDirection: "row", justifyContent: "center", alignItems: "center",  borderTopLeftRadius: 4,
-                    borderTopRightRadius: 4,  backgroundColor: "#333D4C",  height: Bordy.height*0.07
+                    borderTopRightRadius: 4,  backgroundColor: "#333D4C",  height: SCREEN_HEIGHT*0.07
                   }} > 
                   <Text style={{  fontSize: H1FontSize, color: colors.white, textAlign: "center" }}> 
                     {this.translate.Get("Chi tiết Set - Combo")}
@@ -1741,7 +1775,7 @@ if (ProductChoise==null) {
                   </View>
                 </View>
                 <View style={{  
-                   height: ((Bordy.height-Header.height)-(Bordy.height*0.14)),  backgroundColor: colors.white,   justifyContent: "center", alignItems: "center"
+                   height: ((SCREEN_HEIGHT-Header.height)-(SCREEN_HEIGHT*0.14)),  backgroundColor: colors.white,   justifyContent: "center", alignItems: "center"
                   }} >
                 <FlatList 
                 data={this.state.SetItemsFilter}
@@ -1750,7 +1784,7 @@ if (ProductChoise==null) {
                 this.RenderListSetmenuViewDetail(item, index) 
                 }></FlatList>
                 </View>
-                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center",height: Bordy.height*0.07}} >
+                <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center",height: SCREEN_HEIGHT*0.07}} >
                  
                   <TouchableOpacity  onPress={() => this.setState({ showSetInCart: false, CartItemSelected: null, CartProductIndex: -1, })}>
                   <View style={[{ width: (Center.width/5),height:'99%', flexDirection: "row", color: "white", alignItems: "center", justifyContent: "center", backgroundColor: "#008bc5",

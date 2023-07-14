@@ -159,8 +159,7 @@ export default class LoginView extends Component {
   _storeData('APP@USER', JSON.stringify(user), () => {
       _storeData('APP@CONFIG', JSON.stringify(Config), () => {
         _storeData('APP@JWT', JSON.stringify(JwtToken), () => {
-          CheckCasherIn(Config).then(res => { 
-        
+          CheckCasherIn(Config).then(res => {
             if (res.Status == 1) 
             {
                 if(OrderId!= ''||OrderId!=undefined){
@@ -171,8 +170,7 @@ export default class LoginView extends Component {
               });
             }
             else {
-             
-              Question.alert('Thông báo !',
+              Alert.alert('Thông báo !',
               'Quầy này chưa vào ca vui lòng kiểm tra thu ngân !', [
               {
                 text: "OK", onPress: () => {
@@ -183,7 +181,7 @@ export default class LoginView extends Component {
               this.setState({  isWorking: false, isLoading: false, });
             }
           }).catch((error) => {
-            Question.alert( this.translate.Get('Notice'),
+            Alert.alert( this.translate.Get('Notice'),
               this.translate.Get('Có lỗi trong quá trình xử lý :'+error), [
               {
                 text: "OK", onPress: () => {}
@@ -360,7 +358,7 @@ let ImageWidth=SCREEN_WIDTH*0.12
           onBackdropPress={() => this.setModalVisible(!modalVisible)}
           isVisible={true}
           visible={modalVisible}>
-          <View style={{ Top: SCREEN_HEIGHT *0.32, left: SCREEN_WIDTH*0.25,width:SCREEN_WIDTH*0.4,height:SCREEN_HEIGHT*0.34, backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
+          <View style={{ Top: '32%', left: '30%',width:'40%',height:'34%', backgroundColor:isColor==true?'#444444':'white',borderWidth:0.5,borderColor:isColor==true?'#DAA520':'#000000'}}>
           <View style={{height:'15%',width:'100%',backgroundColor:isColor==true?'#111111':'#257DBC',borderBottomWidth:0.5,justifyContent:'space-between',flexDirection:'row',alignItems:'center',}}>
             <TouchableOpacity><AntDesign name="close" style={{ color: isColor==true?'#111111':'#257DBC', left:5 }} size={H1_FONT_SIZE} /></TouchableOpacity>
             <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold"}}>{this.translate.Get('language')}</Text>
@@ -587,8 +585,7 @@ export const FormInput = props => {
 
 const styles = StyleSheet.create({
   container: {
-    height:SCREEN_HEIGHT,width:SCREEN_WIDTH,
-    
+    flex:1,
     alignItems: 'center',
     justifyContent: 'space-around',
   },
