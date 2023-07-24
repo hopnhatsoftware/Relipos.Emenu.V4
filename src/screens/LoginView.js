@@ -41,7 +41,7 @@ export default class LoginView extends Component {
       language: 1,
       listLanguage:[],
       listLanguage2:{},
-      languageText: 'Tiếng Việt / VietNamese',
+      languageText: 'VietNamese',
       languageImg: '',
       isColor: false,
       LgIco:'',

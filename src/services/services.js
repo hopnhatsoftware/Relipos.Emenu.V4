@@ -202,7 +202,6 @@ export const execFetch_NoAuthor = async (Path, Method, Data) => {
   let URL = endpoint +'/'+ Path;
   if (Method == 'GET') {
     URL = URL + '?' + serialize(Data);
-   // console.log('URL:',URL)
     return fetch(URL, {
       method: Method,
       headers: {
