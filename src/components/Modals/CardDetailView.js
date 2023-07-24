@@ -2,7 +2,7 @@ import React from "react";
 import {
   AppState,View, Text, TextInput, TouchableOpacity, StyleSheet, Image,
   Animated, Platform, FlatList, ActivityIndicator, KeyboardAvoidingView, Keyboard,
-  Dimensions,Alert
+  Dimensions,Alert,RefreshControl,
 } from "react-native";
 import Modal from "react-native-modal";
 import colors from "../../config/colors";
@@ -300,7 +300,7 @@ export class CardDetailView extends React.Component {
                   <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.15,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdOrderTime ? formatTime(item.TkdOrderTime):''}</Text>
                   </View>
-                  <View style={{ justifyContent:'center',width:Bordy.width * 0.75*0.15,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:8}}>
+                  <View style={{ justifyContent:'center',width:Bordy.width * 0.75*0.18,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:8}}>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',textAlign:'right'}}>{formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.TkdItemAmount : item.TkdTotalAmount, "")}</Text>
                   </View>
                 </View>
@@ -492,7 +492,7 @@ export class CardDetailView extends React.Component {
       {Name: translate.Get("Thao tác"),widthTitle:Bordy.width * 0.75*0.3},
       {Name: translate.Get("Ghi chú"),widthTitle:Bordy.width * 0.75*0.25},
       {Name: translate.Get("Giờ order"),widthTitle:Bordy.width * 0.75*0.15},
-      {Name: translate.Get("Tổng tiền"),widthTitle:Bordy.width * 0.75*0.15},
+      {Name: translate.Get("Tổng tiền"),widthTitle:Bordy.width * 0.75*0.18},
     ]
     const titleHitory = [
       {Name: 'Stt',widthTitle:Bordy.width * 0.75*0.06},
@@ -500,14 +500,14 @@ export class CardDetailView extends React.Component {
       {Name: translate.Get("ĐVT"),widthTitle:Bordy.width * 0.75*0.1},
       {Name: translate.Get("SL"),widthTitle:Bordy.width * 0.75*0.1},
       {Name: translate.Get("Trạng thái bếp"),widthTitle:Bordy.width * 0.75*0.2},
-      {Name: translate.Get("Ghi chú"),widthTitle:Bordy.width * 0.75*0.25},
+      // {Name: translate.Get("Ghi chú"),widthTitle:Bordy.width * 0.75*0.25},
       {Name: translate.Get("Lý do trả"),widthTitle:Bordy.width * 0.75*0.2},
       {Name: translate.Get("Giờ order"),widthTitle:Bordy.width * 0.75*0.15},
       {Name: translate.Get("Bắt đầu làm"),widthTitle:Bordy.width * 0.75*0.15},
       {Name: translate.Get("Làm xong"),widthTitle:Bordy.width * 0.75*0.15},
       {Name: translate.Get("Tổng TG làm"),widthTitle:Bordy.width * 0.75*0.15},
       {Name: translate.Get("Nhân viên"),widthTitle:Bordy.width * 0.75*0.2},
-      {Name: translate.Get("Tổng tiền"),widthTitle:Bordy.width * 0.75*0.15},
+      {Name: translate.Get("Tổng tiền"),widthTitle:Bordy.width * 0.75*0.18},
     ]
     if(typeof(state.isHavingOrder)==undefined||state.isHavingOrder ==null)
     state.isHavingOrder=1; 
@@ -597,7 +597,6 @@ export class CardDetailView extends React.Component {
                   />
                 </TouchableOpacity>
             </View>
-            
             <View style={{height: '65%',flexDirection:'row', width:'100%'}}>
                     <FlatList
                       keyExtractor={(item, RowIndex) => RowIndex.toString()}
@@ -677,6 +676,7 @@ export class CardDetailView extends React.Component {
             <TouchableOpacity style={{justifyContent:'center', borderRadius: 20, backgroundColor: state.isHavingOrder == 2 ? '#dc7d46': colors.grey3,width: '32%',height:'90%'
             }}
             onPress={() => {
+              _getTicketInforOnTable();
               setState({isHavingOrder:2, iLoadNumber:state.iLoadNumber+1 });
             }} >
              <Text style={{ fontSize: H2FontSize,  color: "white",  textAlign: "center" }}>
@@ -686,6 +686,7 @@ export class CardDetailView extends React.Component {
             <TouchableOpacity style={{justifyContent:'center', borderRadius: 20, backgroundColor: state.isHavingOrder == 3? '#dc7d46': colors.grey3,width: '32%',height:'90%'
             }}
             onPress={() => {
+                _getTicketInforOnTable();
                 setState({isHavingOrder:3,iLoadNumber:state.iLoadNumber+1 });
             }} >
              <Text style={{ fontSize: H2FontSize,  color:"white",  textAlign: "center" }}>
@@ -697,65 +698,65 @@ export class CardDetailView extends React.Component {
             }}>
             {state.isHavingOrder == 3 ?
             <ScrollView horizontal={true}>
-              <View style={{flexDirection:'column',height:'88%',width:Bordy.width * 0.75*2.28 }}>
-              <View style={{flexDirection:'row',height:'5%',width:Bordy.width * 0.75*2.28 }}>
+              <View style={{flexDirection:'column',height:'100%',width:Bordy.width * 0.75*2.06 }}>
+              <View style={{flexDirection:'row',height:'5%',width:Bordy.width * 0.75*2.06 }}>
                 <FlatList
                 numColumns={14}
                 data={titleHitory}
                 keyExtractor={(item, Index) => Index.toString()}
                 renderItem={({ item, index })=>
-                <View style={{backgroundColor:isColor == true ? '#232323' :'#C0C0C0', width:item.widthTitle, justifyContent:'center',alignItems:'center',height:HeightHistory*0.05,borderBottomWidth:0.5,borderRightWidth:0.5,borderTopWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
+                <View style={{backgroundColor:isColor == true ? '#232323' :'#C0C0C0', width:item.widthTitle, justifyContent:'center',alignItems:'center',height:H1_FONT_SIZE*1.2,borderBottomWidth:0.5,borderRightWidth:0.5,borderTopWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
                   <Text style={{fontSize:H3_FONT_SIZE*1.1,color:isColor == true ? '#FFFFFF' :'black',}}>{item.Name}</Text>
                 </View>
                 }
                 />
                 </View>
-                <View style={{flexDirection:'row',height:'95%',width:Bordy.width * 0.75*2.28}}>
+                <View style={{flexDirection:'row',height:'95%',width:Bordy.width * 0.75*2.06}}>
                 <FlatList
                 refreshing={this.props.refreshing}
                 onRefresh={_getTicketInforOnTable}
                 data={TicketHitory}
                 keyExtractor={(item, Index) => Index.toString()}
                 renderItem={({ item, index })=>
-                <View style={{width:'100%', flexDirection:'row',backgroundColor:item.TkdStatus == 3 ? '#AA0000':isColor == true ? '#333333' :'#EEEEEE',}}>
+                <View style={{width:'100%', flexDirection:'row',backgroundColor:isColor == true ? '#333333' :'#EEEEEE',}}>
                   <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.06,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.STT}</Text>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',}}>{item.STT}</Text>
                   </View>
-                  <View style={{ justifyContent:'center',alignItems:'left',width:Bordy.width * 0.75*0.42,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:5}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.PrdNameUi ? item.PrdNameUi : item.PrdName}</Text>
+                  <View style={{  justifyContent:'center',alignItems:'left',width:Bordy.width * 0.75*0.42,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:5}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',}}>{item.PrdNameUi ? item.PrdNameUi : item.PrdName}</Text>
+                  </View>
+                  <View style={{justifyContent:'center',alignItems:'left',width:Bordy.width * 0.75*0.1,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',}}>{item.UnitName}</Text>
                   </View>
                   <View style={{justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.1,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.UnitName}</Text>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',}}>{item.TkdQuantity}</Text>
                   </View>
-                  <View style={{justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.1,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdQuantity}</Text>
+                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.2,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',backgroundColor:item.Color}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',}}>{item.TkdStatusName ? item.TkdStatusName : ''}</Text>
                   </View>
-                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.2,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',backgroundColor:item.TkdStatus == 3 ? '#AA0000':item.Color}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdStatusName ? item.TkdStatusName : ''}</Text>
+                  {/* <View style={{ justifyContent:'center',width:Bordy.width * 0.75*0.25,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:8}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',textAlign:'left'}}>{item.TkdNote}</Text>
+                  </View> */}
+                  <View style={{ justifyContent:'center',width:Bordy.width * 0.75*0.2,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:8}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',textAlign:'left'}}>{item.TkdReason}</Text>
                   </View>
-                  <View style={{ justifyContent:'center',width:Bordy.width * 0.75*0.25,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:8}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',textAlign:'left'}}>{item.TkdNote}</Text>
+                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.15,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',}}>{item.TkdOrderTime ? formatTime(item.TkdOrderTime):''}</Text>
+                  </View>
+                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.15,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',}}>{item.TkdStartCook ? formatTime(item.TkdStartCook):''}</Text>
+                  </View>
+                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.15,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',}}>{item.TkdFinishTime ? formatTime(item.TkdFinishTime):''}</Text>
+                  </View>
+                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.15,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',}}>{item.TotalTime ? formatTime(item.TotalTime):''}</Text>
                   </View>
                   <View style={{ justifyContent:'center',width:Bordy.width * 0.75*0.2,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:8}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',textAlign:'left'}}>{item.TkdReason}</Text>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',textAlign:'left'}}>{item.ObjOrderName}</Text>
                   </View>
-                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.15,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdOrderTime ? formatTime(item.TkdOrderTime):''}</Text>
-                  </View>
-                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.15,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdStartCook ? formatTime(item.TkdStartCook):''}</Text>
-                  </View>
-                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.15,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdFinishTime ? formatTime(item.TkdFinishTime):''}</Text>
-                  </View>
-                  <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.15,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TotalTime ? formatTime(item.TotalTime):''}</Text>
-                  </View>
-                  <View style={{ justifyContent:'center',width:Bordy.width * 0.75*0.2,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:8}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',textAlign:'left'}}>{item.ObjOrderName}</Text>
-                  </View>
-                  <View style={{ justifyContent:'center',width:Bordy.width * 0.75*0.15,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:8}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',textAlign:'right'}}>{formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.TkdItemAmount : item.TkdTotalAmount, "")}</Text>
+                  <View style={{ justifyContent:'center',width:Bordy.width * 0.75*0.18,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:8}}>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',textAlign:'right'}}>{formatCurrency(this.props.state.Config.B_ViewUnitPriceBefor ? item.TkdItemAmount : item.TkdTotalAmount, "")}</Text>
                   </View>
                 </View>
                 }
@@ -839,22 +840,22 @@ export class CardDetailView extends React.Component {
           { state.isHavingOrder == 2 ?
           (
             <ScrollView horizontal={true}>
-            <View style={{flexDirection:'column',height:'100%',width:Bordy.width * 0.75*1.73 }}>
+            <View style={{flexDirection:'column',height:'100%',width:Bordy.width * 0.75*1.76 }}>
               
-              <View style={{flexDirection:'column',height:'100%',width:Bordy.width * 0.75*1.73 }}>
-              <View style={{flexDirection:'row',height:'4%',width:Bordy.width * 0.75*1.73 }}>
+              <View style={{flexDirection:'column',height:'100%',width:Bordy.width * 0.75*1.76 }}>
+              <View style={{flexDirection:'row',height:'4%',width:Bordy.width * 0.75*1.76 }}>
               <FlatList
                 numColumns={14}
                 data={titleProductsOrdered}
                 keyExtractor={(item, Index) => Index.toString()}
                 renderItem={({ item, index })=>
-                <View style={{backgroundColor:isColor == true ? '#232323' :'#C0C0C0', width:item.widthTitle, justifyContent:'center',alignItems:'center',borderBottomWidth:0.5,borderRightWidth:0.5,borderTopWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
+                <View style={{backgroundColor:isColor == true ? '#232323' :'#C0C0C0', width:item.widthTitle, justifyContent:'center',alignItems:'center',height:H1_FONT_SIZE,borderBottomWidth:0.5,borderRightWidth:0.5,borderTopWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
                   <Text style={{fontSize:H3_FONT_SIZE*1.1,color:isColor == true ? '#FFFFFF' :'black',}}>{item.Name}</Text>
                 </View>
                 }
                 />
               </View>
-              <View style={{flexDirection:'row',height:'90%',width:Bordy.width * 0.75*1.73}}>
+              <View style={{flexDirection:'row',height:'90%',width:Bordy.width * 0.75*1.76}}>
               <FlatList
               keyExtractor={(item, RowIndex) => RowIndex.toString()}
               data={ProductsOrdered}

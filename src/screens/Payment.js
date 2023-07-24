@@ -382,7 +382,7 @@ static getDerivedStateFromProps = (props, state) => {
             <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{this.translate.Get("Gọi nhân viên")}</Text>
             </View>
             <View style={{height:'18%',width:'100%', justifyContent:'space-evenly',alignItems:'center',flexDirection:'row'}}>
-              <Text style={{fontSize:H3_FONT_SIZE, color:isColor==true?'#FFFFFF':'#000000'}}>Từ khoá: </Text>
+              <Text style={{fontSize:H3_FONT_SIZE, color:isColor==true?'#FFFFFF':'#000000'}}>{translate.Get("Keywords")}:</Text>
                 <Text onPress={() => this.addNote(this.translate.Get("Gọi nhân viên"))}  style={{fontSize:H3_FONT_SIZE*0.9, color:isColor==true?'#FFFFFF':'#000000',textDecorationLine: 'underline',}}>{this.translate.Get("Gọi nhân viên")}</Text>
                 <Text onPress={() => this.addNote(this.translate.Get("Gọi thanh toán"))} style={{fontSize:H3_FONT_SIZE*0.9, color:isColor==true?'#FFFFFF':'#000000',textDecorationLine: 'underline',}}>{this.translate.Get('Gọi thanh toán')}</Text>
             </View>

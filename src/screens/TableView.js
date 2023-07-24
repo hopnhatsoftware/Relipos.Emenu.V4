@@ -360,7 +360,7 @@ export default class TableView extends Component {
             </TouchableOpacity>
             <View style={{ color: colors.white, flex: 1, justifyContent: "center", alignItems: "center", flexDirection: 'row' }}>
               <Text style={{ fontSize: H2FontSize, color: colors.white, textAlign: 'center'}}>
-                {this.translate.Get('SƠ ĐỒ BÀN')}
+                {this.translate.Get('Table Map')}
               </Text>
             </View>
             <TouchableOpacity onPress={() => this.setState({ showFilterPanel: !showFilterPanel })} >

@@ -414,7 +414,7 @@ export class _HeaderNew extends React.Component  {
             <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{translate.Get("Gọi nhân viên")}</Text>
             </View>
             <View style={{height:'18%',width:'100%', justifyContent:'space-evenly',alignItems:'center',flexDirection:'row'}}>
-              <Text style={{fontSize:H3_FONT_SIZE, color:isColor==true?'#FFFFFF':'#000000'}}>Từ khoá: </Text>
+              <Text style={{fontSize:H3_FONT_SIZE, color:isColor==true?'#FFFFFF':'#000000'}}>{translate.Get("Keywords")}: </Text>
                 <Text onPress={() => this.addNote(translate.Get("Gọi nhân viên"))}  style={{fontSize:H3_FONT_SIZE*0.9, color:isColor==true?'#FFFFFF':'#000000',textDecorationLine: 'underline',}}>{translate.Get("Gọi nhân viên")}</Text>
                 <Text onPress={() => this.addNote(translate.Get("Gọi thanh toán"))} style={{fontSize:H3_FONT_SIZE*0.9, color:isColor==true?'#FFFFFF':'#000000',textDecorationLine: 'underline',}}>{translate.Get('Gọi thanh toán')}</Text>
             </View>
@@ -435,7 +435,7 @@ export class _HeaderNew extends React.Component  {
                 <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{translate.Get("Trở lại")}</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={()=>{this._AcceptPayment(this.state.Description,2)}} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:isColor == true ? '#DAA520' :'#009900',justifyContent:'center',alignItems:'center'}}>
-              <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{translate.Get('Gửi yêu cầu')}</Text>
+              <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{translate.Get('Send')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -550,39 +550,39 @@ export class _HeaderNew extends React.Component  {
               </View>
             }
             {name == 'OrderView' ?
-              <TouchableOpacity style={{ marginLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
+              <TouchableOpacity style={{width:'10%', marginLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
                 onPress={() => { _searchProduct(); }}>
-                <Image resizeMode="stretch" source={require('../../assets/icons/v2/icon_Find.png')}
-                  style={{ width: ITEM_FONT_SIZE * 1.4, height: ITEM_FONT_SIZE * 1.4, }} />
+                <Image resizeMode='contain' source={require('../../assets/icons/v2/icon_Find.png')}
+                  style={{ width: '100%', height: ITEM_FONT_SIZE * 1.4, }} />
               </TouchableOpacity>
               : <View style={{ width: ITEM_FONT_SIZE * 2, }}>
               </View>}
             {!state.lockTable ?
-              <TouchableOpacity style={{ paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
+              <TouchableOpacity style={{ width:'12%',paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
                 onPress={() => {
                   setState({ lockTable: true })
                 }}>
-                <Icon name="unlock" iconStyle={{ color: colors.white, marginleft: ITEM_FONT_SIZE * 1, }} fontSize={ITEM_FONT_SIZE * 1.4} type="antdesign"></Icon>
+                <Icon name="unlock" iconStyle={{ color: colors.white, marginleft: ITEM_FONT_SIZE * 1, }} fontSize={ITEM_FONT_SIZE * 1.5} type="antdesign"></Icon>
               </TouchableOpacity>
-              : <TouchableOpacity onPress={abcdef} style={{ paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}>
-                <Icon name="lock" iconStyle={{ color: colors.red, marginleft: ITEM_FONT_SIZE * 1, }} fontSize={ITEM_FONT_SIZE * 1.4} type="antdesign"></Icon>
+              : <TouchableOpacity onPress={abcdef} style={{ width:'12%',paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}>
+                <Icon name="lock" iconStyle={{ color: colors.red, marginleft: ITEM_FONT_SIZE * 1, }} fontSize={ITEM_FONT_SIZE * 1.5} type="antdesign"></Icon>
               </TouchableOpacity>}
               {state.language == 1 ?
-                <TouchableOpacity style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
+                <TouchableOpacity style={{  width:'12.5%',paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
                 onPress={() => this.setModalLanguage(!modalLanguage )} >
                   <Image resizeMode="stretch" source={require('../../assets/icons/icon-flagvn.png')}
                     style={{ width: ITEM_FONT_SIZE * 2, height: ITEM_FONT_SIZE * 1.4, }} />
                 </TouchableOpacity>
                 :
                 state.language == 2 ?
-                <TouchableOpacity style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
+                <TouchableOpacity style={{width:'12.5%', paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
                 onPress={() => this.setModalLanguage(!modalLanguage )} >
                   <Image resizeMode="stretch" source={require('../../assets/icons/icon-flagus.png')}
                     style={{ width: ITEM_FONT_SIZE * 2, height: ITEM_FONT_SIZE * 1.4, }} />
                 </TouchableOpacity>
                 :
                 state.language == 5 ?
-                <TouchableOpacity style={{ paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
+                <TouchableOpacity style={{ width:'12.5%', paddingLeft: 10, paddingRight: 5, paddingTop: 2, justifyContent: 'center', alignItems: 'center', }}
                 onPress={() => this.setModalLanguage(!modalLanguage )} >
                   <Image resizeMode="stretch" source={require('../../assets/icons/icon-flagcn.png')}
                     style={{ width: ITEM_FONT_SIZE * 2, height: ITEM_FONT_SIZE * 1.4, }} />
@@ -597,7 +597,7 @@ export class _HeaderNew extends React.Component  {
 }
 const styles = StyleSheet.create({
   item_Search: {
-    width: "70%",
+    width: "65%",
     fontSize: ITEM_FONT_SIZE,
     paddingLeft: 15,
     borderRadius: 30,
