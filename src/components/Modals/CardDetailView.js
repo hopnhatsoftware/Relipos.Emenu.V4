@@ -722,7 +722,7 @@ export class CardDetailView extends React.Component {
                   <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.06,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',}}>{item.STT}</Text>
                   </View>
-                  <View style={{  justifyContent:'center',alignItems:'left',width:Bordy.width * 0.75*0.42,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:5}}>
+                  <View style={{  justifyContent:'center',alignItems:'left',width:Bordy.width * 0.75*0.42,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:5, paddingVertical:7}}>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',}}>{item.PrdNameUi ? item.PrdNameUi : item.PrdName}</Text>
                   </View>
                   <View style={{justifyContent:'center',alignItems:'left',width:Bordy.width * 0.75*0.1,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
