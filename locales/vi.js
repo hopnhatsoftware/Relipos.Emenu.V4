@@ -188,5 +188,10 @@ export default en={
     "The total quantity of ordered items must not exceed ": "Tổng số lượng món đặt không được quá " ,
     "Limited Products!": "Số lượng order có hạn!",
     "The total quantity of ordered items should not exceed ":" và tổng số lượng loại món đặt không được quá ",
-    ".Please double-check to avoid incorrect or excessive food orders.": ". Vui lòng kiểm tra tránh order nhầm và dư thừa thức ăn"
+    ".Please double-check to avoid incorrect or excessive food orders.": ". Vui lòng kiểm tra tránh order nhầm và dư thừa thức ăn",
+    "Table Map":"SƠ ĐỒ BÀN",
+    "Send":"Gửi yêu cầu",
+    "Keywords":"Từ khoá",
+    "Hot":"Đặc biệt",
+    "New":"Mới"
 }

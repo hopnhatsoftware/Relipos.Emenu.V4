@@ -1444,20 +1444,26 @@ if (ProductChoise==null) {
               { 
                 this._ShowFullImage(item,true);
             }}> 
-              <ImageBackground  resizeMode='contain'
+              <ImageBackground  resizeMode="contain"
                 source={ item.PrdImageUrl ? {uri: this.state.endpoint + "/Resources/Images/Product/" + item.PrdImageUrl
                   }:  require("../../assets/images/NoImage_trans-04.png")
                 }
                 style={[{ width: '100%', height: '100%', backgroundColor:isColor == true ? '#454545' : "#FFFFFF" }]} >
                 {item.ResName && item.SttName == 'HOT' ? 
-                  <View style={{ position: "absolute", paddingTop:10,right:10, width: '20%'}}>
+                  <View style={{ position: "absolute", paddingTop:0,right:5,height: H1_FONT_SIZE*1.6, width: H1_FONT_SIZE*3.8}}>
+                    <View style={{position: "absolute",zIndex:1000,width: H1_FONT_SIZE*3.8, height: H1_FONT_SIZE*1.6,paddingTop:H1_FONT_SIZE*0.4, justifyContent:'center',alignItems:'center'}}>
+                    <Text style={{fontSize:H4_FONT_SIZE,color:'#FFFFFF',fontFamily:"RobotoBold"}}>{this.translate.Get("Hot")}</Text>
+                    </View>
                     <Image resizeMode="contain" source={require('../../assets/icons/IconHot-09.png')}
-                      style={{ width: H1_FONT_SIZE*1.6, height: H1_FONT_SIZE*1.6,}} />
+                      style={{ width: H1_FONT_SIZE*3.8, height: H1_FONT_SIZE*1.6,}} />
                   </View>
                 : item.ResName && item.SttName == 'NEW' ?
-                  <View style={{  position: "absolute", paddingTop: 10, right: 10,width: '20%' }}>
+                  <View style={{  position: "absolute", top: 10, right: 10,width:H1_FONT_SIZE*1.8,height: H1_FONT_SIZE*1.8 }}>
+                    <View style={{position: "absolute",zIndex:1000,width:H1_FONT_SIZE*1.8, paddingTop:H1_FONT_SIZE*0.6, justifyContent:'center',alignItems:'center'}}>
+                    <Text style={{fontSize:H4_FONT_SIZE,color:'#FFFFFF',fontFamily:"RobotoBold"}}>{this.translate.Get("New")}</Text>
+                    </View>
                     <Image resizeMode="contain" source={require('../../assets/icons/IconNew-09.png')}
-                      style={{width: H1_FONT_SIZE*1.6, height: H1_FONT_SIZE*1.6, }}/>
+                      style={{width: H1_FONT_SIZE*1.8,height: H1_FONT_SIZE*1.8, }}/>
                   </View>
                   : item.SttName == 'SALE' ?
                   <View style={{  position: "absolute", paddingTop: 0, right: 5}}>
@@ -1474,7 +1480,7 @@ if (ProductChoise==null) {
               </ImageBackground>
             </TouchableOpacity>
           </View> 
-          <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%", height:'40%',paddingLeft:5,backgroundColor: isColor == true ? '#454545' : "#FFFFFF" }}>
+          <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%", height:'40%',paddingLeft:5,backgroundColor: isColor == true ? '#444444' : "#FFFFFF" }}>
           <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:'100%'}}>
              {Config.B_ViewProductNo?
                <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",height:'50%'}}>

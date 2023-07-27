@@ -211,7 +211,12 @@ export default en = {
     "Lên món":"上菜",
     "Hoàn thành":"完成",
     "Note: cooking":"正在煮",
-    "Tải lại":"刷新"
+    "Tải lại":"刷新",
+    "Table Map":"桌子地圖",
+    "Send":"送",
+    "Keywords":"关键词",
+    "Hot":"特别",
+    "New":"新"
     // "Limited OrddQuantity!": ,
     // "Your quantity is limited, Please check in!": ,
     // "Limited Products!": ,

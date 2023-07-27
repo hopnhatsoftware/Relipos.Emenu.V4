@@ -221,5 +221,10 @@ export default en = {
     "The total quantity of ordered items must not exceed ": "The total quantity of ordered items must not exceed " ,
     "Limited Products!": "Limited Products!",
     "The total quantity of ordered items should not exceed ":" and the total quantity of ordered items should not exceed ",
-    ".Please double-check to avoid incorrect or excessive food orders.": ".Please double-check to avoid incorrect or excessive food orders."
+    ".Please double-check to avoid incorrect or excessive food orders.": ".Please double-check to avoid incorrect or excessive food orders.",
+    "Table Map":"TABLE MAP",
+    "Send":"Send",
+    "Keywords":"Keywords",
+    "Hot":"HOT",
+    "NEW":"New"
 }
