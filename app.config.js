@@ -25,9 +25,6 @@ const commonConfig = {
       "buildNumber": "1",
       "infoPlist": {
         "supportsTablet": true,
-        "UIBackgroundModes": [
-          "audio"
-        ],
         "NSLocationAlwaysUsageDescription": "needs gps data.",
         "NSLocationWhenInUseUsageDescription": "Emenu need your location to suggest nearest restaurant for you. Please allow Relipos.Emenu access your location!",
         "NSAppTransportSecurity": {
