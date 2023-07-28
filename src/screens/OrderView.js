@@ -1,7 +1,7 @@
 /*Màn hình chọn món */
 import React, { Component } from "react";
 import {AppState,TouchableOpacity,Dimensions,Image,TouchableHighlight,ActivityIndicator, UIManager,StatusBar,ImageBackground,Keyboard,StyleSheet,Alert,Platform,Animated,Easing,Text,View,
-  TextInput,ScrollView} from "react-native";
+  TextInput,ScrollView,RefreshControl} from "react-native";
 import * as Font from "expo-font";
 import Constants from "expo-constants";
 import { _retrieveData, _storeData, _remove } from "../services/storages";
@@ -197,7 +197,6 @@ export default class OrderView extends Component {
 }
 
 onPressLogout = () => {
-  console.log('đăng xuất');
   _remove('APP@USER', () => {
     _remove('APP@TABLE', () => {
       _remove('APP@CART', () => {
@@ -677,7 +676,7 @@ else{
       } else{
             Alert.alert(this.translate.Get("Thông báo"),this.translate.Get("Phiếu này đã đóng hoặc huỷ, vui lòng kiểm tra lại"), [
               {
-                text: "OK", onPress: () => {}
+                text: "OK", onPress: () => {this.onPressLogout();}
               }
             ]);
             await CheckAndGetOrder(table, OrdPlatform).then(async res => {
@@ -845,16 +844,48 @@ else{
     }).start(() => this.setState({ ShowFullCart: isShow }));
   }
   onPressNext = async () => {
-    let {table, lockTable, a,} = this.state;
-    a = table;
-    if (lockTable == true) {
-      _storeData('APP@BACKEND_Payment', JSON.stringify(a), () => {
-        this.props.navigation.navigate('Payment', { lockTable });
-    });
-    }else{
-      _storeData('APP@BACKEND_Payment', JSON.stringify(a), () => {
-        this.props.navigation.navigate('Payment');
+    try{
+    let {table, lockTable, a,Ticket} = this.state;
+    this.setState({ isShowMash: true });
+    getTicketInforOnTable(table).then(res => {
+      this.setState({ isShowMash: false });
+      if ("Table" in res.Data) {
+        if (res.Data.Table.length > 0) {
+          Ticket = res.Data.Table[0];
+        } else {
+          Ticket = { TkTotalAmount: 0,TkItemAmout:0, TkNo: 0, TkServiceChargeAmout: 0 };
+        }
+      }
+      console.log(table.Ticket);
+      table.Ticket = Ticket;
+      a = table;
+      if(table.Ticket.TkIsCash || table.Ticket.TkIsCancel){
+        Alert.alert(this.translate.Get("Thông báo"),this.translate.Get("Phiếu này đã đóng hoặc huỷ, vui lòng kiểm tra lại"), [
+          {
+            text: "OK", onPress: () => {this.onPressLogout();}
+          }
+        ]);
+        return;
+      }
+      if (lockTable == true) {
+        _storeData('APP@BACKEND_Payment', JSON.stringify(a), () => {
+          this.props.navigation.navigate('Payment', { lockTable });
       });
+      }else{
+        _storeData('APP@BACKEND_Payment', JSON.stringify(a), () => {
+          this.props.navigation.navigate('Payment');
+        });
+      }
+      }).catch(error => {
+        this.setState({ isShowMash: false });
+      });
+    this.setState({isShowMash: false});}
+    catch(error){
+      Alert.alert(translate.Get("Thông báo"),translate.Get("Lỗi hệ thống, _getTicketInforOnTable"), [
+        {
+          text: "OK", onPress: () => { }
+        }
+      ]);
     }
   }
   CartToggleHandle = async (isShow) =>{

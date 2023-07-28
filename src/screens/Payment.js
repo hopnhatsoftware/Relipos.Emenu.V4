@@ -141,13 +141,6 @@ export default class Payment extends Component {
       let {PaymentAmount, Ticket} = this.state;
       getPaymentAmount( Ticket.TicketID , '').then(res => {
         PaymentAmount = res.Data;
-        if (PaymentAmount == 0) {
-          Alert.alert(this.translate.Get("Thông báo"),this.translate.Get("Phiếu này đã đóng hoặc huỷ, vui lòng kiểm tra lại"), [
-            {
-              text: "OK", onPress: this.onPressBack
-            }
-          ]);
-        }
         this.setState({ PaymentAmount})
         }).catch((error) => {
         Alert.alert(this.translate.Get('Thông báo'),this.translate.Get('Lỗi hệ thống !'),
