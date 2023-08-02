@@ -234,6 +234,7 @@ export default class Payment2 extends Component {
   _FlushInvoiceInfor = async () => {
     try{
     let{Ticket,Tax,lockTable} =  this.state;
+    console.log(Ticket);
     let a = Ticket
     if (Tax.TaxCode === undefined || Tax.TaxCode === ''){
       Alert.alert(this.translate.Get("Thông báo"),'Mã số thuế không được để trống')
@@ -492,7 +493,7 @@ addNote = (item) => {
             <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{this.translate.Get("Gọi nhân viên")}</Text>
             </View>
             <View style={{height:'18%',width:'100%', justifyContent:'space-evenly',alignItems:'center',flexDirection:'row'}}>
-              <Text style={{fontSize:H3_FONT_SIZE, color:isColor==true?'#FFFFFF':'#000000'}}>{translate.Get("Keywords")}:</Text>
+              <Text style={{fontSize:H3_FONT_SIZE, color:isColor==true?'#FFFFFF':'#000000'}}>{this.translate.Get("Keywords")}:</Text>
                 <Text onPress={() => this.addNote(this.translate.Get("Gọi nhân viên"))}  style={{fontSize:H3_FONT_SIZE*0.9, color:isColor==true?'#FFFFFF':'#000000',textDecorationLine: 'underline',}}>{this.translate.Get("Gọi nhân viên")}</Text>
                 <Text onPress={() => this.addNote(this.translate.Get("Gọi thanh toán"))} style={{fontSize:H3_FONT_SIZE*0.9, color:isColor==true?'#FFFFFF':'#000000',textDecorationLine: 'underline',}}>{this.translate.Get('Gọi thanh toán')}</Text>
             </View>
@@ -512,7 +513,7 @@ addNote = (item) => {
               <TouchableOpacity onPress={() => this.setModalCallStaff(!ModalCallStaff)} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:'#af3037',justifyContent:'center',alignItems:'center'}}>
                 <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{this.translate.Get("Trở lại")}</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={()=>{this._AcceptPayment(this.state.Description,2)}} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:isColor == true ? '#DAA520' :'#009900',justifyContent:'center',alignItems:'center'}}>
+              <TouchableOpacity onPress={()=>{this._AcceptCallStaff(this.state.Description,2)}} style={{width:'47%', height:'80%',borderRadius:8, backgroundColor:isColor == true ? '#DAA520' :'#009900',justifyContent:'center',alignItems:'center'}}>
               <Text style={{fontSize:H2_FONT_SIZE, color:'#FFFFFF'}}>{this.translate.Get('Gửi yêu cầu')}</Text>
               </TouchableOpacity>
             </View>

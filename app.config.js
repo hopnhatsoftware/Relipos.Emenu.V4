@@ -7,7 +7,7 @@ const commonConfig = {
     "android",
     "web"
   ],
-    version: "2.6",
+    version: "2.7",
     orientation: "landscape",
     icon: "./assets/Customer/Logo.png",
     splash: {
@@ -22,7 +22,7 @@ const commonConfig = {
       "**/*"
     ],
     "ios": {
-      "buildNumber": "1",
+      "buildNumber": "2",
       "infoPlist": {
         "supportsTablet": true,
         "NSLocationAlwaysUsageDescription": "needs gps data.",

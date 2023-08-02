@@ -1,6 +1,6 @@
 /*Màn hình chọn món */
 import React, { Component } from "react";
-import {AppState,TouchableOpacity,Dimensions,Image,TouchableHighlight,ActivityIndicator, UIManager,StatusBar,ImageBackground,Keyboard,StyleSheet,Alert,Platform,Animated,Easing,Text,View,
+import {AppState,TouchableOpacity,Dimensions,TouchableHighlight,Image,ActivityIndicator,UIManager, StatusBar,ImageBackground,Keyboard,StyleSheet,Alert,Platform,Animated,Easing,Text,View,
   TextInput,ScrollView,RefreshControl} from "react-native";
 import * as Font from "expo-font";
 import Constants from "expo-constants";
@@ -44,6 +44,10 @@ export default class OrderView extends Component {
       isRenderProduct: true,
       selectedType: null,
       isPostBack: false,
+      isPostBack2: false,
+      isEndReached: false,
+      parenLength: 0,
+      scrollPosition: 0,
       checked:'',
       test:'',
       itemChecked:{},
@@ -57,7 +61,7 @@ export default class OrderView extends Component {
       listLanguage2:{},
       language: 1,
       a:'',
-      b:'',
+      selectedParen:'',
       call: 1,
       data: [],
       TicketDetail: [],
@@ -113,6 +117,7 @@ export default class OrderView extends Component {
       ImageUrl:'',
     };
     this.translate = new translate();
+    this.flatListRef = React.createRef();
   }
   componentWillUnmount= async () => {
     this.appStateSubscription.remove();
@@ -286,7 +291,7 @@ onCallServices= async() => {
   };
   /*Vẽ nhóm cấp 2 */
   _loadChildGroups = async SelectedGroupIndex => {
-    let { table, ProductGroupList, SelectedChildGroupIndex,Config } = this.state;
+    let { table, ProductGroupList, SelectedChildGroupIndex,Config} = this.state;
     if (SelectedGroupIndex >= 0) {
       let group = ProductGroupList[SelectedGroupIndex];
       if (group) {
@@ -363,7 +368,7 @@ onCallServices= async() => {
   };
   _BindingMeta= async () => {
     try{
-    let {  SelectedGroupIndex, ProductGroupList,OrdPlatform,table,Config,} = this.state;
+    let {  SelectedGroupIndex, ProductGroupList,OrdPlatform,table,Config,parenLength} = this.state;
          if (!("TicketId" in table)) {
           table = await _retrieveData("APP@TABLE", JSON.stringify({}));
           table = JSON.parse(table);
@@ -383,8 +388,9 @@ onCallServices= async() => {
           GetViewGroup(Config, table).then(res => {
             if (res.Data.Table.length > 0) {
               ProductGroupList = res.Data.Table;
+              parenLength = ProductGroupList.length - 1;
               SelectedGroupIndex = SelectedGroupIndex < 0 ? 0 : SelectedGroupIndex;
-              this.setState( { table,isShowMash:false, ProductGroupList,  SelectedGroupIndex },
+              this.setState( { table,isShowMash:false, ProductGroupList, parenLength, SelectedGroupIndex },
                 () => {  this._loadChildGroups(SelectedGroupIndex); }
               );
             }
@@ -512,6 +518,30 @@ onCallServices= async() => {
   }
   HandleQuantity = async (item,OrddQuantity,isReplace) => {
     try {
+      let {table,Ticket} = this.state;
+      getTicketInforOnTable(table).then(res => {
+        this.setState({ isShowMash: false });
+        if ("Table" in res.Data) {
+          if (res.Data.Table.length > 0) {
+            Ticket = res.Data.Table[0];
+          } else {
+            Ticket = { TkTotalAmount: 0,TkItemAmout:0, TkNo: 0, TkServiceChargeAmout: 0 };
+          }
+        }
+        table.Ticket = Ticket;
+        console.log(table.Ticket.TkIsCash,table.Ticket.TkIsCancel);
+        if(table.Ticket.TkIsCash || table.Ticket.TkIsCancel){
+          this.CartToggleHandle(true);
+          setTimeout(() => {
+          Alert.alert(this.translate.Get("Thông báo"),'Bill: ' + table.Ticket.TkNo + ', Bàn: ' + table.Ticket.TbNo + this.translate.Get(" đã thanh toán hoặc hủy, Hãy liên hệ nhân viên để mở bàn mới  và order lại các món ở trên!"), [
+            {
+              text: "OK", onPress: () => {}
+            }
+          ]);
+        }, 500);
+          return;
+        }
+      })
       let { CartInfor} = this.state;
       let iQuantity=parseFloat(OrddQuantity);
       if (!('Json' in item) || item.Json == '')
@@ -652,7 +682,9 @@ else{
       return;
     this.setState({ isShowMash: true }); 
     await sendOrder(Config, table, OrdPlatform, CartInfor.items).then(async res => {
+      console.log(res);
       if (res.Status == 1) {
+        
         await _remove("APP@CART", async () => {
           await this.setState({ CartInfor: {  TotalQuantity: 0, TotalAmount: 0, ItemAmount:0, items: [], } }, async () => {
             await CheckAndGetOrder(table, OrdPlatform).then(async res => {
@@ -674,11 +706,19 @@ else{
           );
         });
       } else{
-            Alert.alert(this.translate.Get("Thông báo"),this.translate.Get("Phiếu này đã đóng hoặc huỷ, vui lòng kiểm tra lại"), [
-              {
-                text: "OK", onPress: () => {this.onPressLogout();}
-              }
-            ]);
+            if(res.Exception_Message == " " || res.Exception_Message == "http://emenu.relipos.com/api//OrderDetail/Post -  " || res.Exception_Message == "Cannot insert the value NULL into column 'OrdId', table 'Relisoft_Test.dbo.OrderDetail'; column does not allow nulls. INSERT fails."){
+              Alert.alert(this.translate.Get("Thông báo"),'Bill: ' + table.Ticket.TkNo + ', Bàn: ' + table.Ticket.TbNo + this.translate.Get(" đã thanh toán hoặc hủy, Hãy liên hệ nhân viên để mở bàn mới  và order lại các món ở trên!"), [
+                {
+                  text: "OK", onPress: () => {}
+                }
+              ]);
+            } else {
+              Alert.alert(this.translate.Get("Thông báo"),res.Exception_Message, [
+                {
+                  text: "OK", onPress: () => {}
+                }
+              ]);
+            }
             await CheckAndGetOrder(table, OrdPlatform).then(async res => {
               table.OrderId = res.Data;
               await _storeData("APP@TABLE", JSON.stringify(table), async () => {
@@ -856,11 +896,10 @@ else{
           Ticket = { TkTotalAmount: 0,TkItemAmout:0, TkNo: 0, TkServiceChargeAmout: 0 };
         }
       }
-      console.log(table.Ticket);
       table.Ticket = Ticket;
       a = table;
       if(table.Ticket.TkIsCash || table.Ticket.TkIsCancel){
-        Alert.alert(this.translate.Get("Thông báo"),this.translate.Get("Phiếu này đã đóng hoặc huỷ, vui lòng kiểm tra lại"), [
+        Alert.alert(this.translate.Get("Thông báo"),this.translate.Get(`Phiếu này đã đóng hoặc huỷ, vui lòng kiểm tra lại`) , [
           {
             text: "OK", onPress: () => {this.onPressLogout();}
           }
@@ -1475,14 +1514,21 @@ if (ProductChoise==null) {
               { 
                 this._ShowFullImage(item,true);
             }}> 
-              <ImageBackground  resizeMode="contain"
+            
+              <Image  resizeMode="contain"
+              cachePolicy='memory'
                 source={ item.PrdImageUrl ? {uri: this.state.endpoint + "/Resources/Images/Product/" + item.PrdImageUrl
                   }:  require("../../assets/images/NoImage_trans-04.png")
                 }
                 style={[{ width: '100%', height: '100%', backgroundColor:isColor == true ? '#454545' : "#FFFFFF" }]} >
-                {item.ResName && item.SttName == 'HOT' ? 
+                
+                {/* <View style={{ position: "absolute", paddingTop: (iHeight-36)/2, right: -15 }}>
+                  <Icon  name="caretleft" type="antdesign" iconStyle={{ justifyContent: "space-between", color: "#EEEEEE", fontSize: 36 }} />
+                </View> */}
+              </Image>
+              {item.ResName && item.SttName == 'HOT' ? 
                   <View style={{ position: "absolute", paddingTop:0,right:5,height: H1_FONT_SIZE*1.6, width: H1_FONT_SIZE*3.8}}>
-                    <View style={{position: "absolute",zIndex:1000,width: H1_FONT_SIZE*3.8, height: H1_FONT_SIZE*1.6,paddingTop:H1_FONT_SIZE*0.4, justifyContent:'center',alignItems:'center'}}>
+                    <View style={{position: "absolute",zIndex:1000,width: H1_FONT_SIZE*3.8, height: H1_FONT_SIZE*1.4, justifyContent:'center',alignItems:'center'}}>
                     <Text style={{fontSize:H4_FONT_SIZE,color:'#FFFFFF',fontFamily:"RobotoBold"}}>{this.translate.Get("Hot")}</Text>
                     </View>
                     <Image resizeMode="contain" source={require('../../assets/icons/IconHot-09.png')}
@@ -1505,10 +1551,6 @@ if (ProductChoise==null) {
                       style={{width: H1_FONT_SIZE*4.2, height: H1_FONT_SIZE*1.6, }}/>
                   </View>
                   : null} 
-                {/* <View style={{ position: "absolute", paddingTop: (iHeight-36)/2, right: -15 }}>
-                  <Icon  name="caretleft" type="antdesign" iconStyle={{ justifyContent: "space-between", color: "#EEEEEE", fontSize: 36 }} />
-                </View> */}
-              </ImageBackground>
             </TouchableOpacity>
           </View> 
           <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%", height:'40%',paddingLeft:5,backgroundColor: isColor == true ? '#444444' : "#FFFFFF" }}>
@@ -1630,6 +1672,59 @@ if (ProductChoise==null) {
       </TouchableHighlight>
     );
   };
+
+  loadParenUp = () => {
+    let selectedParen = this.state.SelectedGroupIndex-1
+    this._loadChildGroups(selectedParen)
+    this.setState({SelectedGroupIndex: selectedParen,refreshing:false});
+  } 
+  
+  handleScroll = (event) => {
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+    const offsetY = contentOffset.y;
+    const scrollHeight = contentSize.height;
+    const screenHeight = layoutMeasurement.height;
+    // this.setState({isEndReached:false});
+    // Kiểm tra điểm cuối của danh sách và xác định đã đến cuối danh sách
+    if (offsetY >= scrollHeight - screenHeight + 100 && !this.state.isEndReached) {
+      this.scrollToTop();
+      this.setState({isPostBack2:true, isEndReached: true});
+      setTimeout(() => {
+      let {parenLength} = this.state;
+      if(this.state.SelectedGroupIndex == parenLength){
+          this.setState({SelectedGroupIndex: 0,SelectedChildGroupIndex:0});
+          this._loadChildGroups(0)
+          this.setState({ isEndReached: false,isPostBack2:false});
+      }
+      else{
+          let selectedParen = this.state.SelectedGroupIndex+1
+          this.setState({SelectedGroupIndex: selectedParen, SelectedChildGroupIndex:0});
+          this._loadChildGroups(selectedParen)
+          this.setState({ isEndReached: false,isPostBack2:false});
+      }
+    }, 300);
+    } 
+  };
+
+  handleRefresh = () => {
+    // Xử lý khi người dùng thực hiện Refresh
+    let {parenLength} = this.state;
+    this.setState({refreshing:true});
+      if(this.state.SelectedGroupIndex == 0){
+        this._loadChildGroups(parenLength)
+        this.setState({SelectedGroupIndex: parenLength,SelectedChildGroupIndex:0,refreshing:false});
+      }
+      else{
+        this.loadParenUp();
+      }
+  }; 
+
+  scrollToTop = () => {
+    if (this.flatListRef.current) {
+      this.flatListRef.current.scrollToOffset({ offset: 0 });
+    }
+  };
+
   render() {
     if (!this.state.isPostBack) {
       return (
@@ -1697,9 +1792,20 @@ if (ProductChoise==null) {
                 
           </View>
           <View styles={{ height:'92%',width:'100%',flexDirection: "column"}} >
-              <FlatList   data={Products}  numColumns={ProductList.ColumnNum}
+          {this.state.isPostBack2 ?
+            <View style={{ position:'absolute', justifyContent: "center",alignItems:'center',flex:1, backgroundColor: "black", opacity: 0.3, zIndex:9999, height:'100%',top: 0, width:"100%" }}>
+              <ActivityIndicator size="large" color="#FFFFFF" onLayout={() => { this.setState({ isPostBack2: true });}}/>
+            </View>
+          :null}
+              <FlatList   
+                ref={this.flatListRef}
+                data={Products}  numColumns={ProductList.ColumnNum}
                 extraData={this.state.isRenderProduct==false}
                 renderItem={this.renderProduct}  style={{width:'100%'}}
+                onScroll={this.handleScroll}
+                refreshControl={
+                  <RefreshControl refreshing={this.state.refreshing} onRefresh={this.handleRefresh} />
+                }
                 contentContainerStyle={{paddingBottom: ProductList.height/ProductList.RowNum}}
               />
             </View>

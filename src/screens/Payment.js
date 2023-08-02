@@ -210,6 +210,7 @@ static getDerivedStateFromProps = (props, state) => {
             this.props.navigation.navigate("OrderView");
   };
   _HandleTip = async () => {
+    this._getMasterData();
     let { Ticket,Money,lockTable} = this.state;
     let totalTip = parseFloat(this.state.Money.TkTipAmount) + parseFloat(this.state.value)
     if (totalTip < 0 ){
@@ -217,6 +218,15 @@ static getDerivedStateFromProps = (props, state) => {
     }
     try{
     let a = Ticket;
+    if(Money.TkIsCash || Money.TkIsCancel){
+      console.log('đã');
+      Alert.alert(this.translate.Get("Thông báo"),'Bill: ' + Money.TkNo + ', Bàn: ' + Money.TbNo + this.translate.Get(" đã thanh toán hoặc hủy,  vui lòng liên hệ nhân viên!"), [
+        {
+          text: "OK", onPress: () => {this.onPressLogout();}
+        }
+      ]);
+      return;
+    }
     HandleTip( Ticket.TicketID, totalTip, Money.TkeIsInvoiceTip).then(res => {
       if (res.Status === 1){
         _storeData('APP@BACKEND_Payment', JSON.stringify(a), () => {
@@ -225,6 +235,7 @@ static getDerivedStateFromProps = (props, state) => {
       }
       else{
         Alert.alert(this.translate.Get('Thông báo'),this.translate.Get('Lỗi hệ thống !'))
+        return;
       }
     })}catch{((error) => {
       if(TypeError === 'Network request failed'){

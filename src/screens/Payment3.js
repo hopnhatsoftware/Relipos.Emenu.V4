@@ -370,6 +370,15 @@ export default class Payment3 extends Component {
     // Return null if the state hasn't changed
     return null;
   }
+  onPressLogout = () => {
+    _remove('APP@USER', () => {
+      _remove('APP@TABLE', () => {
+        _remove('APP@CART', () => {
+      this.props.navigation.navigate('LoginView') ;
+      })
+    })
+    });
+  }
   onPressNext = async () => {
     let {lockTable,Ticket } = this.state;
     await CancelOrder(Ticket.OrderId);
@@ -386,8 +395,18 @@ export default class Payment3 extends Component {
    */
   _AcceptPayment = async (Description,typeView) => {
     try{
-    let{Ticket,user,ModalCallStaff} = this.state;
+    this._getMasterData();
+    let{Ticket,user,ModalCallStaff,Money} = this.state;
     this.setState({ isPostBack: false});
+    if(Money.TkIsCash || Money.TkIsCancel){
+      console.log('đã');
+      Alert.alert(this.translate.Get("Thông báo"),'Bill: ' + Money.TkNo + ', Bàn: ' + Money.TbNo + this.translate.Get(" đã thanh toán hoặc hủy,  vui lòng liên hệ nhân viên!"), [
+        {
+          text: "OK", onPress: () => {this.onPressLogout()&&this.setState({ isPostBack: false});}
+        }
+      ]);
+      return;
+    }
     if(typeView == 1){
       API_Print (user.BranchId, Ticket.TicketID,typeView, Description).then(res => {
         this.setState({ isPostBack: true});
@@ -526,7 +545,7 @@ export default class Payment3 extends Component {
             <Text style={{fontSize:H2_FONT_SIZE, color:isColor==true?'#DAA520':'white',fontFamily: "RobotoBold",textAlign:'center'}}>{this.translate.Get("Gọi nhân viên")}</Text>
             </View>
             <View style={{height:'18%',width:'100%', justifyContent:'space-evenly',alignItems:'center',flexDirection:'row'}}>
-              <Text style={{fontSize:H3_FONT_SIZE, color:isColor==true?'#FFFFFF':'#000000'}}>{translate.Get("Keywords")}:</Text>
+              <Text style={{fontSize:H3_FONT_SIZE, color:isColor==true?'#FFFFFF':'#000000'}}>{this.translate.Get("Keywords")}:</Text>
                 <Text onPress={() => this.addNote(this.translate.Get("Gọi nhân viên"))}  style={{fontSize:H3_FONT_SIZE*0.9, color:isColor==true?'#FFFFFF':'#000000',textDecorationLine: 'underline',}}>{this.translate.Get("Gọi nhân viên")}</Text>
                 <Text onPress={() => this.addNote(this.translate.Get("Gọi thanh toán"))} style={{fontSize:H3_FONT_SIZE*0.9, color:isColor==true?'#FFFFFF':'#000000',textDecorationLine: 'underline',}}>{this.translate.Get('Gọi thanh toán')}</Text>
             </View>

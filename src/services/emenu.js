@@ -204,11 +204,11 @@ export const sendOrder = async (settings, table, OrdPlatform, details) => {
   const URL = '/OrderDetail/Post';
   //console.warn('Data', ParramOrders);
   //console.warn('URL', URL);
-  return await execFetch(URL, 'POST', ParramOrders);
+  return await execFetch2(URL, 'POST', ParramOrders);
 }catch(ex)
 {
   console.log("sendOrder Error"+ex);
-   
+
 }
 }
 

@@ -386,7 +386,7 @@ let ImageWidth=SCREEN_WIDTH*0.12
         </Modal>
           : null}
           <StatusBar hidden={true} />
-        <KeyboardAvoidingView  keyboardType='light' behavior= 'padding' contentContainerStyle={styles.formContainer}  >
+        <KeyboardAvoidingView  keyboardType='light' behavior={Platform.OS === 'ios' ? 'position' : 'height'} contentContainerStyle={styles.formContainer}  >
           <View style={[styles.BorderLogin,{backgroundColor:isColor == true ? '#252525':'#EEEEEE',borderColor: isColor == true ?'#FFA500' : '#166ead',}]}>
             <View style={styles.BorderFormLogin}>
             <View><Text style={{ color: isColor == true ?'#FEAD1D' : BACKGROUND_COLOR , textAlign: 'center', fontSize: H1FontSize, }}>{this.translate.Get('Đăng nhập hệ thống')}</Text></View> 
