@@ -388,9 +388,6 @@ export default class SetMenuView extends Component {
         TksdQuantity: OrddQuantity,
       });
       GroupQuantity = OrddQuantity;
-      console.log('----------------')
-      console.log('CategorySelectedIndex',CategorySelectedIndex)
-      console.log(ProductGroupList[CategorySelectedIndex+1])
       this._ChoiceCategorySelect(ProductGroupList[CategorySelectedIndex+1],true)
     } 
     // console.log('Detail product:'+ JSON.stringify(Detail));
@@ -509,7 +506,6 @@ export default class SetMenuView extends Component {
      //console.log('CartInfor :'+JSON.stringify(CartInfor)); 
       _storeData("APP@CART", JSON.stringify(CartInfor), () => 
       {  this.setState({ isShowMash:false });
-        
         this.props.navigation.navigate('OrderView');
       });
     } catch (ex) {

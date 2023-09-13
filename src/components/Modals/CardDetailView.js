@@ -88,7 +88,6 @@ export class CardDetailView extends React.Component {
     let{appState}= this.state;
     let{table}=this.props;
     if(appState == 'background'){
-      console.log(table.OrderId);
       await CancelOrder(table.OrderId);
     }
   }

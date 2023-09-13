@@ -172,7 +172,7 @@ export default class OrderView extends Component {
   };
   _getMasterData = async () => {
     let { table } = this.state;
-    table = await _retrieveData('APP@BACKEND_Payment', JSON.stringify({}))
+    table = await _retrieveData('APP@TABLE', JSON.stringify({}))
     table=JSON.parse(table);
     this.setState({table})
   }
@@ -529,7 +529,6 @@ onCallServices= async() => {
           }
         }
         table.Ticket = Ticket;
-        console.log(table.Ticket.TkIsCash,table.Ticket.TkIsCancel);
         if(table.Ticket.TkIsCash || table.Ticket.TkIsCancel){
           this.CartToggleHandle(true);
           setTimeout(() => {
@@ -682,7 +681,6 @@ else{
       return;
     this.setState({ isShowMash: true }); 
     await sendOrder(Config, table, OrdPlatform, CartInfor.items).then(async res => {
-      console.log(res);
       if (res.Status == 1) {
         
         await _remove("APP@CART", async () => {
@@ -1563,7 +1561,7 @@ if (ProductChoise==null) {
                 </Text>
               </View>
               <View name='pnProductName' style={{width: '100%',paddingTop:2,height:'50%' }}>
-                <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H4FontSize,}} numberOfLines={5}>
+                <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H4FontSize,}} numberOfLines={3}>
                   {item.PrdNameUi}
                 </Text>
               </View>
@@ -1571,7 +1569,7 @@ if (ProductChoise==null) {
               :
               <View style={{ flexDirection: "column", flexWrap: "wrap", width: "100%",justifyContent:'space-between',paddingVertical: 5,height:'50%'}}>
             <View name='pnProductName' style={{width: '100%',marginTop:5}}>
-              <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H3FontSize,fontWeight:'bold',flexWrap:"wrap"}} numberOfLines={5}>
+              <Text style={{color: isColor == true ? '#FFFFFF' : "#000000",marginLeft:2,marginRight:2,textAlign:'left',fontSize:H3FontSize,fontWeight:'bold',flexWrap:"wrap"}} numberOfLines={3}>
                 {item.PrdNameUi}
               </Text>
               
@@ -1588,14 +1586,14 @@ if (ProductChoise==null) {
                 </ScrollView>
                 :
                 <View style={{ flexDirection: "row", width: "100%",}}  >
-                  <View style={{width: "50%",height:'100%',justifyContent: 'center'}}>
+                  <View style={{width: "65%",height:'100%',justifyContent: 'center'}}>
                   <Text style={{fontStyle:'italic',color:isColor == true ?'#FFFFFF' : "#af3037",fontFamily:'RobotoBold',marginLeft:5,textAlign:'left',fontSize: H4FontSize*0.9,textAlign:'left'}}>
              {formatCurrency(Config.B_ViewUnitPriceBefor ? item.UnitPrice: item.UnitPriceAfter, "")}/{item.UnitName} 
                 </Text>
                   </View>
                   {item.OrddQuantity> 0 ?
                     <TouchableOpacity
-                    style={{width:'15%',height:'100%', alignItems:'center',justifyContent: 'center' }}
+                    style={{width:'10%',height:'100%', alignItems:'center',justifyContent: 'center' }}
                     onPress={() => { 
                 if (item.PrdIsSetMenu == true&&item.PrdViewSetMenuType && item.PrdViewSetMenuType == 1){
                       this.setState({ showSetInCart: true,SetItemsFilter:CartFilter.items, CartItemSelected: CartFilter.FirstItem, CartProductIndex :CartFilter.FirstIndex})
@@ -1612,10 +1610,10 @@ if (ProductChoise==null) {
                       <Image resizeMode='contain' source={require('../../assets/icons/IconDelete.png')} style={{ width: H2FontSize, height: H2FontSize,}} />
                       }
                     </TouchableOpacity> :
-                    <View style={{  width:'15%', height: '100%', justifyContent: 'center', alignItems: 'center', }}>
+                    <View style={{  width:'10%', height: '100%', justifyContent: 'center', alignItems: 'center', }}>
                     </View>
                   }
-                  <View style={{ width:'20%', justifyContent: 'center' }}>
+                  <View style={{ width:'15%', justifyContent: 'center' }}>
                  {(item.OrddQuantity>0)?
                       <TextInput ref={input => this.textInput = input}
                         style={{  color:isColor == true ?'#FFFFFF' :  "#af3037",width: '100%',fontSize:H2FontSize*0.8,textAlign:"center",fontFamily: "RobotoBold", }}
@@ -1650,7 +1648,7 @@ if (ProductChoise==null) {
                   <View style={{width:'15%',height:'100%',alignItems:'flex-start',justifyContent: 'flex-start' }}>
                   </View>
                   : 
-                  <TouchableOpacity style={{width:'15%',height:'100%',alignItems:'center',justifyContent: 'center' }} onPress={() => {
+                  <TouchableOpacity style={{width:'10%',height:'100%',alignItems:'center',justifyContent: 'center' }} onPress={() => {
                      if (item.PrdIsSetMenu == true ) 
                      this.PrerenderProductModal(item,CartFilter,index);
                      else{
@@ -1968,12 +1966,12 @@ if (ProductChoise==null) {
     </View>
       :null}
        {(this.state.isShowFullImage==true&& this.state.ImageUrl!='')?
-            <View style={{ backgroundColor: "rgba(98,98,98,0.6)", position: "absolute", top: 0, left: 0, width: SCREEN_WIDTH, justifyContent: 'center', alignItems: 'center', height: SCREEN_HEIGHT }}>
+            <View style={{ backgroundColor: "rgba(98,98,98,0.6)",position: "absolute", width: '100%', height: '100%' }}>
              <TouchableOpacity style={{}} onPress={() =>  this._ShowFullImage(null,false)}>
             <ImageBackground resizeMode="contain"
               source={{ uri:this.state.endpoint + "/Resources/Images/Product/" + this.state.ImageUrl}
               }
-              style={[{ width: SCREEN_WIDTH, height: SCREEN_HEIGHT, backgroundColor: colors.grey1 }]} >
+              style={[{ width: '100%', height: '100%', backgroundColor: colors.grey1 }]} >
 
               </ImageBackground>
               </TouchableOpacity>
