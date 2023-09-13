@@ -579,7 +579,7 @@ export default class SetMenuView extends Component {
         <View style={{ width: '90%', flexDirection: "row", justifyContent: 'center', alignItems: 'center', }}>
           <View style={{ flexDirection: "row",  justifyContent: "flex-start", alignContent: 'flex-start', alignItems: 'flex-start', width: '53%', }}>
             <Text style={[{ color:isColor == true ? "#FFFFFF" : "#000000", width: '100%', fontSize: H4FontSize, textAlign: 'left', }]} numberOfLines={5}>
-            {item.PrdName}
+            {item.PrdNameUi}
             </Text>  
           </View>
           <View style={{ flexDirection: "row", justifyContent: "center", alignContent: 'center', alignItems: 'center', width: '35%', paddingRight: 5, }}>
@@ -624,7 +624,7 @@ export default class SetMenuView extends Component {
           <TouchableOpacity style={{}} onPress={() =>  this._ShowFullImage(item,true)}>
             <ImageBackground resizeMode="contain"
               source={item.PrdImageUrl ? {  uri:this.state.endpoint + "/Resources/Images/Product/" +  item.PrdImageUrl 
-                } : require("../../assets/icons/ReliposEmenu_4x.png")
+                } :  require("../../assets/images/NoImage_trans-04.png")
               }
               style={[{ width: '100%', height: '100%', backgroundColor: colors.grey1 }]} >
               {item.SttId && item.SttId == 3 ?
@@ -663,14 +663,14 @@ export default class SetMenuView extends Component {
               </View> 
               <View style={{  width: '100%',paddingTop:5 }}>
                 <Text style={{  color:isColor == true ? "#FFFFFF" : "#0d65cd",width: '99%',fontSize: H4FontSize,textAlign:'left', alignContent:'center', flexWrap: "wrap" }} numberOfLines={15}>
-                  {item.PrdName}
+                  {item.PrdNameUi}
                 </Text>    
               </View> 
                </View>
               :
               <View style={{  width: '99%',textAlign:'left',paddingTop:10 }}>
                 <Text style={{color:isColor == true ? "#FFFFFF" : "#000000", marginLeft:2,marginRight:2,fontSize: H4FontSize*1.1,textAlign: 'left', flexWrap: "wrap" ,fontWeight:'bold'}} numberOfLines={15}>
-                  {item.PrdName}
+                  {item.PrdNameUi}
                 </Text>    
               </View> 
             }
