@@ -193,5 +193,7 @@ export default en={
     "Send":"Gửi yêu cầu",
     "Keywords":"Từ khoá",
     "Hot":"Đặc biệt",
-    "New":"Mới"
+    "New":"Mới",
+    'Tên hàng': 'Tên hàng',
+    'ĐVT': 'ĐVT',
 }

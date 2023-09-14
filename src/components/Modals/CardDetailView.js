@@ -483,7 +483,7 @@ export class CardDetailView extends React.Component {
       );
     }
     const titleProductsOrdered = [
-      {Name: 'Stt',widthTitle:Bordy.width * 0.75*0.06},
+      {Name: translate.Get("STT"),widthTitle:Bordy.width * 0.75*0.06},
       {Name: translate.Get("Tên hàng"),widthTitle:Bordy.width * 0.75*0.42},
       {Name: translate.Get("ĐVT"),widthTitle:Bordy.width * 0.75*0.1},
       {Name: translate.Get("SL"),widthTitle:Bordy.width * 0.75*0.1},
@@ -494,7 +494,7 @@ export class CardDetailView extends React.Component {
       {Name: translate.Get("Tổng tiền"),widthTitle:Bordy.width * 0.75*0.18},
     ]
     const titleHitory = [
-      {Name: 'Stt',widthTitle:Bordy.width * 0.75*0.06},
+      {Name: translate.Get("STT"),widthTitle:Bordy.width * 0.75*0.06},
       {Name: translate.Get("Tên hàng"),widthTitle:Bordy.width * 0.75*0.42},
       {Name: translate.Get("ĐVT"),widthTitle:Bordy.width * 0.75*0.1},
       {Name: translate.Get("SL"),widthTitle:Bordy.width * 0.75*0.1},

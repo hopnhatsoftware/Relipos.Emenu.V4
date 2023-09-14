@@ -22,7 +22,7 @@ const commonConfig = {
       "**/*"
     ],
     "ios": {
-      "buildNumber": "1",
+      "buildNumber": "3",
       "infoPlist": {
         "supportsTablet": true,
         "NSLocationAlwaysUsageDescription": "needs gps data.",

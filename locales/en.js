@@ -167,7 +167,6 @@ export default en = {
     'Hủy': 'Cancel',
     'người': 'person',
     'Không được quá số lượng của 1 set!': 'Do not exceed the number of 1 set!',
-    'STT': 'No',
     'Đặt': 'Order',
     'Giá': 'Price',
     'Số lượng': 'Quantity',
@@ -226,5 +225,8 @@ export default en = {
     "Send":"Send",
     "Keywords":"Keywords",
     "Hot":"HOT",
-    "NEW":"New"
+    "NEW":"New",
+    'STT': 'No.',
+    'Tên hàng': 'Item Name',
+    'ĐVT': 'UOM',
 }
