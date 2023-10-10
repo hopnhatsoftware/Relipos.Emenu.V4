@@ -14,6 +14,15 @@ import translate from '../services/translate';
 import colors from "../config/colors";
 import { setCustomText } from 'react-native-global-props';
 import Question from '../components/Question';
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SCREEN_HEIGHT = Dimensions.get('window').height;
 // const Bordy={width:SCREEN_WIDTH > SCREEN_HEIGHT ? SCREEN_WIDTH : SCREEN_HEIGHT,height:SCREEN_HEIGHT < SCREEN_WIDTH ? SCREEN_HEIGHT : SCREEN_WIDTH};
@@ -152,8 +161,55 @@ export default class LoginView extends Component {
     }
     setCustomText(customTextProps)
   }
+  getToken = async () => {
+    try {
+      let token = await _retrieveData('token');
+      if (Device.isDevice) {
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        // only ask if permissions have not already been determined, because
+        // iOS won't necessarily prompt the user a second time.
+        if (existingStatus !== 'granted') {
+          // Android remote notification permissions are granted during the app
+          // install, so this will only ask on iOS
+          const { status } = await Notifications.requestPermissionsAsync();
+          finalStatus = status;
+        }
+        // Stop here if the user did not grant permissions
+        if (finalStatus !== 'granted') {
+          if (token == undefined) {
+            token = encodeURI('AppToken[' + md5.b64_md5(Date.now()) + ']');
+            _storeData('token', token, null);
+          }
+          return token;
+        }
+        // Get the token that uniquely identifies this device
+        token = (await Notifications.getExpoPushTokenAsync({
+          projectId: '51ced16b-2562-41bf-8cfd-e4c8c12e1dce'})).data;
+        _storeData('token', JSON.stringify(token), () => { });
+        return encodeURI(token);
+      }
+      else if (!Device.isDevice) {
+        if (token == undefined) {
+          token = encodeURI('AppToken[' + md5.b64_md5(Date.now()) + ']');
+          _storeData('token', JSON.stringify(token), () => { });
+        }
+        return token;
+      }
+    } catch (error) {
+      // Error saving data
+      Alert.alert(
+        'Thông báo',
+        'getToken error',
+        [
+          { text: 'OK', onPress: () => { } }
+        ]
+      )
+    }
+  }
   _LoginSucess = async (user,Config,JwtToken) => { 
   let { password, settings ,OrderId} = this.state;
+  let token = await this.getToken();
   user.PassWord = password;
   user.BranchId = Config.I_BranchId;
   _storeData('APP@USER', JSON.stringify(user), () => {

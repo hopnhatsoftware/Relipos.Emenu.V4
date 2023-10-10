@@ -7,7 +7,7 @@ import { FlatList } from "react-native";
 import { Icon } from "react-native-elements";
 import { setCustomText } from 'react-native-global-props';
 import {  _Header, _ChoiceCategory } from '../components';
-import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE, H1FontSize, H2FontSize, H3FontSize, H4FontSize } from "../config/constants";
+import { ENDPOINT_URL, BUTTON_FONT_SIZE, ITEM_FONT_SIZE,H1_FONT_SIZE, H1FontSize, H2FontSize, H3FontSize, H4FontSize, H4_FONT_SIZE } from "../config/constants";
 import translate from "../services/translate";
 import { SetMenu_getChoiceCategory, getByChoiceId, SetMenu_gettemDefault, } from "../services";
 import { formatCurrency } from "../services/util";
@@ -381,6 +381,7 @@ export default class SetMenuView extends Component {
         PrdId: item.PrdId,
         PrdNo: item.PrdNo,
         PrdName: item.PrdName,
+        PrdNameUi: item.PrdNameUi,
         TksdUnitId: item.UnitId,
         chsId: ('chsId' in item) ? item.chsId : null,
         TksdPrice: ('TksdPrice' in item) ? item.TksdPrice : 0,
@@ -579,7 +580,7 @@ export default class SetMenuView extends Component {
         <View style={{ width: '90%', flexDirection: "row", justifyContent: 'center', alignItems: 'center', }}>
           <View style={{ flexDirection: "row",  justifyContent: "flex-start", alignContent: 'flex-start', alignItems: 'flex-start', width: '53%', }}>
             <Text style={[{ color:isColor == true ? "#FFFFFF" : "#000000", width: '100%', fontSize: H4FontSize, textAlign: 'left', }]} numberOfLines={5}>
-            {item.PrdNameUi}
+            {item.PrdNameUi ? item.PrdNameUi : item.PrdName}
             </Text>  
           </View>
           <View style={{ flexDirection: "row", justifyContent: "center", alignContent: 'center', alignItems: 'center', width: '35%', paddingRight: 5, }}>
@@ -627,24 +628,39 @@ export default class SetMenuView extends Component {
                 } :  require("../../assets/images/NoImage_trans-04.png")
               }
               style={[{ width: '100%', height: '100%', backgroundColor: colors.grey1 }]} >
-              {item.SttId && item.SttId == 3 ?
-                <View style={{
-                  position: "absolute", paddingTop: H1FontSize, right: 0,
-                  paddingRight: Platform.OS === "android" ? 13 : 26, width: '20%'
-                }}>
-                  <Image resizeMode="stretch" source={require('../../assets/icons/v2/icon_like.png')}
-                    style={{ width: H1FontSize, height: H1FontSize, }} />
-                </View>
-                : null}
-              {item.SttId && item.SttId == 2 ?
-                <View style={{
-                  position: "absolute", paddingTop: H1FontSize, right: 0,
-                  paddingRight: Platform.OS === "android" ? 13 : 26, width: '20%'
-                }}>
-                  <Image resizeMode="stretch" source={require('../../assets/icons/v2/icon_new.png')}
-                    style={{ width: H1FontSize, height: H1FontSize, }} />
-                </View>
-                : null}
+                {item.isSoldout ?
+            <View style={{position:'absolute',width: "100%", height: '100%',zIndex:9,justifyContent:'center' }}>
+              <View style={{ position:'absolute',width: "100%", height: '100%',zIndex:99,backgroundColor:'black',opacity: 0.5,}}></View>
+              <View style={{transform: [{rotate: '-30deg'}],alignItems:'center',zIndex:100}}>
+                <Text style={{fontSize: H1FontSize, color:'#FF0000',fontFamily: "RobotoBold",}}>{this.translate.Get("Hết hàng")}</Text>
+              </View>
+            </View>
+            : null}
+                {item.ResName == 'HOT' ? 
+                  <View style={{ position: "absolute", paddingTop:0,right:5,height: H1_FONT_SIZE*1.6, width: H1_FONT_SIZE*3.8}}>
+                    <View style={{position: "absolute",zIndex:1000,width: H1_FONT_SIZE*3.8, height: H1_FONT_SIZE*1.4, justifyContent:'center',alignItems:'center'}}>
+                    <Text style={{fontSize:H4_FONT_SIZE,color:'#FFFFFF',fontFamily:"RobotoBold"}}>{this.translate.Get("Hot")}</Text>
+                    </View>
+                    <Image resizeMode="contain" source={require('../../assets/icons/IconHot-09.png')}
+                      style={{ width: H1_FONT_SIZE*3.8, height: H1_FONT_SIZE*1.6,}} />
+                  </View>
+                : item.ResName == 'NEW' ?
+                  <View style={{ position: "absolute", paddingTop:0,right:5,height: H1_FONT_SIZE*1.6, width: H1_FONT_SIZE*3.8}}>
+                    <View style={{position: "absolute",zIndex:1000,width: H1_FONT_SIZE*3.8, height: H1_FONT_SIZE*1.4, justifyContent:'center',alignItems:'center'}}>
+                    <Text style={{fontSize:H4_FONT_SIZE,color:'#FFFFFF',fontFamily:"RobotoBold"}}>{this.translate.Get("New")}</Text>
+                    </View>
+                    <Image resizeMode="contain" source={require('../../assets/icons/IconNew-09.png')}
+                      style={{ width: H1_FONT_SIZE*3.8, height: H1_FONT_SIZE*1.6,}}/>
+                  </View>
+                  : item.ResName == 'SALE' ?
+                  <View style={{  position: "absolute", paddingTop: 0, right: 5}}>
+                    <View style={{position: "absolute",zIndex:1000,width: H1_FONT_SIZE*4.2, height: H1_FONT_SIZE*1.3,justifyContent:'center',alignItems:'center',paddingHorizontal:5}}>
+                    <Text style={{fontSize:H4_FONT_SIZE,color:'#FFFFFF'}}>{item.ResName}</Text>
+                    </View>
+                    <Image resizeMode="contain" source={require('../../assets/icons/IconSale.png')}
+                      style={{width: H1_FONT_SIZE*4.2, height: H1_FONT_SIZE*1.6, }}/>
+                  </View>
+                  : null} 
               <View style={{ position: "absolute", paddingTop: SCREEN_HEIGHT * 0.136 - ITEM_FONT_SIZE, right: -15 }}>
                 <Icon  name="caretleft"  type="antdesign"  iconStyle={{ justifyContent: "space-between", color: "#FFFFFF", fontSize: 36 }} />
               </View>
@@ -663,14 +679,14 @@ export default class SetMenuView extends Component {
               </View> 
               <View style={{  width: '100%',paddingTop:5 }}>
                 <Text style={{  color:isColor == true ? "#FFFFFF" : "#0d65cd",width: '99%',fontSize: H4FontSize,textAlign:'left', alignContent:'center', flexWrap: "wrap" }} numberOfLines={15}>
-                  {item.PrdNameUi}
+                  {item.PrdNameUi ? item.PrdNameUi : item.PrdName}
                 </Text>    
               </View> 
                </View>
               :
               <View style={{  width: '99%',textAlign:'left',paddingTop:10 }}>
                 <Text style={{color:isColor == true ? "#FFFFFF" : "#000000", marginLeft:2,marginRight:2,fontSize: H4FontSize*1.1,textAlign: 'left', flexWrap: "wrap" ,fontWeight:'bold'}} numberOfLines={15}>
-                  {item.PrdNameUi}
+                  {item.PrdNameUi ? item.PrdNameUi : item.PrdName}
                 </Text>    
               </View> 
             }
@@ -692,15 +708,25 @@ export default class SetMenuView extends Component {
                   : null
                   }
                   </View>
+                  {item.isSoldout ?
+                  <View style={{width:'60%',height:'100%',justifyContent: 'center' }}>
+                  </View>
+                  :
                 <View style={{ width:'60%', justifyContent: 'center', height: H2FontSize*1.2, }}>
                   <Text style={{ color:isColor == true ? "#FFFFFF" : "#af3037", width: '100%', fontSize: H2FontSize*0.8 , textAlign: "center" }} >
                     {this._showQty(item)} 
                   </Text>
                 </View> 
+                  }
+                {item.isSoldout ?
+                  <View style={{width:'20%',height:'100%',alignItems:'flex-start',justifyContent: 'flex-start' }}>
+                  </View>
+                  : 
                 <TouchableOpacity style={{width: '20%',justifyContent: 'center',}} onPress={() => this._HandleQuantityDetail(item, 1, false)}>
                   <Image resizeMode="stretch" source={require('../../assets/icons/IconAdd.png')}
                     style={{ width: H2FontSize, height: H2FontSize }} />
                 </TouchableOpacity>
+                }
               </View>
             </View>
           </View>

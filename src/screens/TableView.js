@@ -233,15 +233,40 @@ export default class TableView extends Component {
       try{
       this.setState({ isLoading: true });
       CheckAndGetOrder(item, OrdPlatform).then((res) => {
-        item.OrderId = res.Data;
-        item.AreaID = AreasList[selectedAreaIndex].AreID;
-        this.setState({ isLoading: false });
-        _storeData('APP@TABLE', JSON.stringify(item),
-          () => {
-            _remove('APP@CART', () => {
-            this.props.navigation.navigate("OrderView", { settings, user, table: item ,AreasList, selectedAreaIndex,sItemTable,CustomerList});
-              })
+        if(res.Status == 1){
+          item.OrderId = res.Data;
+          item.AreaID = AreasList[selectedAreaIndex].AreID;
+          this.setState({ isLoading: false });
+          _storeData('APP@TABLE', JSON.stringify(item),
+            () => {
+              _remove('APP@CART', () => {
+              this.props.navigation.navigate("OrderView", { settings, user, table: item ,AreasList, selectedAreaIndex,sItemTable,CustomerList});
+                })
+            });
+        }
+        else{
+          CheckAndGetOrder2(item, OrdPlatform).then((res) => {
+            if(res.Status == 1){
+              item.OrderId = res.Data;
+              item.AreaID = AreasList[selectedAreaIndex].AreID;
+              this.setState({ isLoading: false });
+              _storeData('APP@TABLE', JSON.stringify(item),
+                () => {
+                  _remove('APP@CART', () => {
+                  this.props.navigation.navigate("OrderView", { settings, user, table: item ,AreasList, selectedAreaIndex,sItemTable,CustomerList});
+                    })
+                });
+            }
+            else{
+                  Alert.alert(this.translate.Get("Thông báo"), this.translate.Get("CheckAndGetOrder failed"), [
+                    {
+                      text: "OK", onPress: () => { }
+                    }
+                  ]);
+            }
           });
+        }
+        
       })}
       catch{((error) => {
         Question.alert( 'System Error',error, [

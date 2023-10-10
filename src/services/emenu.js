@@ -38,9 +38,25 @@ export const CancelOrder = async (OrderId) => {
    return await execFetch(URL, 'GET', { OrderId:OrderId });
 }
 export const CheckAndGetOrder = async (item, OrdPlatform) => { //////////////////////// dư tham số: OrdPlatform
+  try{
+  const culture = await _retrieveData('culture', 1);
+  let token = await _retrieveData('token');
+  const URL = '/OrderView/CheckAndGetOrder';
+  return await execFetch(URL, 'GET', { TicketId: item.TicketID, Platform: OrdPlatform, Culture: culture,TockenId: token });
+  }
+  catch(e){
+    console.log(e)
+  }
+}
+export const CheckAndGetOrder2 = async (item, OrdPlatform) => { //////////////////////// dư tham số: OrdPlatform
+  try{
   const culture = await _retrieveData('culture', 1);
   const URL = '/Emenu/CheckAndGetOrder';
   return await execFetch(URL, 'GET', { TicketId: item.TicketID, Culture: culture, OrdPlatform: OrdPlatform });
+  }
+  catch(e){
+    console.log(e)
+  }
 }
 
 export const GetViewGroup = async (Config, item) => {

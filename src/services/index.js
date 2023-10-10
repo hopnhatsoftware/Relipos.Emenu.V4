@@ -8,5 +8,5 @@ export {ListArea,ListTables, CheckAndGetOrder,
     CallServices,getMasterData,getPaymentAmount,getLinkQrBank,ApplyVoucher,ApplyVipCard,
     CheckCasherIn, HandleTip,getQrCode,FlushInvoiceInfor,SearchTaxInfor,
     Object_Search, Ticket_getById, Ticket_Flush,getVipCardInfor,getinvoiceInfor,getLanguage,API_Print,
-    CheckProductManyPrice,getFromTicketInfor,getTicketInforOnTable,UpdateStatus_TicketDetail,UpdateNote_TicketDetail
+    CheckProductManyPrice,getFromTicketInfor,getTicketInforOnTable,UpdateStatus_TicketDetail,UpdateNote_TicketDetail,CheckAndGetOrder2
     } from './emenu';

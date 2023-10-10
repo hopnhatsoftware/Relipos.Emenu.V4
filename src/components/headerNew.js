@@ -46,19 +46,8 @@ export class _HeaderNew extends React.Component  {
     this.setState({ modalLanguage: visible });
   }
   componentWillUnmount = async () => {
-    this.appStateSubscription.remove();
   };
   componentDidMount= async () => {
-    this.appStateSubscription = AppState.addEventListener(
-      'change',
-      nextAppState => {
-        if ( this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-          console.log('App has come to the foreground!');
-        }
-        this.setState({appState: nextAppState});
-        this._CancelOrder();
-      },
-    );
     let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
     isColor = JSON.parse(isColor);
     let settings = await _retrieveData('settings', JSON.stringify({}));
@@ -71,13 +60,6 @@ export class _HeaderNew extends React.Component  {
   Config = JSON.parse(Config);
     this.setState({IsLoaded:true ,isColor,settings,Config});
   };
-  _CancelOrder = async() => {
-    let{appState}= this.state;
-    let{table}=this.props;
-    if(appState == 'background'){
-      await CancelOrder(table.OrderId);
-    }
-  }
   _handleChangeButton = async () => {
     try{
       let{ticketId,table,Ticket}=this.props;

@@ -63,34 +63,13 @@ export class CardDetailView extends React.Component {
     }
   }
   componentWillUnmount = async () => {
-    this.appStateSubscription.remove();
   };
   componentDidMount= async () => {
-
-    this.appStateSubscription = AppState.addEventListener(
-      'change',
-      nextAppState => {
-        if ( this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-          console.log('App has come to the foreground!');
-          this._CancelOrder();
-        }
-        this.setState({appState: nextAppState});
-        this._CancelOrder();
-      },
-    );
     let isColor = await _retrieveData('APP@Interface', JSON.stringify({}));
     isColor = JSON.parse(isColor);
-
     this.setState({IsLoaded:true ,KeyCode:'',isColor});
     
   };
-  _CancelOrder = async() => {
-    let{appState}= this.state;
-    let{table}=this.props;
-    if(appState == 'background'){
-      await CancelOrder(table.OrderId);
-    }
-  }
   //danh sách yêu cầu thêm
   _loadExtraRequest = async (item) =>{
     try{
@@ -264,6 +243,7 @@ export class CardDetailView extends React.Component {
   }
   // Đã Order
   renderOrdered= ({ item, RowIndex }) => {
+    console.log(item);
     const { BookingsStyle,translate} = this.props;
     const {isColor} = this.state;
     if (item.TkdQuantity <= 0&&item.TksdQuantity<=0)
@@ -271,7 +251,7 @@ export class CardDetailView extends React.Component {
       return (
         <View style={{width:'100%', flexDirection:'row',backgroundColor: isColor == true ? '#333333' :'#EEEEEE',}}>
                   <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.06,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.STT}</Text>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.TkdSetType != 2 ? item.STT : ''}</Text>
                   </View>
                   <View style={{ justifyContent:'center',alignItems:'left',width:Bordy.width * 0.75*0.42,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:5}}>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :'black',}}>{item.PrdNameUi ? item.PrdNameUi : item.PrdName}</Text>
@@ -666,7 +646,7 @@ export class CardDetailView extends React.Component {
             <TouchableOpacity style={{justifyContent:'center', borderRadius: 20, backgroundColor: state.isHavingOrder == 1?  '#dc7d46': colors.grey3,width: '32%',height:'90%'
             }}
             onPress={() => {
-                setState({ isHavingOrder: 1,iLoadNumber:state.iLoadNumber+1 });
+                setState({ isHavingOrder: 1, });
             }} >
              <Text style={{ fontSize: H2FontSize,  color:"white",  textAlign: "center" }}>
                 {translate.Get("Đang order")}
@@ -676,7 +656,7 @@ export class CardDetailView extends React.Component {
             }}
             onPress={() => {
               _getTicketInforOnTable();
-              setState({isHavingOrder:2, iLoadNumber:state.iLoadNumber+1 });
+              setState({isHavingOrder:2, });
             }} >
              <Text style={{ fontSize: H2FontSize,  color: "white",  textAlign: "center" }}>
                 {translate.Get("Đã order")}
@@ -686,7 +666,7 @@ export class CardDetailView extends React.Component {
             }}
             onPress={() => {
                 _getTicketInforOnTable();
-                setState({isHavingOrder:3,iLoadNumber:state.iLoadNumber+1 });
+                setState({isHavingOrder:3,});
             }} >
              <Text style={{ fontSize: H2FontSize,  color:"white",  textAlign: "center" }}>
                 {translate.Get("Lịch sử gọi món")}
@@ -719,7 +699,7 @@ export class CardDetailView extends React.Component {
                 renderItem={({ item, index })=>
                 <View style={{width:'100%', flexDirection:'row',backgroundColor:isColor == true ? '#333333' :'#EEEEEE',}}>
                   <View style={{ justifyContent:'center',alignItems:'center',width:Bordy.width * 0.75*0.06,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',}}>
-                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',}}>{item.STT}</Text>
+                    <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',}}>{item.TkdSetType != 2 ? item.STT : ''}</Text>
                   </View>
                   <View style={{  justifyContent:'center',alignItems:'left',width:Bordy.width * 0.75*0.42,borderBottomWidth:0.5,borderRightWidth:0.5,borderColor:isColor == true ? '#FFFFFF' :'black',paddingHorizontal:5, paddingVertical:7}}>
                     <Text style={{fontSize:H3_FONT_SIZE,color:isColor == true ? '#FFFFFF' :item.TkdStatus == 3 ? '#AA0000':'black',}}>{item.PrdNameUi ? item.PrdNameUi : item.PrdName}</Text>
@@ -774,7 +754,6 @@ export class CardDetailView extends React.Component {
                 <FlatList
               keyExtractor={(item, RowIndex) => RowIndex.toString()}
               data={state.CartInfor.items}
-              extraData={state.iLoadNumber}
               renderItem={this.renderOrder }
             /> 
               </View>
@@ -840,7 +819,6 @@ export class CardDetailView extends React.Component {
           (
             <ScrollView horizontal={true}>
             <View style={{flexDirection:'column',height:'100%',width:Bordy.width * 0.75*1.76 }}>
-              
               <View style={{flexDirection:'column',height:'100%',width:Bordy.width * 0.75*1.76 }}>
               <View style={{flexDirection:'row',height:'4%',width:Bordy.width * 0.75*1.76 }}>
               <FlatList
@@ -856,17 +834,13 @@ export class CardDetailView extends React.Component {
               </View>
               <View style={{flexDirection:'row',height:'90%',width:Bordy.width * 0.75*1.76}}>
               <FlatList
-              keyExtractor={(item, RowIndex) => RowIndex.toString()}
               data={ProductsOrdered}
-              extraData={state.iLoadNumber}
               refreshing={this.props.refreshing}
               onRefresh={_getTicketInforOnTable}
               renderItem={this.renderOrdered } 
             /> 
               </View>
               </View>
-              
-              
               <View  style={{bottom:0,position:'absolute',height:'6%',width: '100%',borderTopColor: isColor == true ? '#222222' :colors.grey5,
                borderTopWidth: 1,backgroundColor:isColor == true ? '#222222' : colors.grey5,
              }}>
