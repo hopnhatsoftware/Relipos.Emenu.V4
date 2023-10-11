@@ -56,6 +56,7 @@ export default class LoginView extends Component {
       LgIco:'',
       modalVisible : false,
       settings: {},
+      notification: false,
       firstTouch: '',
       lockTable: false,
       isWorking: false,
@@ -112,7 +113,7 @@ export default class LoginView extends Component {
 
     let endpoint =await _retrieveData( "APP@BACKEND_ENDPOINT",  JSON.stringify(ENDPOINT_URL));
     endpoint=JSON.parse(endpoint);
- 
+
     StatusBar.setHidden(true);
     this.defaultFonts();
     this.setState({ fontLoaded: true,endpoint, username, language: language, settings,isColor });
@@ -538,6 +539,7 @@ let ImageWidth=SCREEN_WIDTH*0.12
                 <View style={{ flexDirection: "row", alignContent: "center", paddingTop: ITEM_FONT_SIZE / 2, paddingBottom: ITEM_FONT_SIZE / 2, }}>
                 {this.has_back_button ?
                 <View style={{ paddingRight: ITEM_FONT_SIZE / 3 }}>
+                  {!this.state.notification ?
                   <Button
                     con={{name:"input", color:"white"}}
                     buttonStyle={[styles.button,{backgroundColor:isColor == true? '#DAA520': '#0176cd'}]}
@@ -549,8 +551,8 @@ let ImageWidth=SCREEN_WIDTH*0.12
                     }}
                     titleStyle={[styles.buttonText,{color:isColor == true? 'black':'white'}]}
                     disabled={isLoading}
-                  /></View> 
-                   : null}
+                  />
+                  :null}</View> :null}
                   <View style={{}}><Button buttonStyle={[styles.button,{backgroundColor:isColor == true? '#DAA520': '#0176cd'}]}  title={this.translate.Get(this.login_button_text)}
                     onPress={() => {
                       Keyboard.dismiss();

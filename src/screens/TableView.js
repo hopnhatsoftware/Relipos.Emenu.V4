@@ -4,7 +4,7 @@ import {TouchableOpacity,  Dimensions,  ActivityIndicator, UIManager, TextInput,
 import Constants from 'expo-constants';
 import { _retrieveData, _storeData, _remove, _clearData } from '../services/storages';
 import { cacheFonts } from "../helpers/AssetsCaching";
-import { ListArea, ListTables, CheckAndGetOrder, Object_Search, Ticket_getById, Ticket_Flush } from '../services';
+import { ListArea, ListTables, CheckAndGetOrder,CheckAndGetOrder2, Object_Search, Ticket_getById, Ticket_Flush } from '../services';
 import translate from '../services/translate';
 import { Icon } from 'react-native-elements';
 import { getTableColor } from '../services/util';
